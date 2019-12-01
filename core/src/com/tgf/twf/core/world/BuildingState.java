@@ -1,17 +1,15 @@
 package com.tgf.twf.core.world;
 
-import com.tgf.twf.core.ecs.Component;
-import com.tgf.twf.core.ecs.Entity;
+import lombok.Getter;
 
 import java.time.Duration;
 
-public class BuildingComponent extends Component {
+public class BuildingState {
+    @Getter
     private final BuildingType buildingType;
     private Duration buildingDurationRemaining;
 
-    public BuildingComponent(final Entity entity,
-                             final BuildingType buildingType) {
-        super(entity);
+    public BuildingState(final BuildingType buildingType) {
         this.buildingType = buildingType;
         this.buildingDurationRemaining = buildingType.getBuildTime();
     }

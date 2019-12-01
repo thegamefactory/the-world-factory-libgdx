@@ -1,22 +1,26 @@
 package com.tgf.twf.core.ecs;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 /**
  * An entity which is essentially an {@link EntityId} and set of associated {@link Component}.
  * {@link Component}s are identified by their class; it is only possible to attach a single component of the same class to an identity.
- * {@link Component}s should be attached and detached via the {@link EntityContainer} so that entity events can be sent as expected.
+ * {@link Component}s should be attached and detached via the {@link Entities} so that entity events can be sent as expected.
  */
 public class Entity {
     private final EntityId entityId;
 
     // using a linked hash map so the order of the components attachments is preserved
     // this is useful to fire components detaching events in the reverse order when detaching an entity
-    private final LinkedHashMap<Class<? extends Component>, Component> components;
+    private final LinkedHashMap<Class<?>, Component<?>> components;
 
-    Entity(final EntityId entityId) {
+    private Entity(final EntityId entityId) {
         this.entityId = entityId;
         components = new LinkedHashMap<>();
     }
@@ -25,8 +29,12 @@ public class Entity {
         return entityId;
     }
 
-    public <T extends Component> T getComponent(final Class<T> clazz) {
-        return (T) components.get(clazz);
+    public <StateT> boolean hasComponent(final Class<StateT> clazz) {
+        return components.containsKey(clazz);
+    }
+
+    public <StateT> Component<StateT> getComponent(final Class<StateT> clazz) {
+        return (Component<StateT>) components.get(clazz);
     }
 
     @Override
@@ -51,23 +59,41 @@ public class Entity {
         return entityId.toString();
     }
 
-    // this method is package visible on purpose; use EntityContainer#attachComponent instead
-    void attachComponent(final Component component) {
+    public <StateT> void attachComponent(final Component<StateT> component) {
         if (!component.getEntity().equals(this)) {
             throw new IllegalArgumentException("Component is not associated to this entity " + getEntityId());
         }
-        if (components.containsKey(component.getClass())) {
-            throw new IllegalArgumentException("Entity " + entityId + " already contains component " + component.getClass().getSimpleName());
+        if (components.containsKey(component.getStateClass())) {
+            throw new IllegalArgumentException("Entity " + entityId + " already contains component " + component.getState().getClass().getSimpleName());
         }
-        components.put(component.getClass(), component);
+        components.put(component.getStateClass(), component);
+        Entities.getInstance().attachComponent(component);
     }
 
-    // this method is package visible on purpose; use EntityContainer#detachComponent instead
-    <T extends Component> T detachComponent(final Class<T> clazz) {
-        return (T) components.remove(clazz);
+    public static Builder builder() {
+        return new Builder();
     }
 
-    Collection<Component> getComponents() {
+    @RequiredArgsConstructor
+    public static class Builder {
+        private final List<Object> components = new LinkedList<>();
+
+        public <StateT> Builder withComponent(final StateT stateT) {
+            this.components.add(stateT);
+            return this;
+        }
+
+        public Entity buildAndAttach() {
+            final Entity entity = new Entity(Entities.getInstance().allocateEntityId());
+            components.forEach(
+                    state -> entity.attachComponent(new Component<>(entity, state))
+            );
+            Entities.getInstance().attachEntity(entity);
+            return entity;
+        }
+    }
+
+    Collection<Component<?>> getComponents() {
         return components.values();
     }
 }

@@ -1,18 +1,32 @@
 package com.tgf.twf.core.ecs;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Base interface for a component that can be attached to an entity.
  * Because a {@link Component} is identifier to {@link Entity} by its class, implementations of {@link Component} must be final classes.
  */
-@RequiredArgsConstructor
-public abstract class Component {
+public final class Component<StateT> {
     @Getter
     private final Entity entity;
 
-    public <T extends Component> T getRelatedComponent(final Class<T> clazz) {
+    @Getter
+    private StateT state;
+
+    public Component(final Entity entity, final StateT state) {
+        this.entity = entity;
+        this.state = state;
+    }
+
+    public <T> Component<T> getRelatedComponent(final Class<T> clazz) {
         return entity.getComponent(clazz);
+    }
+
+    public void updateState(final StateT newState) {
+        this.state = newState;
+    }
+
+    public Class<StateT> getStateClass() {
+        return (Class<StateT>) state.getClass();
     }
 }

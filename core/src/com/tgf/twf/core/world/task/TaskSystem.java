@@ -1,9 +1,9 @@
 package com.tgf.twf.core.world.task;
 
+import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.ComponentLifecycleListener;
-import com.tgf.twf.core.ecs.Entity;
 import com.tgf.twf.core.ecs.System;
-import com.tgf.twf.core.world.AgentComponent;
+import com.tgf.twf.core.world.AgentState;
 
 import java.time.Duration;
 import java.util.HashSet;
@@ -12,27 +12,23 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
-public class TaskSystem implements System, ComponentLifecycleListener<AgentComponent> {
+public class TaskSystem implements System, ComponentLifecycleListener<AgentState> {
     private final Queue<Task> unassignedTasks = new LinkedList<>();
-    private final Queue<AgentComponent> idleAgents = new LinkedList<>();
-    private final List<AgentComponent> busyAgents = new LinkedList<>();
+    private final Queue<Component<AgentState>> idleAgents = new LinkedList<>();
+    private final List<Component<AgentState>> busyAgents = new LinkedList<>();
 
     public void addTask(final Task task) {
         unassignedTasks.add(task);
     }
 
     @Override
-    public void onComponentAttached(final Entity entity, final AgentComponent agent) {
-        if (agent.isIdle()) {
-            idleAgents.add(agent);
+    public void onComponentAttached(final Component<AgentState> agentStateComponent) {
+        final AgentState agentState = agentStateComponent.getState();
+        if (agentState.isIdle()) {
+            idleAgents.add(agentStateComponent);
         } else {
-            busyAgents.add(agent);
+            busyAgents.add(agentStateComponent);
         }
-    }
-
-    @Override
-    public void onComponentDetached(final Entity entity, final AgentComponent component) {
-        throw new UnsupportedOperationException("Cannot remove agents");
     }
 
     @Override
@@ -43,24 +39,26 @@ public class TaskSystem implements System, ComponentLifecycleListener<AgentCompo
 
     private void assignTaskToIdleAgents() {
         while (!idleAgents.isEmpty() && !unassignedTasks.isEmpty()) {
-            final AgentComponent idleAgent = idleAgents.poll();
+            final Component<AgentState> idleAgentComponent = idleAgents.poll();
             final Task unassignedTask = unassignedTasks.poll();
-            idleAgent.assignTask(unassignedTask);
-            busyAgents.add(idleAgent);
+            final List<Action> actions = unassignedTask.createActions(idleAgentComponent);
+            idleAgentComponent.getState().addActions(actions);
+            busyAgents.add(idleAgentComponent);
         }
     }
 
     public void executeTasks(final Duration delta) {
-        final Set<AgentComponent> idlingAgents = new HashSet<>();
+        final Set<Component<AgentState>> idlingAgents = new HashSet<>();
         busyAgents.forEach(
-                agent -> {
-                    final Action activeAction = agent.getActiveAction();
+                agentStateComponent -> {
+                    final AgentState agentState = agentStateComponent.getState();
+                    final Action activeAction = agentState.getActiveAction();
                     activeAction.update(delta);
                     if (activeAction.isComplete()) {
-                        agent.completeAction();
+                        agentState.completeAction();
                     }
-                    if (agent.isIdle()) {
-                        idlingAgents.add(agent);
+                    if (agentState.isIdle()) {
+                        idlingAgents.add(agentStateComponent);
                     }
                 }
         );

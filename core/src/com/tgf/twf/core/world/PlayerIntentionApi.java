@@ -1,8 +1,7 @@
 package com.tgf.twf.core.world;
 
 import com.tgf.twf.core.ecs.Entity;
-import com.tgf.twf.core.geo.PositionComponent;
-import com.tgf.twf.core.geo.Vector2;
+import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.world.task.BuildTask;
 import lombok.RequiredArgsConstructor;
 
@@ -10,20 +9,20 @@ import lombok.RequiredArgsConstructor;
 public class PlayerIntentionApi {
     private final World world;
 
-    public boolean build(final Vector2 position, final BuildingType buildingType) {
-        if (world.getGeoMap().getEntityAt(position).isPresent()) {
+    public boolean build(final BuildingType buildingType, final Position position) {
+        if (world.getGeoMap().isPositionOccupied(position.x, position.y)) {
             return false;
         }
 
-        final Entity entity = world.createEntity();
-        final BuildingComponent buildingComponent = new BuildingComponent(entity, buildingType);
-        final PositionComponent positionComponent = new PositionComponent(entity, position);
-        world.attachComponents(
-                buildingComponent,
-                positionComponent
-        );
+        final BuildingState buildingState = new BuildingState(buildingType);
+
+        Entity.builder()
+                .withComponent(buildingState)
+                .withComponent(position)
+                .buildAndAttach();
+
         world.getTaskSystem().addTask(
-                new BuildTask(buildingComponent, positionComponent)
+                new BuildTask(buildingState, position)
         );
 
         return true;

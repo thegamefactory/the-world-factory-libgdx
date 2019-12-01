@@ -1,29 +1,23 @@
 package com.tgf.twf.core.world;
 
-import com.tgf.twf.core.ecs.Component;
-import com.tgf.twf.core.ecs.ComponentLifecycleListener;
+import com.tgf.twf.core.ecs.Entities;
 import com.tgf.twf.core.ecs.Entity;
-import com.tgf.twf.core.ecs.EntityContainer;
-import com.tgf.twf.core.ecs.EntityEventsProducer;
-import com.tgf.twf.core.ecs.EntityFactory;
-import com.tgf.twf.core.ecs.EntityLifecycleListener;
 import com.tgf.twf.core.ecs.System;
 import com.tgf.twf.core.geo.GeoMap;
-import com.tgf.twf.core.geo.PositionComponent;
+import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.task.TaskSystem;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Random;
 
 /**
  * Top class representing the world.
  */
 @RequiredArgsConstructor
-public class World implements EntityEventsProducer, System {
+public class World implements System {
     @Getter
     private final Vector2 size;
     private final Random random;
@@ -31,51 +25,30 @@ public class World implements EntityEventsProducer, System {
     @Getter
     private final GeoMap geoMap;
 
-    private final EntityFactory entityFactory = new EntityFactory();
-    private final EntityContainer entityContainer;
     @Getter
     private final TaskSystem taskSystem;
 
-    public World(final EntityContainer entityContainer, final Vector2 size, final Random random) {
-        this.entityContainer = entityContainer;
+    public World(final Vector2 size, final Random random) {
         this.size = size;
         this.random = random;
 
         geoMap = new GeoMap(size);
-        entityContainer.registerComponentLifecycleListener(geoMap, PositionComponent.class);
+        Entities.registerComponentLifecycleListener(geoMap, Position.class);
 
         taskSystem = new TaskSystem();
-        entityContainer.registerComponentLifecycleListener(taskSystem, AgentComponent.class);
-    }
+        Entities.registerComponentLifecycleListener(taskSystem, AgentState.class);
 
-    public Entity createEntity(final Component... components) {
-        final Entity entity = entityFactory.create();
-        Arrays.stream(components).forEach(c -> entityContainer.attachComponent(entity.getEntityId(), c));
-        return entity;
-    }
+        final Entity farm = Entity.builder()
+                .withComponent(new BuildingState(BuildingType.FARM))
+                .withComponent(Position.of(1, 1))
+                .buildAndAttach();
 
-    public void attachComponents(final Component... components) {
-        Arrays.stream(components).forEach(c -> entityContainer.attachComponent(c.getEntity().getEntityId(), c));
-    }
-
-    @Override
-    public void registerEntityLifecycleListener(final EntityLifecycleListener listener) {
-        entityContainer.registerEntityLifecycleListener(listener);
-    }
-
-    @Override
-    public void deregisterEntityLifecycleListener(final EntityLifecycleListener listener) {
-        entityContainer.deregisterEntityLifecycleListener(listener);
-    }
-
-    @Override
-    public <T extends Component> void registerComponentLifecycleListener(final ComponentLifecycleListener<T> listener, final Class<T> component) {
-        entityContainer.registerComponentLifecycleListener(listener, component);
-    }
-
-    @Override
-    public <T extends Component> void deregisterComponentLifecycleListener(final ComponentLifecycleListener<T> listener, final Class<T> component) {
-        entityContainer.deregisterComponentLifecycleListener(listener, component);
+        for (int i = 0; i < 3; i++) {
+            Entity.builder()
+                    .withComponent(new AgentState(farm.getComponent(BuildingState.class)))
+                    .withComponent(Position.of(1, 1))
+                    .buildAndAttach();
+        }
     }
 
     @Override

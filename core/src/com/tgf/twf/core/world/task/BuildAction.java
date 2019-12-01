@@ -1,13 +1,13 @@
 package com.tgf.twf.core.world.task;
 
-import com.tgf.twf.core.world.BuildingComponent;
+import com.tgf.twf.core.world.BuildingState;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Duration;
 
 @RequiredArgsConstructor
 public class BuildAction implements Action {
-    private final BuildingComponent buildingComponent;
+    private final BuildingState buildingComponent;
 
     @Override
     public boolean isComplete() {
