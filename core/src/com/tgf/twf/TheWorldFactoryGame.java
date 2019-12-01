@@ -28,6 +28,7 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
     private Texture field;
     private Texture grass;
     private Texture agent;
+    private Texture agentIdle;
 
     public TheWorldFactoryGame(final World world) {
         this.world = world;
@@ -42,7 +43,12 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         field = new Texture("field.png");
         grass = new Texture("grass.png");
         agent = new Texture("agent.png");
+        agentIdle = new Texture("agent_idle.png");
+
         playerIntentionApi.build(BuildingType.FIELD, Position.of(2, 2));
+        playerIntentionApi.build(BuildingType.FIELD, Position.of(2, 3));
+        playerIntentionApi.build(BuildingType.FIELD, Position.of(3, 2));
+        playerIntentionApi.build(BuildingType.FIELD, Position.of(3, 3));
     }
 
     @Override
@@ -64,7 +70,13 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
                 batch.draw(imageAt(x, y), xPixel, yPixel);
                 final List<Component<AgentState>> agents = world.getGeoMap().getAgentsAt(x, y);
                 for (int i = 0; i < agents.size(); i++) {
-                    batch.draw(agent, xPixel + (agent.getWidth() * i), yPixel);
+                    final Texture agentTexture;
+                    if (agents.get(i).getState().isIdle()) {
+                        agentTexture = agentIdle;
+                    } else {
+                        agentTexture = agent;
+                    }
+                    batch.draw(agentTexture, xPixel + (agent.getWidth() * i), yPixel);
                 }
             }
         }
