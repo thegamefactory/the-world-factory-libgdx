@@ -34,6 +34,7 @@ public class World implements System {
 
         geoMap = new GeoMap(size);
         Entities.registerComponentLifecycleListener(geoMap, Position.class);
+        Entities.registerComponentStateUpdateListener(geoMap, Position.class);
 
         taskSystem = new TaskSystem();
         Entities.registerComponentLifecycleListener(taskSystem, AgentState.class);

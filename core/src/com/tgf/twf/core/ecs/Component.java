@@ -23,7 +23,9 @@ public final class Component<StateT> {
     }
 
     public void updateState(final StateT newState) {
+        final StateT oldState = this.state;
         this.state = newState;
+        Entities.getInstance().updateComponentState(this, oldState);
     }
 
     public Class<StateT> getStateClass() {

@@ -4,8 +4,6 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,8 +15,8 @@ import java.util.Map;
 public class Entities {
     private int nextId = 0;
     private final Map<EntityId, Entity> entities = new HashMap<>();
-    private final List<EntityLifecycleListener> entityLifecycleListeners = new LinkedList<>();
     private final Multimap<Class<?>, ComponentLifecycleListener> componentLifecycleListeners = LinkedHashMultimap.create();
+    private final Multimap<Class<?>, ComponentStateUpdateListener> componentStateUpdateListeners = LinkedHashMultimap.create();
 
     private static final Entities INSTANCE = new Entities();
 
@@ -30,12 +28,16 @@ public class Entities {
         // no-op
     }
 
-    public static void registerEntityLifecycleListener(final EntityLifecycleListener listener) {
-        getInstance().entityLifecycleListeners.add(listener);
+    public static <StateT> void registerComponentLifecycleListener(
+            final ComponentLifecycleListener<StateT> listener,
+            final Class<StateT> component) {
+        getInstance().componentLifecycleListeners.put(component, listener);
     }
 
-    public static <T> void registerComponentLifecycleListener(final ComponentLifecycleListener<T> listener, final Class<T> component) {
-        getInstance().componentLifecycleListeners.put(component, listener);
+    public static <StateT> void registerComponentStateUpdateListener(
+            final ComponentStateUpdateListener<StateT> listener,
+            final Class<StateT> component) {
+        getInstance().componentStateUpdateListeners.put(component, listener);
     }
 
     EntityId allocateEntityId() {
@@ -53,17 +55,30 @@ public class Entities {
         }
         entities.put(entity.getEntityId(), entity);
 
-        entityLifecycleListeners.forEach(l -> l.sendEntityAttachedEvent(entity));
-        entity.getComponents().forEach(this::sendComponentAttachedEvent);
+        entity.getComponents().forEach(this::sendComponentAttachedEvents);
     }
 
-    void attachComponent(final Component<?> component) {
-        if (entities.containsKey(component.getEntity().getEntityId())) {
-            sendComponentAttachedEvent(component);
+    <StateT> void attachComponent(final Component<StateT> component) {
+        if (isComponentEntityAttached(component)) {
+            sendComponentAttachedEvents(component);
         }
     }
 
-    private <T> void sendComponentAttachedEvent(final Component<T> component) {
+    private <StateT> void sendComponentAttachedEvents(final Component<StateT> component) {
         componentLifecycleListeners.get(component.getStateClass()).forEach(l -> l.onComponentAttached(component));
+    }
+
+    <StateT> void updateComponentState(final Component<StateT> component, final StateT oldState) {
+        if (isComponentEntityAttached(component)) {
+            sendComponentUpdatedEvents(component, oldState);
+        }
+    }
+
+    private <StateT> void sendComponentUpdatedEvents(final Component<StateT> component, final StateT oldState) {
+        componentStateUpdateListeners.get(component.getStateClass()).forEach(l -> l.onComponentStateUpdated(component, oldState));
+    }
+
+    private boolean isComponentEntityAttached(final Component<?> component) {
+        return entities.containsKey(component.getEntity().getEntityId());
     }
 }

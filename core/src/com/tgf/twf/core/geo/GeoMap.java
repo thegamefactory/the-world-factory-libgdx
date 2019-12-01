@@ -3,6 +3,7 @@ package com.tgf.twf.core.geo;
 import com.google.common.collect.ImmutableList;
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.ComponentLifecycleListener;
+import com.tgf.twf.core.ecs.ComponentStateUpdateListener;
 import com.tgf.twf.core.ecs.Entity;
 import com.tgf.twf.core.world.AgentState;
 import com.tgf.twf.core.world.BuildingState;
@@ -16,7 +17,7 @@ import java.util.Optional;
  * A class for geographical position lookups.
  * It is kept up to date with the world by listening to the attachment and detachment of entities {@link Position}s.
  */
-public class GeoMap implements ComponentLifecycleListener<Position> {
+public class GeoMap implements ComponentLifecycleListener<Position>, ComponentStateUpdateListener<Position> {
     private final Vector2 size;
     private final List<Entity>[] entities;
 
@@ -52,6 +53,12 @@ public class GeoMap implements ComponentLifecycleListener<Position> {
             entities[index] = new LinkedList<>();
         }
         entities[index].add(positionComponent.getEntity());
+    }
+
+    @Override
+    public void onComponentStateUpdated(final Component<Position> component, final Position oldState) {
+        entities[getIndex(oldState)].remove(component.getEntity());
+        onComponentAttached(component);
     }
 
     private int getIndex(final Position position) {
