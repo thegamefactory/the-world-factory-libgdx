@@ -1,0 +1,6 @@
+Next:
+* implement path finding and move action
+* implement move back to agent home
+* implement field gathering tasks (collect food)
+* implement agent cycle (go back to base eat food sleep)
+* rendering

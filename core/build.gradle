@@ -1,6 +1,13 @@
 apply plugin: "java"
 
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 sourceSets.main.java.srcDirs = [ "src/" ]
+
+dependencies {
+    annotationProcessor "org.projectlombok:lombok:1.18.10"
+    compileOnly "org.projectlombok:lombok:1.18.10"
+    compile "com.google.inject:guice:4.2.2"
+    compile "com.google.guava:guava:28.1-jre"
+}
