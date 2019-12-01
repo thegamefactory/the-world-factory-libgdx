@@ -18,6 +18,6 @@ public final class Position {
     }
 
     public int manatthanDistance(final Position other) {
-        return Math.abs(x - other.x) + Math.abs(other.x - other.y);
+        return Math.abs(x - other.x) + Math.abs(y - other.y);
     }
 }

@@ -8,8 +8,4 @@ import lombok.RequiredArgsConstructor;
 public class Vector2 {
     public final int x;
     public final int y;
-
-    public int manatthanDistance(final Vector2 other) {
-        return Math.abs(x - other.x) + Math.abs(other.x - other.y);
-    }
 }
