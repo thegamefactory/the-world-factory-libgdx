@@ -38,10 +38,10 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
     @Override
     public void create() {
         batch = new SpriteBatch();
-        dirt = new Texture("dirt.png");
-        farm = new Texture("farm.png");
-        field = new Texture("field.png");
-        grass = new Texture("grass.png");
+        dirt = new Texture("dirt_tile.png");
+        farm = new Texture("farm_tile.png");
+        field = new Texture("field_tile.png");
+        grass = new Texture("grass_tile.png");
         agent = new Texture("agent.png");
         agentIdle = new Texture("agent_idle.png");
 
@@ -55,17 +55,17 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
     public void render() {
         world.update(Duration.ofNanos((long) (1_000_000_000 * Gdx.graphics.getDeltaTime())));
 
-        Gdx.gl.glClearColor(1, 0, 0, 1);
+        Gdx.gl.glClearColor(0.5f, 0.5f, 0.5f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        final int tileSizePixels = 64;
         final Vector2 worldSize = world.getSize();
 
         batch.begin();
-        for (int x = 0; x < worldSize.x; ++x) {
-            for (int y = 0; y < worldSize.y; ++y) {
-                final int xPixel = x * tileSizePixels;
-                final int yPixel = y * tileSizePixels;
+
+        for (int y = worldSize.y - 1; y >= 0; --y) {
+            for (int x = 0; x < worldSize.x; ++x) {
+                final int xPixel = (x + y) * 45;
+                final int yPixel = (y - x) * 27 + 200;
 
                 batch.draw(imageAt(x, y), xPixel, yPixel);
                 final List<Component<AgentState>> agents = world.getGeoMap().getAgentsAt(x, y);
@@ -76,7 +76,7 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
                     } else {
                         agentTexture = agent;
                     }
-                    batch.draw(agentTexture, xPixel + (agent.getWidth() * i), yPixel);
+                    batch.draw(agentTexture, xPixel + ((int) (agent.getWidth() * (i - 0.5))) + 45, -agent.getHeight() / 2 + yPixel + 27);
                 }
             }
         }
