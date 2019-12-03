@@ -11,6 +11,9 @@ public class DesktopLauncher {
     public static void main(final String[] arg) {
         final Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 
+        // TODO: fullscreen from command line args
+        // config.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
+
         final World world = Guice.createInjector(new WorldModule()).getInstance(World.class);
         new Lwjgl3Application(new TheWorldFactoryGame(world), config);
     }
