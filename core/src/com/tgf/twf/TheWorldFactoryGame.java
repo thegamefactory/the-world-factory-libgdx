@@ -4,9 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
@@ -15,7 +13,6 @@ import com.tgf.twf.core.world.BuildingState;
 import com.tgf.twf.core.world.BuildingType;
 import com.tgf.twf.core.world.PlayerIntentionApi;
 import com.tgf.twf.core.world.World;
-import com.tgf.twf.libgdx.TransparentTexture;
 
 import java.time.Duration;
 import java.util.List;
@@ -26,16 +23,12 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
     private final World world;
     private final PlayerIntentionApi playerIntentionApi;
 
-    private Stage stage;
-
-    private TransparentTexture dirt;
-    private TransparentTexture farm;
-    private TransparentTexture field;
-    private TransparentTexture grass;
+    private Texture dirt;
+    private Texture farm;
+    private Texture field;
+    private Texture grass;
     private Texture agent;
     private Texture agentIdle;
-
-    private BitmapFont font;
 
     public TheWorldFactoryGame(final World world) {
         this.world = world;
@@ -44,16 +37,11 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
 
     @Override
     public void create() {
-        font = new BitmapFont();
-
-        stage = new Stage();
-        Gdx.input.setInputProcessor(stage);
-
         batch = new SpriteBatch();
-        dirt = new TransparentTexture("dirt_tile.png");
-        farm = new TransparentTexture("farm_tile.png");
-        field = new TransparentTexture("field_tile.png");
-        grass = new TransparentTexture("grass_tile.png");
+        dirt = new Texture("dirt_tile.png");
+        farm = new Texture("farm_tile.png");
+        field = new Texture("field_tile.png");
+        grass = new Texture("grass_tile.png");
         agent = new Texture("agent.png");
         agentIdle = new Texture("agent_idle.png");
 
@@ -69,9 +57,6 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
 
         Gdx.gl.glClearColor(0.5f, 0.5f, 0.5f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
 
         final Vector2 worldSize = world.getSize();
 
@@ -91,23 +76,15 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
                     } else {
                         agentTexture = agent;
                     }
-                    batch.draw(agentTexture, xPixel + ((int) (agent.getWidth() * (i - 0.5))) + 45, (int) (agent.getHeight() * 0.5) + yPixel + 27);
+                    batch.draw(agentTexture, xPixel + ((int) (agent.getWidth() * (i - 0.5))) + 45, -agent.getHeight() / 2 + yPixel + 27);
                 }
             }
         }
 
         batch.end();
-
-        batch.begin();
-        font.draw(batch,
-                Gdx.graphics.getFramesPerSecond() + " fps; " +
-                        "heap " + Gdx.app.getJavaHeap() + "; " +
-                        "mem " + Gdx.app.getNativeHeap(),
-                3, Gdx.graphics.getHeight() - 3);
-        batch.end();
     }
 
-    public TransparentTexture imageAt(final int x, final int y) {
+    public Texture imageAt(final int x, final int y) {
         final Optional<Component<BuildingState>> buildingComponentOptional = world.getGeoMap().getBuildingAt(x, y);
         if (buildingComponentOptional.isPresent()) {
             final BuildingState buildingComponent = buildingComponentOptional.get().getState();
