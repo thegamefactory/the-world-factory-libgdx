@@ -5,12 +5,14 @@ import com.google.common.collect.Multimap;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * Container of {@link Entity}.
  * Manages Entities lifecycle, including attaching/detaching them from the container, attaching/detaching {@link Component}s from the entities, and
  * firing corresponding events.
- * {@link EntityLifecycleListener} and {@link ComponentLifecycleListener}s can subscribe/unsubscribe to events fired by the container.
+ * {@link ComponentLifecycleListener} and {@link ComponentStateUpdateListener}s can subscribe/unsubscribe to events fired by the container.
  */
 public class Entities {
     private int nextId = 0;
@@ -38,6 +40,10 @@ public class Entities {
             final ComponentStateUpdateListener<StateT> listener,
             final Class<StateT> component) {
         getInstance().componentStateUpdateListeners.put(component, listener);
+    }
+
+    public static <StateT> Stream<Component<StateT>> allComponents(final Class<StateT> componentStateClass) {
+        return getInstance().entities.values().stream().map(e -> e.getComponent(componentStateClass)).filter(Objects::nonNull);
     }
 
     EntityId allocateEntityId() {

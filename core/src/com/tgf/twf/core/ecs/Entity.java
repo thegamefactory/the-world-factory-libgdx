@@ -59,7 +59,13 @@ public class Entity {
         return entityId.toString();
     }
 
-    public <StateT> void attachComponent(final Component<StateT> component) {
+    public <StateT> Component<StateT> attachComponent(final StateT state) {
+        final Component<StateT> component = new Component<>(this, state);
+        attachComponent(component);
+        return component;
+    }
+
+    private <StateT> void attachComponent(final Component<StateT> component) {
         if (!component.getEntity().equals(this)) {
             throw new IllegalArgumentException("Component is not associated to this entity " + getEntityId());
         }

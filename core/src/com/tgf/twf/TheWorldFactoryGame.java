@@ -10,15 +10,14 @@ import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.AgentState;
-import com.tgf.twf.core.world.BuildingState;
 import com.tgf.twf.core.world.BuildingType;
 import com.tgf.twf.core.world.PlayerIntentionApi;
 import com.tgf.twf.core.world.World;
+import com.tgf.twf.libgdx.BuildingTextureSystem;
 import com.tgf.twf.libgdx.TransparentTexture;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
 
 public class TheWorldFactoryGame extends ApplicationAdapter {
     private SpriteBatch batch;
@@ -33,6 +32,8 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
     private Texture agentIdle;
 
     private BitmapFont font;
+
+    private BuildingTextureSystem buildingTextureSystem;
 
     public TheWorldFactoryGame(final World world) {
         this.world = world;
@@ -55,11 +56,15 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         playerIntentionApi.build(BuildingType.FIELD, Position.of(2, 3));
         playerIntentionApi.build(BuildingType.FIELD, Position.of(3, 2));
         playerIntentionApi.build(BuildingType.FIELD, Position.of(3, 3));
+
+        buildingTextureSystem = new BuildingTextureSystem(dirt, farm, field);
     }
 
     @Override
     public void render() {
-        world.update(Duration.ofNanos((long) (1_000_000_000 * Gdx.graphics.getDeltaTime())));
+        final Duration delta = Duration.ofNanos((long) (1_000_000_000 * Gdx.graphics.getDeltaTime()));
+        world.update(delta);
+        buildingTextureSystem.update(delta);
 
         Gdx.gl.glClearColor(0.5f, 0.5f, 0.5f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -91,21 +96,10 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
     }
 
     public TransparentTexture imageAt(final int x, final int y) {
-        final Optional<Component<BuildingState>> buildingComponentOptional = world.getGeoMap().getBuildingAt(x, y);
-        if (buildingComponentOptional.isPresent()) {
-            final BuildingState buildingComponent = buildingComponentOptional.get().getState();
-            final BuildingType buildingType = buildingComponent.getBuildingType();
-            switch (buildingType) {
-                case FARM:
-                    return farm;
-                case FIELD:
-                    return buildingComponent.isBuilt() ? field : dirt;
-                default:
-                    throw new IllegalStateException("Not a valid building type: " + buildingType);
-            }
-        } else {
-            return grass;
-        }
+        return world.getGeoMap().getBuildingAt(x, y)
+                .map(buildingStateComponent -> buildingStateComponent.getRelatedComponent(TransparentTexture.class))
+                .map(Component::getState)
+                .orElse(grass);
     }
 
     @Override
