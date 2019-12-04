@@ -1,13 +1,16 @@
 package com.tgf.twf.core.world.task;
 
-import com.tgf.twf.core.world.BuildingState;
+import com.tgf.twf.core.world.Building;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Duration;
 
+/**
+ * An {@link Action} implementation which constructs a building (by updating its {@link Building}).
+ */
 @RequiredArgsConstructor
-public class BuildAction implements Action {
-    private final BuildingState buildingComponent;
+public class ConstructAction implements Action {
+    private final Building buildingComponent;
 
     @Override
     public boolean isComplete() {

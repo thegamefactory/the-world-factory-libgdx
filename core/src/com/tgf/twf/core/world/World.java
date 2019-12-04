@@ -6,6 +6,7 @@ import com.tgf.twf.core.ecs.System;
 import com.tgf.twf.core.geo.GeoMap;
 import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
+import com.tgf.twf.core.world.task.Agent;
 import com.tgf.twf.core.world.task.TaskSystem;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -37,16 +38,16 @@ public class World implements System {
         Entities.registerComponentStateUpdateListener(geoMap, Position.class);
 
         taskSystem = new TaskSystem();
-        Entities.registerComponentLifecycleListener(taskSystem, AgentState.class);
+        Entities.registerComponentLifecycleListener(taskSystem, Agent.class);
 
         final Entity farm = Entity.builder()
-                .withComponent(new BuildingState(BuildingType.FARM))
+                .withComponent(new Building(BuildingType.FARM))
                 .withComponent(Position.of(1, 1))
                 .buildAndAttach();
 
         for (int i = 0; i < 3; i++) {
             Entity.builder()
-                    .withComponent(new AgentState(farm.getComponent(BuildingState.class)))
+                    .withComponent(new Agent(farm.getComponent(Building.class)))
                     .withComponent(Position.of(1, 1))
                     .buildAndAttach();
         }

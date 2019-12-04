@@ -9,10 +9,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
-import com.tgf.twf.core.world.AgentState;
 import com.tgf.twf.core.world.BuildingType;
 import com.tgf.twf.core.world.PlayerIntentionApi;
 import com.tgf.twf.core.world.World;
+import com.tgf.twf.core.world.task.Agent;
 import com.tgf.twf.libgdx.BuildingTextureSystem;
 import com.tgf.twf.libgdx.TransparentTexture;
 
@@ -79,7 +79,7 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
                 final int yPixel = (y - x) * 27 + 200;
 
                 batch.draw(imageAt(x, y), xPixel, yPixel);
-                final List<Component<AgentState>> agents = world.getGeoMap().getAgentsAt(x, y);
+                final List<Component<Agent>> agents = world.getGeoMap().getAgentsAt(x, y);
                 for (int i = 0; i < agents.size(); i++) {
                     final Texture agentTexture;
                     if (agents.get(i).getState().isIdle()) {

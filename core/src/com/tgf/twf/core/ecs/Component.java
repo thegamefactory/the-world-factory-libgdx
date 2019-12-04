@@ -3,8 +3,10 @@ package com.tgf.twf.core.ecs;
 import lombok.Getter;
 
 /**
- * Base interface for a component that can be attached to an entity.
- * Because a {@link Component} is identifier to {@link Entity} by its class, implementations of {@link Component} must be final classes.
+ * {@link Component} are data that can be attached to an {@link Entity}.
+ * Multiple {@link Component}s can be attached to the same {@link Entity}.
+ * A {@link Component} wraps a state of the generic type StateT. Component should be pure data objects.
+ * {@link Component}s are identified to the entity by the StateT class; therefore, StateT should be final classes.
  */
 public final class Component<StateT> {
     @Getter

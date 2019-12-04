@@ -3,7 +3,6 @@ package com.tgf.twf.core.world.task;
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.ComponentLifecycleListener;
 import com.tgf.twf.core.ecs.System;
-import com.tgf.twf.core.world.AgentState;
 
 import java.time.Duration;
 import java.util.HashSet;
@@ -12,19 +11,26 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
-public class TaskSystem implements System, ComponentLifecycleListener<AgentState> {
+/**
+ * The {@link TaskSystem} is the brain ticking the {@link Task}s.
+ * It maintains a list of idle {@link Agent}s and assign them incoming {@link Task}s by building and queuing the list of corresponding task
+ * {@link Action}s to the {@link Agent}.
+ * It checks the state of busy {@link Agent}s and ticks their active {@link Action}. When the active {@link Action} is complete, it dequeues the
+ * {@link Action} queue of the {@link Agent}; if the queue is empty, it puts back the {@link Agent} into the idle {@link Agent} pool.
+ */
+public class TaskSystem implements System, ComponentLifecycleListener<Agent> {
     private final Queue<Task> unassignedTasks = new LinkedList<>();
-    private final Queue<Component<AgentState>> idleAgents = new LinkedList<>();
-    private final List<Component<AgentState>> busyAgents = new LinkedList<>();
+    private final Queue<Component<Agent>> idleAgents = new LinkedList<>();
+    private final List<Component<Agent>> busyAgents = new LinkedList<>();
 
     public void addTask(final Task task) {
         unassignedTasks.add(task);
     }
 
     @Override
-    public void onComponentAttached(final Component<AgentState> agentStateComponent) {
-        final AgentState agentState = agentStateComponent.getState();
-        if (agentState.isIdle()) {
+    public void onComponentAttached(final Component<Agent> agentStateComponent) {
+        final Agent agent = agentStateComponent.getState();
+        if (agent.isIdle()) {
             idleAgents.add(agentStateComponent);
         } else {
             busyAgents.add(agentStateComponent);
@@ -39,7 +45,7 @@ public class TaskSystem implements System, ComponentLifecycleListener<AgentState
 
     private void assignTaskToIdleAgents() {
         while (!idleAgents.isEmpty() && !unassignedTasks.isEmpty()) {
-            final Component<AgentState> idleAgentComponent = idleAgents.poll();
+            final Component<Agent> idleAgentComponent = idleAgents.poll();
             final Task unassignedTask = unassignedTasks.poll();
             final List<Action> actions = unassignedTask.createActions(idleAgentComponent);
             idleAgentComponent.getState().addActions(actions);
@@ -48,17 +54,17 @@ public class TaskSystem implements System, ComponentLifecycleListener<AgentState
     }
 
     public void executeTasks(final Duration delta) {
-        final Set<Component<AgentState>> idlingAgents = new HashSet<>();
+        final Set<Component<Agent>> idlingAgents = new HashSet<>();
         busyAgents.forEach(
-                agentStateComponent -> {
-                    final AgentState agentState = agentStateComponent.getState();
-                    final Action activeAction = agentState.getActiveAction();
+                agentComponent -> {
+                    final Agent agent = agentComponent.getState();
+                    final Action activeAction = agent.getActiveAction();
                     activeAction.update(delta);
                     if (activeAction.isComplete()) {
-                        agentState.completeAction();
+                        agent.completeAction();
                     }
-                    if (agentState.isIdle()) {
-                        idlingAgents.add(agentStateComponent);
+                    if (agent.isIdle()) {
+                        idlingAgents.add(agentComponent);
                     }
                 }
         );

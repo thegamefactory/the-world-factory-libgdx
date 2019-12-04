@@ -7,8 +7,8 @@ import java.time.Duration;
 
 @RequiredArgsConstructor
 public enum BuildingType {
-    FARM(Duration.ofSeconds(5)),
-    FIELD(Duration.ofSeconds(10));
+    FARM(Duration.ofSeconds(10)),
+    FIELD(Duration.ofSeconds(5));
 
     @Getter
     private final Duration buildTime;

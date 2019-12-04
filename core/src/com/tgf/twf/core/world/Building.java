@@ -4,12 +4,12 @@ import lombok.Getter;
 
 import java.time.Duration;
 
-public class BuildingState {
+public class Building {
     @Getter
     private final BuildingType buildingType;
     private Duration buildingDurationRemaining;
 
-    public BuildingState(final BuildingType buildingType) {
+    public Building(final BuildingType buildingType) {
         this.buildingType = buildingType;
         this.buildingDurationRemaining = buildingType.getBuildTime();
     }

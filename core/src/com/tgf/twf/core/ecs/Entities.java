@@ -9,10 +9,10 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
- * Container of {@link Entity}.
- * Manages Entities lifecycle, including attaching/detaching them from the container, attaching/detaching {@link Component}s from the entities, and
- * firing corresponding events.
- * {@link ComponentLifecycleListener} and {@link ComponentStateUpdateListener}s can subscribe/unsubscribe to events fired by the container.
+ * Manages {@link Entity} lifecycle.
+ * All active entities must be attached to {@link Entities} via the {@link #attachEntity(Entity)} method.
+ * In practice {@link Entities} is a singleton and the creation of a new {@link Entity} automatically handles the attachment to {@link Entities}.
+ * {@link ComponentLifecycleListener} and {@link ComponentStateUpdateListener}s can subscribe/unsubscribe to events fired by {@link Entities}.
  */
 public class Entities {
     private int nextId = 0;

@@ -11,7 +11,6 @@ import java.util.Objects;
 /**
  * An entity which is essentially an {@link EntityId} and set of associated {@link Component}.
  * {@link Component}s are identified by their class; it is only possible to attach a single component of the same class to an identity.
- * {@link Component}s should be attached and detached via the {@link Entities} so that entity events can be sent as expected.
  */
 public class Entity {
     private final EntityId entityId;

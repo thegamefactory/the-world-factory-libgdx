@@ -5,8 +5,8 @@ import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.ComponentLifecycleListener;
 import com.tgf.twf.core.ecs.ComponentStateUpdateListener;
 import com.tgf.twf.core.ecs.Entity;
-import com.tgf.twf.core.world.AgentState;
-import com.tgf.twf.core.world.BuildingState;
+import com.tgf.twf.core.world.Building;
+import com.tgf.twf.core.world.task.Agent;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -26,23 +26,23 @@ public class GeoMap implements ComponentLifecycleListener<Position>, ComponentSt
         entities = new List[size.x * size.y];
     }
 
-    public Optional<Component<BuildingState>> getBuildingAt(final int x, final int y) {
+    public Optional<Component<Building>> getBuildingAt(final int x, final int y) {
         return getEntityAt(x, y).stream()
-                .map(entity -> entity.getComponent(BuildingState.class))
+                .map(entity -> entity.getComponent(Building.class))
                 .filter(Objects::nonNull)
                 .findFirst();
     }
 
-    public List<Component<AgentState>> getAgentsAt(final int x, final int y) {
+    public List<Component<Agent>> getAgentsAt(final int x, final int y) {
         return getEntityAt(x, y).stream()
-                .map(entity -> entity.getComponent(AgentState.class))
+                .map(entity -> entity.getComponent(Agent.class))
                 .filter(Objects::nonNull)
                 .collect(ImmutableList.toImmutableList());
     }
 
     public boolean isPositionOccupied(final int x, final int y) {
         return getEntityAt(x, y).stream()
-                .anyMatch(e -> e.hasComponent(BuildingState.class));
+                .anyMatch(e -> e.hasComponent(Building.class));
     }
 
     @Override
