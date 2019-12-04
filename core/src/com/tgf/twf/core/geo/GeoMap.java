@@ -41,6 +41,10 @@ public class GeoMap implements ComponentLifecycleListener<Position>, ComponentSt
     }
 
     public boolean isPositionOccupied(final int x, final int y) {
+        if (x < 0 || x >= size.x || y < 0 || y >= size.y) {
+            return true;
+        }
+
         return getEntityAt(x, y).stream()
                 .anyMatch(e -> e.hasComponent(Building.class));
     }

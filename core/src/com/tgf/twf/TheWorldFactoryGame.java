@@ -7,9 +7,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.tgf.twf.core.ecs.Component;
-import com.tgf.twf.core.geo.Position;
+import com.tgf.twf.core.ecs.Entities;
 import com.tgf.twf.core.geo.Vector2;
-import com.tgf.twf.core.world.BuildingType;
+import com.tgf.twf.core.geo.Vector2f;
+import com.tgf.twf.core.world.Building;
 import com.tgf.twf.core.world.PlayerIntentionApi;
 import com.tgf.twf.core.world.World;
 import com.tgf.twf.core.world.task.Agent;
@@ -35,9 +36,17 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
 
     private BuildingTextureSystem buildingTextureSystem;
 
+    private final CoordinatesTransformer coordinatesTransformer;
+
+    private GameInputProcessor gameInputProcessor;
+
     public TheWorldFactoryGame(final World world) {
         this.world = world;
         this.playerIntentionApi = new PlayerIntentionApi(world);
+        this.coordinatesTransformer = CoordinatesTransformer.builder()
+                .tileSize(new Vector2f(90, 54))
+                .offset(new Vector2f(45, 200))
+                .build();
     }
 
     @Override
@@ -51,13 +60,18 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         grass = new TransparentTexture("grass_tile.png");
         agent = new Texture("agent.png");
         agentIdle = new Texture("agent_idle.png");
-
-        playerIntentionApi.build(BuildingType.FIELD, Position.of(2, 2));
-        playerIntentionApi.build(BuildingType.FIELD, Position.of(2, 3));
-        playerIntentionApi.build(BuildingType.FIELD, Position.of(3, 2));
-        playerIntentionApi.build(BuildingType.FIELD, Position.of(3, 3));
-
+        
         buildingTextureSystem = new BuildingTextureSystem(dirt, farm, field);
+        Entities.registerComponentLifecycleListener(buildingTextureSystem, Building.class);
+
+        gameInputProcessor = new GameInputProcessor(playerIntentionApi, coordinatesTransformer);
+        gameInputProcessor.setScreenHeight(Gdx.graphics.getHeight());
+        Gdx.input.setInputProcessor(gameInputProcessor);
+    }
+
+    @Override
+    public void resize(final int width, final int height) {
+        gameInputProcessor.setScreenHeight(height);
     }
 
     @Override
@@ -73,13 +87,19 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
 
         batch.begin();
 
-        for (int y = worldSize.y - 1; y >= 0; --y) {
-            for (int x = 0; x < worldSize.x; ++x) {
-                final int xPixel = (x + y) * 45;
-                final int yPixel = (y - x) * 27 + 200;
+        final Vector2 pos = new Vector2();
+        final Vector2f screenPos = new Vector2f();
+        final Vector2f tileSize = coordinatesTransformer.getTileSize();
 
-                batch.draw(imageAt(x, y), xPixel, yPixel);
-                final List<Component<Agent>> agents = world.getGeoMap().getAgentsAt(x, y);
+        for (pos.y = worldSize.y - 1; pos.y >= 0; --pos.y) {
+            for (pos.x = 0; pos.x < worldSize.x; ++pos.x) {
+                coordinatesTransformer.convertToScreen(pos, screenPos);
+
+                batch.draw(
+                        imageAt(pos),
+                        screenPos.x - tileSize.x / 2,
+                        screenPos.y - tileSize.y / 2);
+                final List<Component<Agent>> agents = world.getGeoMap().getAgentsAt(pos.x, pos.y);
                 for (int i = 0; i < agents.size(); i++) {
                     final Texture agentTexture;
                     if (agents.get(i).getState().isIdle()) {
@@ -87,7 +107,9 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
                     } else {
                         agentTexture = agent;
                     }
-                    batch.draw(agentTexture, xPixel + ((int) (agent.getWidth() * (i - 0.5))) + 45, (int) (agent.getHeight() * 0.5) + yPixel + 27);
+                    batch.draw(agentTexture,
+                            screenPos.x + ((int) (agent.getWidth() * (i - 0.5))),
+                            screenPos.y + (int) (agent.getHeight() * -0.5));
                 }
             }
         }
@@ -95,8 +117,8 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         batch.end();
     }
 
-    public TransparentTexture imageAt(final int x, final int y) {
-        return world.getGeoMap().getBuildingAt(x, y)
+    public TransparentTexture imageAt(final Vector2 pos) {
+        return world.getGeoMap().getBuildingAt(pos.x, pos.y)
                 .map(buildingStateComponent -> buildingStateComponent.getRelatedComponent(TransparentTexture.class))
                 .map(Component::getState)
                 .orElse(grass);

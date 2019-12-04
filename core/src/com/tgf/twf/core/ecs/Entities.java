@@ -1,9 +1,11 @@
 package com.tgf.twf.core.ecs;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -61,7 +63,8 @@ public class Entities {
         }
         entities.put(entity.getEntityId(), entity);
 
-        entity.getComponents().forEach(this::sendComponentAttachedEvents);
+        final List<Component<?>> components = ImmutableList.copyOf(entity.getComponents());
+        components.forEach(this::sendComponentAttachedEvents);
     }
 
     <StateT> void attachComponent(final Component<StateT> component) {
