@@ -5,6 +5,9 @@ import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.world.task.ConstructTask;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * An world service which to invoke to express player intentions (captured by input).
+ */
 @RequiredArgsConstructor
 public class PlayerIntentionApi {
     private final World world;

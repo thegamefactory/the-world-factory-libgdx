@@ -2,6 +2,9 @@ package com.tgf.twf.core.geo;
 
 import lombok.Data;
 
+/**
+ * An integer vector.
+ */
 @Data
 public class Vector2 {
     public int x;
@@ -15,9 +18,5 @@ public class Vector2 {
     public Vector2(final int x, final int y) {
         this.x = x;
         this.y = y;
-    }
-
-    public Vector2(final Vector2 other) {
-        this(other.x, other.y);
     }
 }

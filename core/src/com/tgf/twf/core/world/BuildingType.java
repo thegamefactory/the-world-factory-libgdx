@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.Duration;
 
+/**
+ * A {@link BuildingType} defines the behavior of {@link Building} instances that are constructed from it.
+ */
 @RequiredArgsConstructor
 public enum BuildingType {
     FARM(Duration.ofSeconds(10)),

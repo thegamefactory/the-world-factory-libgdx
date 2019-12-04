@@ -4,6 +4,9 @@ import lombok.Getter;
 
 import java.time.Duration;
 
+/**
+ * A component state modeling a live instance of a {@link BuildingType}.
+ */
 public class Building {
     @Getter
     private final BuildingType buildingType;

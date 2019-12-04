@@ -3,7 +3,7 @@ package com.tgf.twf.core.world.task;
 import java.time.Duration;
 
 /**
- * A  generic {@link Action} that waits the given {@link Duration}, and completes and invokes the {@link CompletionCallback} once the action has been
+ * A generic {@link Action} that waits the given {@link Duration}, and completes and invokes the {@link CompletionCallback} once the action has been
  * updated for a total time corresponding to the total duration.
  */
 public class TimedAction implements Action {

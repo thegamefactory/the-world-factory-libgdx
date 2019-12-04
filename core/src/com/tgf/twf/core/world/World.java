@@ -42,13 +42,13 @@ public class World implements System {
 
         final Entity farm = Entity.builder()
                 .withComponent(new Building(BuildingType.FARM))
-                .withComponent(Position.of(1, 1))
+                .withComponent(Position.from(1, 1))
                 .buildAndAttach();
 
         for (int i = 0; i < 3; i++) {
             Entity.builder()
                     .withComponent(new Agent(farm.getComponent(Building.class)))
-                    .withComponent(Position.of(1, 1))
+                    .withComponent(Position.from(1, 1))
                     .buildAndAttach();
         }
     }

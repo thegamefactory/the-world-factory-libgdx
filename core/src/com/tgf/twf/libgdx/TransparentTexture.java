@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.BitSet;
 
+/**
+ * {@link Texture} maintaining a {@link Mask} which can be queried to define if the image is opaque or not at a certain pixel.
+ */
 public class TransparentTexture extends Texture {
     @Getter
     private final Mask mask;

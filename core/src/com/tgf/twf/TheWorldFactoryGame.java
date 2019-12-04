@@ -14,12 +14,15 @@ import com.tgf.twf.core.world.Building;
 import com.tgf.twf.core.world.PlayerIntentionApi;
 import com.tgf.twf.core.world.World;
 import com.tgf.twf.core.world.task.Agent;
-import com.tgf.twf.libgdx.BuildingTextureSystem;
+import com.tgf.twf.libgdx.BuildingAspectSystem;
 import com.tgf.twf.libgdx.TransparentTexture;
 
 import java.time.Duration;
 import java.util.List;
 
+/**
+ * Entry point; loads assets, create systems responsible for rendering and input processing, implements game loop and ticks systems.
+ */
 public class TheWorldFactoryGame extends ApplicationAdapter {
     private SpriteBatch batch;
     private final World world;
@@ -34,7 +37,7 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
 
     private BitmapFont font;
 
-    private BuildingTextureSystem buildingTextureSystem;
+    private BuildingAspectSystem buildingAspectSystem;
 
     private final CoordinatesTransformer coordinatesTransformer;
 
@@ -60,9 +63,9 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         grass = new TransparentTexture("grass_tile.png");
         agent = new Texture("agent.png");
         agentIdle = new Texture("agent_idle.png");
-        
-        buildingTextureSystem = new BuildingTextureSystem(dirt, farm, field);
-        Entities.registerComponentLifecycleListener(buildingTextureSystem, Building.class);
+
+        buildingAspectSystem = new BuildingAspectSystem(dirt, farm, field);
+        Entities.registerComponentLifecycleListener(buildingAspectSystem, Building.class);
 
         gameInputProcessor = new GameInputProcessor(playerIntentionApi, coordinatesTransformer);
         gameInputProcessor.setScreenHeight(Gdx.graphics.getHeight());
@@ -78,7 +81,7 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
     public void render() {
         final Duration delta = Duration.ofNanos((long) (1_000_000_000 * Gdx.graphics.getDeltaTime()));
         world.update(delta);
-        buildingTextureSystem.update(delta);
+        buildingAspectSystem.update(delta);
 
         Gdx.gl.glClearColor(0.5f, 0.5f, 0.5f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);

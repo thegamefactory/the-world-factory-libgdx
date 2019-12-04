@@ -10,13 +10,17 @@ import lombok.Builder;
 
 import java.time.Duration;
 
+/**
+ * {@link System} responsible of defining {@link Building} aspects.
+ * It implements it by ensuring that each entity with a {@link Building} component is attached an up to date {@link TransparentTexture} component.
+ */
 @Builder
-public class BuildingTextureSystem implements System, ComponentLifecycleListener<Building> {
+public class BuildingAspectSystem implements System, ComponentLifecycleListener<Building> {
     private final TransparentTexture dirt;
     private final TransparentTexture farm;
     private final TransparentTexture field;
 
-    public BuildingTextureSystem(
+    public BuildingAspectSystem(
             final TransparentTexture dirt,
             final TransparentTexture farm,
             final TransparentTexture field) {

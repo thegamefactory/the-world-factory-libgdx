@@ -2,6 +2,9 @@ package com.tgf.twf.core.geo;
 
 import lombok.Data;
 
+/**
+ * A float vector.
+ */
 @Data
 public class Vector2f {
     public float x;
