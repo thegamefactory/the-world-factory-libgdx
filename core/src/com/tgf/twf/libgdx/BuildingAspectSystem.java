@@ -28,6 +28,7 @@ public class BuildingAspectSystem implements System, ComponentLifecycleListener<
         this.farm = farm;
         this.field = field;
         Entities.allComponents(Building.class).forEach(this::onComponentAttached);
+        Entities.registerComponentLifecycleListener(this, Building.class);
     }
 
     @Override

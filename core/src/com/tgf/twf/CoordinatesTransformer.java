@@ -25,7 +25,7 @@ public class CoordinatesTransformer {
         output.y = (-x + y) * (tileSize.y / 2) + offset.y;
     }
 
-    public void convertToWorld(final Vector2 input, final Vector2f output) {
+    public void convertToWorld(final Vector2f input, final Vector2f output) {
         final float x = input.x;
         final float y = input.y;
         final float tmpX = (x - offset.x) / (tileSize.x);
