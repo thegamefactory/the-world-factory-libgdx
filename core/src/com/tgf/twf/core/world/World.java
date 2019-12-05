@@ -40,8 +40,10 @@ public class World implements System {
         taskSystem = new TaskSystem();
         Entities.registerComponentLifecycleListener(taskSystem, Agent.class);
 
+        final Building farmBuilding = new Building(BuildingType.FARM);
+        farmBuilding.setBuilt();
         final Entity farm = Entity.builder()
-                .withComponent(new Building(BuildingType.FARM))
+                .withComponent(farmBuilding)
                 .withComponent(Position.from(1, 1))
                 .buildAndAttach();
 

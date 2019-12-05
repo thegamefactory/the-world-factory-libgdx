@@ -17,8 +17,8 @@ public class Building {
         this.buildingDurationRemaining = buildingType.getBuildTime();
     }
 
-    public void build(final Duration duration) {
-        buildingDurationRemaining = buildingDurationRemaining.minus(duration);
+    public void build(final Duration delta) {
+        buildingDurationRemaining = buildingDurationRemaining.minus(delta);
         if (buildingDurationRemaining.isNegative()) {
             buildingDurationRemaining = Duration.ZERO;
         }
@@ -28,7 +28,7 @@ public class Building {
         return buildingDurationRemaining.isZero();
     }
 
-    public double buildProgress() {
-        return (double) buildingDurationRemaining.toMillis() / buildingType.getBuildTime().toMillis();
+    public void setBuilt() {
+        buildingDurationRemaining = Duration.ZERO;
     }
 }

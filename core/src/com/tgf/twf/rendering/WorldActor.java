@@ -1,4 +1,4 @@
-package com.tgf.twf;
+package com.tgf.twf.rendering;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -6,13 +6,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.PlayerIntentionApi;
 import com.tgf.twf.core.world.World;
-import com.tgf.twf.libgdx.BuildingAspectSystem;
-import com.tgf.twf.libgdx.TransparentTexture;
+import com.tgf.twf.input.WorldInputListener;
 
 import java.time.Duration;
 
 /**
- * An {@link Actor} that ticks the {@link World}, draws it with a {@link WorldDrawable} and processes inputs with a {@link WorldInputProcessor}.
+ * An {@link Actor} that ticks the {@link World}, draws it with a {@link WorldDrawable} and processes inputs with a {@link WorldInputListener}.
  */
 public class WorldActor extends Image {
     private final World world;
@@ -60,7 +59,7 @@ public class WorldActor extends Image {
                 .build());
         setBounds(0, 0, sizeX, sizeY);
 
-        addListener(new WorldInputProcessor(new PlayerIntentionApi(world), coordinatesTransformer));
+        addListener(new WorldInputListener(new PlayerIntentionApi(world), coordinatesTransformer));
     }
 
     @Override

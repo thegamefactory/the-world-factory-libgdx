@@ -1,4 +1,4 @@
-package com.tgf.twf.libgdx;
+package com.tgf.twf.rendering;
 
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.ComponentLifecycleListener;
@@ -47,12 +47,15 @@ public class BuildingAspectSystem implements System, ComponentLifecycleListener<
     }
 
     public TransparentTexture getBuildingTexture(final Building building) {
+        if (!building.isBuilt()) {
+            return dirt;
+        }
         final BuildingType buildingType = building.getBuildingType();
         switch (buildingType) {
             case FARM:
                 return farm;
             case FIELD:
-                return building.isBuilt() ? field : dirt;
+                return field;
             default:
                 throw new IllegalStateException("Not a valid building type: " + buildingType);
         }

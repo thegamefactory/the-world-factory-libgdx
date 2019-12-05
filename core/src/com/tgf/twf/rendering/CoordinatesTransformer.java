@@ -1,4 +1,4 @@
-package com.tgf.twf;
+package com.tgf.twf.rendering;
 
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;

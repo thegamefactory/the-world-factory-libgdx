@@ -1,4 +1,4 @@
-package com.tgf.twf.libgdx;
+package com.tgf.twf.rendering;
 
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;

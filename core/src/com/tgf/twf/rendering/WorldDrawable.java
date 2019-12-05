@@ -1,4 +1,4 @@
-package com.tgf.twf;
+package com.tgf.twf.rendering;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -8,7 +8,6 @@ import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.World;
 import com.tgf.twf.core.world.task.Agent;
-import com.tgf.twf.libgdx.TransparentTexture;
 import lombok.Builder;
 
 import java.util.List;
