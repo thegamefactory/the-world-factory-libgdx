@@ -35,6 +35,7 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
 
         gameStage = new Stage();
         Gdx.input.setInputProcessor(gameStage);
+        Gdx.input.setInputProcessor(new GameInputProcessor(gameStage));
 
         final WorldActor worldActor = new WorldActor(world, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         worldActor.addListener(worldInputProcessor);
