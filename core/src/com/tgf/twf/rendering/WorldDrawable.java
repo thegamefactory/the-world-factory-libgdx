@@ -9,8 +9,6 @@ import com.tgf.twf.core.world.World;
 import com.tgf.twf.core.world.task.Agent;
 import lombok.Builder;
 
-import java.util.List;
-
 /**
  * A drawable that draws the world in the given {@link Batch}.
  */
@@ -26,6 +24,8 @@ public class WorldDrawable extends BaseDrawable {
     // TODO: terrain
     private final TransparentTexture grass;
 
+    final int MAX_AGENTS_RENDERED_PER_TILE = 5;
+
     @Override
     public void draw(final Batch batch, final float x, final float y, final float width, final float height) {
         final Vector2 pos = new Vector2();
@@ -33,18 +33,18 @@ public class WorldDrawable extends BaseDrawable {
         final Vector2f tileSize = coordinatesTransformer.getTileSize();
         final Vector2 worldSize = world.getSize();
 
+        final Agent[] agents = new Agent[MAX_AGENTS_RENDERED_PER_TILE];
         for (pos.y = worldSize.y - 1; pos.y >= 0; --pos.y) {
             for (pos.x = 0; pos.x < worldSize.x; ++pos.x) {
                 coordinatesTransformer.convertToScreen(pos, screenPos);
-
                 batch.draw(
                         imageAt(pos),
                         screenPos.x - tileSize.x / 2,
                         screenPos.y - tileSize.y / 2);
-                final List<Agent> agents = world.getGeoMap().getAgentsAt(pos.x, pos.y);
-                for (int i = 0; i < agents.size(); i++) {
+                world.getGeoMap().getAgentsAt(pos.x, pos.y, agents);
+                for (int i = 0; i < agents.length && agents[i] != null; i++) {
                     final Texture agentTexture;
-                    if (agents.get(i).isIdle()) {
+                    if (agents[i].isIdle()) {
                         agentTexture = agentIdle;
                     } else {
                         agentTexture = agent;

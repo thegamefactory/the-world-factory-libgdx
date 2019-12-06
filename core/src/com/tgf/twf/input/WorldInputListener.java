@@ -7,6 +7,7 @@ import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.PlayerIntentionApi;
 import com.tgf.twf.rendering.CoordinatesTransformer;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
@@ -20,6 +21,12 @@ public class WorldInputListener extends InputListener {
     @Setter
     private Tool activeTool;
 
+    @Getter
+    private final Vector2f mouseWorld = new Vector2f();
+
+    @Getter
+    private final Vector2f mouseScreen = new Vector2f();
+
     @Override
     public boolean touchDown(final InputEvent event, final float x, final float y, final int pointer, final int button) {
         if (button != Input.Buttons.LEFT || pointer > 0 || activeTool == null) {
@@ -29,5 +36,14 @@ public class WorldInputListener extends InputListener {
         final Vector2f world = new Vector2f();
         coordinatesTransformer.convertToWorld(screen, world);
         return activeTool.execute(Position.from(world));
+    }
+
+
+    @Override
+    public boolean mouseMoved(final InputEvent event, final float x, final float y) {
+        mouseScreen.x = x;
+        mouseScreen.y = y;
+        coordinatesTransformer.convertToWorld(mouseScreen, mouseWorld);
+        return false;
     }
 }

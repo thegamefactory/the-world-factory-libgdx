@@ -3,8 +3,6 @@ package com.tgf.twf.rendering;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.tgf.twf.core.geo.Vector2f;
-import com.tgf.twf.core.world.PlayerIntentionApi;
 import com.tgf.twf.core.world.World;
 import com.tgf.twf.input.WorldInputListener;
 
@@ -32,13 +30,9 @@ public class WorldActor extends Image {
 
     private final BuildingAspectSystem buildingAspectSystem;
 
-    public WorldActor(final World world, final float sizeX, final float sizeY) {
+    public WorldActor(final World world, final CoordinatesTransformer coordinatesTransformer) {
         this.world = world;
-
-        coordinatesTransformer = CoordinatesTransformer.builder()
-                .tileSize(new Vector2f(90, 54))
-                .offset(new Vector2f(45, 200))
-                .build();
+        this.coordinatesTransformer = coordinatesTransformer;
 
         dirt = new TransparentTexture("dirt_tile.png");
         farm = new TransparentTexture("farm_tile.png");
@@ -57,9 +51,6 @@ public class WorldActor extends Image {
                 .grass(grass)
                 .world(world)
                 .build());
-        setBounds(0, 0, sizeX, sizeY);
-
-        addListener(new WorldInputListener(new PlayerIntentionApi(world), coordinatesTransformer));
     }
 
     @Override

@@ -9,7 +9,6 @@ import com.tgf.twf.core.world.task.Agent;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -29,17 +28,33 @@ public class GeoMap {
     }
 
     public Optional<Building> getBuildingAt(final int x, final int y) {
-        return getEntityAt(x, y).stream()
-                .map(entity -> entity.getComponent(Building.class))
-                .filter(Objects::nonNull)
-                .findFirst();
+        final List<Entity> entities = getEntityAt(x, y);
+
+        for (final Entity entity : entities) {
+            final Building building = entity.getComponent(Building.class);
+            if (null != building) {
+                return Optional.of(building);
+            }
+        }
+        return Optional.empty();
     }
 
-    public List<Agent> getAgentsAt(final int x, final int y) {
-        return getEntityAt(x, y).stream()
-                .map(entity -> entity.getComponent(Agent.class))
-                .filter(Objects::nonNull)
-                .collect(ImmutableList.toImmutableList());
+    public void getAgentsAt(final int x, final int y, final Agent[] agents) {
+        final List<Entity> entities = getEntityAt(x, y);
+
+        int i = 0;
+        for (final Entity entity : entities) {
+            final Agent agent = entity.getComponent(Agent.class);
+            if (null != agent) {
+                agents[i++] = agent;
+                if (i == agents.length) {
+                    break;
+                }
+            }
+        }
+        if (i != agents.length) {
+            agents[i] = null;
+        }
     }
 
     public boolean isPositionOccupied(final int x, final int y) {
@@ -51,7 +66,7 @@ public class GeoMap {
                 .anyMatch(e -> e.hasComponent(Building.class));
     }
 
-    private List<Entity> getEntityAt(final int x, final int y) {
+    public List<Entity> getEntityAt(final int x, final int y) {
         return Optional.ofNullable(entities[x * size.y + y]).orElse(ImmutableList.of());
     }
 

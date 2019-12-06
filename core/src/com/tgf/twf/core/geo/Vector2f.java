@@ -23,4 +23,8 @@ public class Vector2f {
     public Vector2f(final Vector2f other) {
         this(other.x, other.y);
     }
+
+    public String friendlyFormat() {
+        return String.format("[%.2f;%.2f]", x, y);
+    }
 }

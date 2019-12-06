@@ -9,11 +9,11 @@ import com.tgf.twf.core.world.World;
 
 public class DesktopLauncher {
     public static void main(final String[] arg) {
-        final Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-
-        config.setMaximized(true);
-
         final World world = Guice.createInjector(new WorldModule()).getInstance(World.class);
-        new Lwjgl3Application(new TheWorldFactoryGame(world), config);
+
+        final Lwjgl3ApplicationConfiguration lwjgl3ApplicationConfiguration = new Lwjgl3ApplicationConfiguration();
+        lwjgl3ApplicationConfiguration.setMaximized(true);
+
+        new Lwjgl3Application(new TheWorldFactoryGame(world), lwjgl3ApplicationConfiguration);
     }
 }

@@ -2,20 +2,24 @@ package com.tgf.twf;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.BuildingType;
 import com.tgf.twf.core.world.PlayerIntentionApi;
 import com.tgf.twf.core.world.World;
 import com.tgf.twf.input.BuildingToolButtonListener;
+import com.tgf.twf.input.GameInputProcessor;
 import com.tgf.twf.input.WorldInputListener;
 import com.tgf.twf.rendering.CoordinatesTransformer;
 import com.tgf.twf.rendering.WorldActor;
@@ -24,35 +28,44 @@ import com.tgf.twf.rendering.WorldActor;
  * Entry point; loads assets, create systems responsible for rendering and input processing, implements game loop and ticks systems.
  */
 public class TheWorldFactoryGame extends ApplicationAdapter {
+    private static final Vector2f TILE_SIZE = new Vector2f(90, 54);
+    private static final float CAMERA_SPEED_PIXELS_PER_SECONDS = 1000.0f;
+
     private final World world;
+    private WorldActor worldActor;
     private final PlayerIntentionApi playerIntentionApi;
 
+    private GameInputProcessor gameInputProcessor;
     private final CoordinatesTransformer coordinatesTransformer;
 
     private WorldInputListener worldInputListener;
     private Stage gameStage;
+    private Table uiLayout;
+
+    private Label debugLabel;
 
     public TheWorldFactoryGame(final World world) {
         this.world = world;
         this.playerIntentionApi = new PlayerIntentionApi(world);
-        this.coordinatesTransformer = CoordinatesTransformer.builder()
-                .tileSize(new Vector2f(90, 54))
-                .offset(new Vector2f(45, 200))
-                .build();
+        this.coordinatesTransformer = CoordinatesTransformer.ofTileSize(TILE_SIZE);
     }
 
     @Override
     public void resize(final int width, final int height) {
         gameStage.getViewport().update(width, height);
+        gameStage.getCamera().position.set(0f, 0f, 0f);
+        uiLayout.setBounds(-width * 0.5f, -height * 0.5f, width, height);
+        worldActor.setBounds(-width * 0.5f, -height * 0.5f, width, height);
+        coordinatesTransformer.setOffset(width * 0.5f, height * 0.5f);
     }
 
     @Override
     public void create() {
         gameStage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(gameStage);
-        Gdx.input.setInputProcessor(new GameInputProcessor(gameStage));
+        gameInputProcessor = new GameInputProcessor(gameStage);
+        Gdx.input.setInputProcessor(gameInputProcessor);
 
-        final WorldActor worldActor = new WorldActor(world, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        worldActor = new WorldActor(world, coordinatesTransformer);
         worldInputListener = new WorldInputListener(playerIntentionApi, coordinatesTransformer);
         worldActor.addListener(worldInputListener);
         gameStage.addActor(worldActor);
@@ -64,30 +77,38 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         final ImageButton farmButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(farmButtonTexture)));
         farmButton.addListener(new BuildingToolButtonListener(worldInputListener, BuildingType.FARM, playerIntentionApi));
 
-        final Container<Table> tableContainer = new Container<>();
-        final float sw = Gdx.graphics.getWidth();
-        final float sh = Gdx.graphics.getHeight();
+        final Label.LabelStyle defaultStyle = new Label.LabelStyle();
+        final BitmapFont defaultFont = new BitmapFont();
+        defaultStyle.font = defaultFont;
+        defaultStyle.fontColor = Color.BLACK;
 
-        final float cw = sw * 0.85f;
-        final float ch = sh * 0.85f;
+        debugLabel = new Label("", defaultStyle);
 
-        tableContainer.setSize(cw, ch);
-        tableContainer.setPosition(cw / 2f, ch / 2f);
-        tableContainer.fillX();
-
-        final Table table = new Table();
-        table.row();
-        table.add(farmButton);
-        table.row();
-        table.add(fieldButton);
-
-        tableContainer.setActor(table);
-
-        gameStage.addActor(tableContainer);
+        uiLayout = new Table();
+        uiLayout.setDebug(true);
+        uiLayout.row();
+        uiLayout.add(debugLabel).align(Align.left).expandX();
+        uiLayout.add(farmButton).align(Align.right);
+        uiLayout.row();
+        uiLayout.add().align(Align.right);
+        uiLayout.add(fieldButton);
+        uiLayout.row();
+        uiLayout.add().expandY();
+        gameStage.addActor(uiLayout);
     }
 
     @Override
     public void render() {
+        debugLabel.setText("fps: " + Gdx.graphics.getFramesPerSecond() +
+                "\nnativeHeap: " + Gdx.app.getNativeHeap() + "; javaHeap: " + Gdx.app.getJavaHeap() +
+                "\nmouseWorld: " + worldInputListener.getMouseWorld().friendlyFormat() +
+                ", mouseScreen: " + worldInputListener.getMouseScreen().friendlyFormat());
+
+        coordinatesTransformer.pan(
+                CAMERA_SPEED_PIXELS_PER_SECONDS * gameInputProcessor.horizontalSpeed() * Gdx.graphics.getDeltaTime(),
+                CAMERA_SPEED_PIXELS_PER_SECONDS * gameInputProcessor.verticalSpeed() * Gdx.graphics.getDeltaTime()
+        );
+
         Gdx.gl.glClearColor(0.5f, 0.5f, 0.5f, 1);
         Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
 
