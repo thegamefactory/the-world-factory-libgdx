@@ -6,7 +6,7 @@ import com.tgf.twf.core.world.task.ConstructTask;
 import lombok.RequiredArgsConstructor;
 
 /**
- * An world service which to invoke to express player intentions (captured by input).
+ * An world service to invoke to expressed player intentions (captured by input).
  */
 @RequiredArgsConstructor
 public class PlayerIntentionApi {
@@ -18,7 +18,6 @@ public class PlayerIntentionApi {
         }
 
         final Building building = new Building(buildingType);
-
         Entity.builder()
                 .withComponent(building)
                 .withComponent(position)

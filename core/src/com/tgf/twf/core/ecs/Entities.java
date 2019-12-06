@@ -3,6 +3,7 @@ package com.tgf.twf.core.ecs;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
+import lombok.Data;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,13 +15,17 @@ import java.util.stream.Stream;
  * Manages {@link Entity} lifecycle.
  * All active entities must be attached to {@link Entities} via the {@link #attachEntity(Entity)} method.
  * In practice {@link Entities} is a singleton and the creation of a new {@link Entity} automatically handles the attachment to {@link Entities}.
- * {@link ComponentLifecycleListener} and {@link ComponentStateUpdateListener}s can subscribe/unsubscribe to events fired by {@link Entities}.
  */
 public class Entities {
     private int nextId = 0;
     private final Map<EntityId, Entity> entities = new HashMap<>();
-    private final Multimap<Class<?>, ComponentLifecycleListener> componentLifecycleListeners = LinkedHashMultimap.create();
-    private final Multimap<Class<?>, ComponentStateUpdateListener> componentStateUpdateListeners = LinkedHashMultimap.create();
+    private final Multimap<ComponentEventKey, Component.EventListener> componentEventListeners = LinkedHashMultimap.create();
+
+    @Data
+    private static class ComponentEventKey {
+        private final Class<? extends Component> componentClass;
+        private final Class<? extends Component.Event> eventClass;
+    }
 
     private static final Entities INSTANCE = new Entities();
 
@@ -32,19 +37,25 @@ public class Entities {
         // no-op
     }
 
-    public static <StateT> void registerComponentLifecycleListener(
-            final ComponentLifecycleListener<StateT> listener,
-            final Class<StateT> component) {
-        getInstance().componentLifecycleListeners.put(component, listener);
+    /**
+     * Registers a {@link Component.EventListener} which will be notified for all events of the given {@link Component} class and of the given
+     * {@link Component.Event} class. The same {@link Component.EventListener} can be registered multiple times with different {@link Component}
+     * and {@link Component.Event} classes.
+     */
+    public static <ComponentT extends Component, EventT extends Component.Event> void registerComponentEventListener(
+            final Component.EventListener<ComponentT, EventT> listener,
+            final Class<ComponentT> componentClass,
+            final Class<EventT> eventClass) {
+        if (Component.class.equals(componentClass)) {
+            throw new IllegalArgumentException("Cannot register base component class. Use actual components implementations.");
+        }
+        if (Component.Event.class.equals(eventClass)) {
+            throw new IllegalArgumentException("Cannot register base event class. Use actual event implementations.");
+        }
+        getInstance().componentEventListeners.put(new ComponentEventKey(componentClass, eventClass), listener);
     }
 
-    public static <StateT> void registerComponentStateUpdateListener(
-            final ComponentStateUpdateListener<StateT> listener,
-            final Class<StateT> component) {
-        getInstance().componentStateUpdateListeners.put(component, listener);
-    }
-
-    public static <StateT> Stream<Component<StateT>> allComponents(final Class<StateT> componentStateClass) {
+    public static <ComponentT extends Component> Stream<ComponentT> allComponents(final Class<ComponentT> componentStateClass) {
         return getInstance().entities.values().stream().map(e -> e.getComponent(componentStateClass)).filter(Objects::nonNull);
     }
 
@@ -63,31 +74,28 @@ public class Entities {
         }
         entities.put(entity.getEntityId(), entity);
 
-        final List<Component<?>> components = ImmutableList.copyOf(entity.getComponents());
+        final List<Component> components = ImmutableList.copyOf(entity.getComponents());
         components.forEach(this::sendComponentAttachedEvents);
     }
 
-    <StateT> void attachComponent(final Component<StateT> component) {
+    <ComponentT extends Component> void attachComponent(final ComponentT component) {
         if (isComponentEntityAttached(component)) {
             sendComponentAttachedEvents(component);
         }
     }
 
-    private <StateT> void sendComponentAttachedEvents(final Component<StateT> component) {
-        componentLifecycleListeners.get(component.getStateClass()).forEach(l -> l.onComponentAttached(component));
-    }
-
-    <StateT> void updateComponentState(final Component<StateT> component, final StateT oldState) {
-        if (isComponentEntityAttached(component)) {
-            sendComponentUpdatedEvents(component, oldState);
-        }
-    }
-
-    private <StateT> void sendComponentUpdatedEvents(final Component<StateT> component, final StateT oldState) {
-        componentStateUpdateListeners.get(component.getStateClass()).forEach(l -> l.onComponentStateUpdated(component, oldState));
-    }
-
-    private boolean isComponentEntityAttached(final Component<?> component) {
+    private <ComponentT extends Component> boolean isComponentEntityAttached(final ComponentT component) {
         return entities.containsKey(component.getEntity().getEntityId());
+    }
+
+    private <ComponentT extends Component> void sendComponentAttachedEvents(final ComponentT component) {
+        componentEventListeners.get(new ComponentEventKey(component.getClass(), Component.CreationEvent.class))
+                .forEach(l -> l.handle(component, Component.CreationEvent.INSTANCE));
+    }
+
+    public boolean notify(final Component sender, final Component.Event event) {
+        componentEventListeners.get(new ComponentEventKey(sender.getClass(), event.getClass()))
+                .forEach(l -> l.handle(sender, event));
+        return true;
     }
 }

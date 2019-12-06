@@ -1,6 +1,5 @@
 package com.tgf.twf.core.world;
 
-import com.tgf.twf.core.ecs.Entities;
 import com.tgf.twf.core.ecs.Entity;
 import com.tgf.twf.core.ecs.System;
 import com.tgf.twf.core.geo.GeoMap;
@@ -34,14 +33,10 @@ public class World implements System {
         this.random = random;
 
         geoMap = new GeoMap(size);
-        Entities.registerComponentLifecycleListener(geoMap, Position.class);
-        Entities.registerComponentStateUpdateListener(geoMap, Position.class);
-
         taskSystem = new TaskSystem();
-        Entities.registerComponentLifecycleListener(taskSystem, Agent.class);
 
         final Building farmBuilding = new Building(BuildingType.FARM);
-        farmBuilding.setBuilt();
+        farmBuilding.setConstructed();
         final Entity farm = Entity.builder()
                 .withComponent(farmBuilding)
                 .withComponent(Position.from(1, 1))

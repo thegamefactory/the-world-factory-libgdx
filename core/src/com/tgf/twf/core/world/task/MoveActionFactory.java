@@ -1,7 +1,7 @@
 package com.tgf.twf.core.world.task;
 
-import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.geo.Position;
+import com.tgf.twf.core.geo.Vector2;
 
 import java.time.Duration;
 
@@ -14,14 +14,14 @@ public final class MoveActionFactory {
     private static final double SPEED = 1.0;
 
     public static Action create(
-            final Component<Agent> agent,
-            final Position startPosition,
-            final Position targetPosition) {
+            final Agent agent,
+            final Vector2 startPosition,
+            final Vector2 targetPosition) {
         return new TimedAction(
                 Duration.ofMillis((long) (1000 * targetPosition.manatthanDistance(startPosition) / SPEED)),
                 () -> {
-                    final Component<Position> positionComponent = agent.getRelatedComponent(Position.class);
-                    positionComponent.updateState(targetPosition);
+                    final Position position = agent.getRelatedComponent(Position.class);
+                    position.setPosition(targetPosition);
                 }
         );
     }

@@ -1,7 +1,6 @@
 package com.tgf.twf.rendering;
 
 import com.tgf.twf.core.ecs.Component;
-import com.tgf.twf.core.ecs.ComponentLifecycleListener;
 import com.tgf.twf.core.ecs.Entities;
 import com.tgf.twf.core.ecs.System;
 import com.tgf.twf.core.world.Building;
@@ -12,10 +11,11 @@ import java.time.Duration;
 
 /**
  * {@link System} responsible of defining {@link Building} aspects.
- * It implements it by ensuring that each entity with a {@link Building} component is attached an up to date {@link TransparentTexture} component.
+ * It implements it by ensuring that each entity with a {@link Building} component is attached an up to date {@link TransparentTexture}
+ * component.
  */
 @Builder
-public class BuildingAspectSystem implements System, ComponentLifecycleListener<Building> {
+public class BuildingAspectSystem implements System {
     private final TransparentTexture dirt;
     private final TransparentTexture farm;
     private final TransparentTexture field;
@@ -27,27 +27,29 @@ public class BuildingAspectSystem implements System, ComponentLifecycleListener<
         this.dirt = dirt;
         this.farm = farm;
         this.field = field;
-        Entities.allComponents(Building.class).forEach(this::onComponentAttached);
-        Entities.registerComponentLifecycleListener(this, Building.class);
+        Entities.allComponents(Building.class).forEach(this::attachTransparentTextureComponent);
+        Entities.registerComponentEventListener(this::handle, Building.class, Component.CreationEvent.class);
+        Entities.registerComponentEventListener(this::handle, Building.class, Building.ConstructedEvent.class);
     }
 
     @Override
     public void update(final Duration delta) {
-        // if this class was listening to building state events, it would not have to update the texture of all buildings at each frame
-        Entities.allComponents(Building.class).forEach(buildingStateComponent ->
-                buildingStateComponent
-                        .getRelatedComponent(TransparentTexture.class)
-                        .updateState(getBuildingTexture(buildingStateComponent.getState()))
-        );
     }
 
-    @Override
-    public void onComponentAttached(final Component<Building> component) {
-        component.getEntity().attachComponent(getBuildingTexture(component.getState()));
+    public void handle(final Building sender, final Component.CreationEvent event) {
+        attachTransparentTextureComponent(sender);
+    }
+
+    public void handle(final Building sender, final Building.ConstructedEvent event) {
+        sender.getEntity().getComponent(TransparentTexture.Component.class).setTransparentTexture(getBuildingTexture(sender));
+    }
+
+    private void attachTransparentTextureComponent(final Building sender) {
+        sender.getEntity().attachComponent(new TransparentTexture.Component(getBuildingTexture(sender)));
     }
 
     public TransparentTexture getBuildingTexture(final Building building) {
-        if (!building.isBuilt()) {
+        if (!building.isConstructed()) {
             return dirt;
         }
         final BuildingType buildingType = building.getBuildingType();

@@ -1,8 +1,8 @@
 package com.tgf.twf.core.world.task;
 
 import com.google.common.collect.ImmutableList;
-import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.geo.Position;
+import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.Building;
 import lombok.RequiredArgsConstructor;
 
@@ -14,15 +14,17 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 public class ConstructTask implements Task {
-    private final Building buildingComponent;
+    private final Building building;
     private final Position buildingPosition;
 
     @Override
-    public List<Action> createActions(final Component<Agent> agentStateComponent) {
+    public List<Action> createActions(final Agent agent) {
+        final Vector2 agentHomePos = agent.getHomePosition().toVector2();
+        final Vector2 buildingPos = buildingPosition.toVector2();
         return ImmutableList.of(
-                MoveActionFactory.create(agentStateComponent, agentStateComponent.getState().getHomePosition(), buildingPosition),
-                new ConstructAction(buildingComponent),
-                MoveActionFactory.create(agentStateComponent, buildingPosition, agentStateComponent.getState().getHomePosition())
+                MoveActionFactory.create(agent, agentHomePos, buildingPos),
+                new ConstructAction(building),
+                MoveActionFactory.create(agent, buildingPos, agentHomePos)
         );
     }
 }

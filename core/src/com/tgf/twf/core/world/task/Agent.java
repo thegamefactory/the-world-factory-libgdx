@@ -9,14 +9,14 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * A component state modeling an {@link Agent} able to enqueue {@link Action}s and execute them.
+ * A mobile entity able to enqueue {@link Action}s and execute them.
  * An {@link Agent} is attached to a {@link Building} home which it goes back to (via a move action) once other actions are completed.
  */
-public class Agent {
-    private final Component<Building> home;
+public class Agent extends Component {
+    private final Building home;
     private final Queue<Action> actions = new LinkedList<>();
 
-    public Agent(final Component<Building> home) {
+    public Agent(final Building home) {
         this.home = home;
     }
 
@@ -37,6 +37,6 @@ public class Agent {
     }
 
     public Position getHomePosition() {
-        return home.getRelatedComponent(Position.class).getState();
+        return home.getRelatedComponent(Position.class);
     }
 }

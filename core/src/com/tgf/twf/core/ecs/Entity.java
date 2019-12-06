@@ -17,7 +17,7 @@ public class Entity {
 
     // using a linked hash map so the order of the components attachments is preserved
     // this is useful to fire components detaching events in the reverse order when detaching an entity
-    private final LinkedHashMap<Class<?>, Component<?>> components;
+    private final LinkedHashMap<Class<?>, Component> components;
 
     private Entity(final EntityId entityId) {
         this.entityId = entityId;
@@ -32,8 +32,8 @@ public class Entity {
         return components.containsKey(clazz);
     }
 
-    public <StateT> Component<StateT> getComponent(final Class<StateT> clazz) {
-        return (Component<StateT>) components.get(clazz);
+    public <ComponentT> ComponentT getComponent(final Class<ComponentT> clazz) {
+        return (ComponentT) components.get(clazz);
     }
 
     @Override
@@ -58,20 +58,15 @@ public class Entity {
         return entityId.toString();
     }
 
-    public <StateT> Component<StateT> attachComponent(final StateT state) {
-        final Component<StateT> component = new Component<>(this, state);
-        attachComponent(component);
-        return component;
-    }
-
-    private <StateT> void attachComponent(final Component<StateT> component) {
-        if (!component.getEntity().equals(this)) {
-            throw new IllegalArgumentException("Component is not associated to this entity " + getEntityId());
+    public void attachComponent(final Component component) {
+        if (component.getEntity() != null) {
+            throw new IllegalArgumentException("Component is already attached to " + getEntityId());
         }
-        if (components.containsKey(component.getStateClass())) {
-            throw new IllegalArgumentException("Entity " + entityId + " already contains component " + component.getState().getClass().getSimpleName());
+        if (components.containsKey(component.getClass())) {
+            throw new IllegalArgumentException("Entity " + entityId + " already contains component " + component.getClass().getSimpleName());
         }
-        components.put(component.getStateClass(), component);
+        component.setEntity(this);
+        components.put(component.getClass(), component);
         Entities.getInstance().attachComponent(component);
     }
 
@@ -81,24 +76,22 @@ public class Entity {
 
     @RequiredArgsConstructor
     public static class Builder {
-        private final List<Object> components = new LinkedList<>();
+        private final List<Component> components = new LinkedList<>();
 
-        public <StateT> Builder withComponent(final StateT stateT) {
-            this.components.add(stateT);
+        public <ComponentT extends Component> Builder withComponent(final ComponentT component) {
+            this.components.add(component);
             return this;
         }
 
         public Entity buildAndAttach() {
             final Entity entity = new Entity(Entities.getInstance().allocateEntityId());
-            components.forEach(
-                    state -> entity.attachComponent(new Component<>(entity, state))
-            );
+            components.forEach(entity::attachComponent);
             Entities.getInstance().attachEntity(entity);
             return entity;
         }
     }
 
-    Collection<Component<?>> getComponents() {
+    Collection<Component> getComponents() {
         return components.values();
     }
 }

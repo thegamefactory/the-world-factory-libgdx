@@ -19,4 +19,8 @@ public class Vector2 {
         this.x = x;
         this.y = y;
     }
+
+    public int manatthanDistance(final Vector2 other) {
+        return Math.abs(x - other.x) + Math.abs(y - other.y);
+    }
 }

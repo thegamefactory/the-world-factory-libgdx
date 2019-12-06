@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.util.BitSet;
 
@@ -58,6 +59,16 @@ public class TransparentTexture extends Texture {
 
         void setOpaque(final int x, final int y) {
             bitSet.set(x * height + y);
+        }
+    }
+
+    public static class Component extends com.tgf.twf.core.ecs.Component {
+        @Getter
+        @Setter
+        private TransparentTexture transparentTexture;
+
+        public Component(final TransparentTexture transparentTexture) {
+            this.transparentTexture = transparentTexture;
         }
     }
 }

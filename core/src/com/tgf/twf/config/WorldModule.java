@@ -12,7 +12,7 @@ import java.util.Random;
  * Guice DI for {@link World}.
  */
 public class WorldModule extends AbstractModule {
-    private final Vector2 worldSize = new Vector2(5, 5);
+    private final Vector2 worldSize = new Vector2(15, 15);
 
     @Provides
     @Singleton

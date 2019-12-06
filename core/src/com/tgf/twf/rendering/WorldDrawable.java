@@ -3,7 +3,6 @@ package com.tgf.twf.rendering;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable;
-import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.World;
@@ -42,10 +41,10 @@ public class WorldDrawable extends BaseDrawable {
                         imageAt(pos),
                         screenPos.x - tileSize.x / 2,
                         screenPos.y - tileSize.y / 2);
-                final List<Component<Agent>> agents = world.getGeoMap().getAgentsAt(pos.x, pos.y);
+                final List<Agent> agents = world.getGeoMap().getAgentsAt(pos.x, pos.y);
                 for (int i = 0; i < agents.size(); i++) {
                     final Texture agentTexture;
-                    if (agents.get(i).getState().isIdle()) {
+                    if (agents.get(i).isIdle()) {
                         agentTexture = agentIdle;
                     } else {
                         agentTexture = agent;
@@ -60,8 +59,8 @@ public class WorldDrawable extends BaseDrawable {
 
     private TransparentTexture imageAt(final Vector2 pos) {
         return world.getGeoMap().getBuildingAt(pos.x, pos.y)
-                .map(buildingStateComponent -> buildingStateComponent.getRelatedComponent(TransparentTexture.class))
-                .map(Component::getState)
+                .map(building -> building.getRelatedComponent(TransparentTexture.Component.class))
+                .map(TransparentTexture.Component::getTransparentTexture)
                 .orElse(grass);
     }
 }

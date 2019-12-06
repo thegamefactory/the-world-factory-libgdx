@@ -78,8 +78,6 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
 
         tableContainer.setActor(table);
 
-//        gameStage.addActor(fieldButton);
-//        gameStage.addActor(farmButton);
         gameStage.addActor(tableContainer);
     }
 
