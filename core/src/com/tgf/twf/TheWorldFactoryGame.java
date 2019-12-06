@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.BuildingType;
 import com.tgf.twf.core.world.PlayerIntentionApi;
@@ -41,14 +42,18 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
     }
 
     @Override
-    public void create() {
-        worldInputListener = new WorldInputListener(playerIntentionApi, coordinatesTransformer);
+    public void resize(final int width, final int height) {
+        gameStage.getViewport().update(width, height);
+    }
 
-        gameStage = new Stage();
+    @Override
+    public void create() {
+        gameStage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(gameStage);
         Gdx.input.setInputProcessor(new GameInputProcessor(gameStage));
 
         final WorldActor worldActor = new WorldActor(world, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        worldInputListener = new WorldInputListener(playerIntentionApi, coordinatesTransformer);
         worldActor.addListener(worldInputListener);
         gameStage.addActor(worldActor);
 
