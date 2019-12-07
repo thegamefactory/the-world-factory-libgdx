@@ -36,20 +36,9 @@ public class CoordinatesTransformer {
         cameraPan.y = ((worldX - worldY) * tileSize.y) / 2;
     }
 
-    public Vector2f getTileSize() {
-        return new Vector2f(tileSize);
-    }
-
     public void convertWorldToScreen(final Vector2 world, final Vector2f screen) {
         final float x = world.x;
         final float y = world.y;
-        screen.x = (x + y) * (tileSize.x / 2) + cameraPan.x;
-        screen.y = (-x + y) * (tileSize.y / 2) + cameraPan.y;
-    }
-
-    public void convertWorldToScreen(final Vector2f world, final Vector2f screen, final boolean snap) {
-        final float x = snap ? Math.round(world.x) : world.x;
-        final float y = snap ? Math.round(world.y) : world.y;
         screen.x = (x + y) * (tileSize.x / 2) + cameraPan.x;
         screen.y = (-x + y) * (tileSize.y / 2) + cameraPan.y;
     }
@@ -77,9 +66,9 @@ public class CoordinatesTransformer {
         render.y = screen.y - tileSize.y / 2;
     }
 
-    public void convertWorldToRender(final Vector2f world, final Vector2f render) {
+    public void convertWorldToRender(final Vector2 world, final Vector2f render) {
         final Vector2f screen = new Vector2f();
-        convertWorldToScreen(world, screen, true);
+        convertWorldToScreen(world, screen);
         convertScreenToRender(screen, render);
     }
 }

@@ -18,11 +18,20 @@ public class ToolPreview {
     private Vector2f screenPosition;
     private final CoordinatesTransformer coordinatesTransformer;
 
-    public void preview(final Batch batch) {
-        final Vector2f render = new Vector2f();
-        coordinatesTransformer.convertScreenToWorld(screenPosition, render);
-        coordinatesTransformer.convertWorldToRender(render, render);
-        tool.preview(batch, render);
+    public boolean preview(final Batch batch) {
+        final Vector2f renderPosition = new Vector2f();
+        final Vector2 worldPosition = new Vector2();
+        coordinatesTransformer.convertScreenToWorld(screenPosition, worldPosition);
+        coordinatesTransformer.convertWorldToRender(worldPosition, renderPosition);
+        final boolean isSuccess = tool.execute(worldPosition, ExecutionMode.DRY_RUN);
+        if (isSuccess) {
+            batch.setColor(0.3f, 1.0f, 0.3f, 0.8f);
+        } else {
+            batch.setColor(1.0f, 0.3f, 0.3f, 0.8f);
+        }
+        tool.preview(batch, renderPosition);
+        batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        return isSuccess;
     }
 
     public Vector2 getWorldPosition() {

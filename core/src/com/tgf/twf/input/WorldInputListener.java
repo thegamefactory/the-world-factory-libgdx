@@ -3,7 +3,7 @@ package com.tgf.twf.input;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.tgf.twf.core.geo.Position;
+import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.PlayerIntentionApi;
 import com.tgf.twf.rendering.CoordinatesTransformer;
@@ -28,9 +28,9 @@ public class WorldInputListener extends InputListener {
             return false;
         }
         final Vector2f screen = new Vector2f(x, y);
-        final Vector2f world = new Vector2f();
+        final Vector2 world = new Vector2();
         coordinatesTransformer.convertScreenToWorld(screen, world);
-        return toolPreview.getTool().execute(Position.from(world));
+        return toolPreview.getTool().execute(world, ExecutionMode.COMMIT);
     }
 
 

@@ -1,14 +1,14 @@
 package com.tgf.twf.input;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.tgf.twf.core.geo.Position;
+import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
 
 /**
  * Defines an interface for player actions which can be executed at the given position. These are typically mutations to the world.
  */
 public interface Tool {
-    boolean execute(Position worldPosition);
+    boolean execute(Vector2 worldPosition, final ExecutionMode executionMode);
 
     void preview(Batch batch, Vector2f renderPos);
 
@@ -17,7 +17,7 @@ public interface Tool {
     final class DefaultTool implements Tool {
 
         @Override
-        public boolean execute(final Position worldPosition) {
+        public boolean execute(final Vector2 worldPosition, final ExecutionMode executionMode) {
             return false;
         }
 

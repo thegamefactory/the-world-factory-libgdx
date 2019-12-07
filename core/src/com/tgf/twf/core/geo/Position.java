@@ -19,6 +19,10 @@ public final class Position extends Component {
         return new Position(x, y);
     }
 
+    public static Position from(final Vector2 position) {
+        return new Position(position.x, position.y);
+    }
+
     public static Position from(final Vector2f position) {
         return new Position(Math.round(position.x), Math.round(position.y));
     }
