@@ -7,6 +7,7 @@ import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.World;
 import com.tgf.twf.core.world.task.Agent;
+import com.tgf.twf.input.ToolPreview;
 import lombok.Builder;
 
 /**
@@ -24,23 +25,23 @@ public class WorldDrawable extends BaseDrawable {
     // TODO: terrain
     private final TransparentTexture grass;
 
+    private final ToolPreview toolPreview;
+
     final int MAX_AGENTS_RENDERED_PER_TILE = 5;
 
     @Override
     public void draw(final Batch batch, final float x, final float y, final float width, final float height) {
         final Vector2 pos = new Vector2();
         final Vector2f screenPos = new Vector2f();
-        final Vector2f tileSize = coordinatesTransformer.getTileSize();
+        final Vector2f renderPos = new Vector2f();
         final Vector2 worldSize = world.getSize();
 
         final Agent[] agents = new Agent[MAX_AGENTS_RENDERED_PER_TILE];
         for (pos.y = worldSize.y - 1; pos.y >= 0; --pos.y) {
             for (pos.x = 0; pos.x < worldSize.x; ++pos.x) {
-                coordinatesTransformer.convertToScreen(pos, screenPos);
-                batch.draw(
-                        imageAt(pos),
-                        screenPos.x - tileSize.x / 2,
-                        screenPos.y - tileSize.y / 2);
+                coordinatesTransformer.convertWorldToScreen(pos, screenPos);
+                coordinatesTransformer.convertScreenToRender(screenPos, renderPos);
+                batch.draw(imageAt(pos), renderPos.x, renderPos.y);
                 world.getGeoMap().getAgentsAt(pos.x, pos.y, agents);
                 for (int i = 0; i < agents.length && agents[i] != null; i++) {
                     final Texture agentTexture;
@@ -55,6 +56,11 @@ public class WorldDrawable extends BaseDrawable {
                 }
             }
         }
+        drawToolPreview(batch);
+    }
+
+    private void drawToolPreview(final Batch batch) {
+        toolPreview.preview(batch);
     }
 
     private TransparentTexture imageAt(final Vector2 pos) {

@@ -9,7 +9,6 @@ import com.tgf.twf.core.world.PlayerIntentionApi;
 import com.tgf.twf.rendering.CoordinatesTransformer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 /**
  * Process player inputs and translates them into {@link PlayerIntentionApi} calls.
@@ -18,8 +17,7 @@ import lombok.Setter;
 public class WorldInputListener extends InputListener {
     private final PlayerIntentionApi playerIntentionApi;
     private final CoordinatesTransformer coordinatesTransformer;
-    @Setter
-    private Tool activeTool;
+    private final ToolPreview toolPreview;
 
     @Getter
     private final Vector2f mouseWorld = new Vector2f();
@@ -29,13 +27,13 @@ public class WorldInputListener extends InputListener {
 
     @Override
     public boolean touchDown(final InputEvent event, final float x, final float y, final int pointer, final int button) {
-        if (button != Input.Buttons.LEFT || pointer > 0 || activeTool == null) {
+        if (button != Input.Buttons.LEFT || pointer > 0 || toolPreview.getTool() == null) {
             return false;
         }
         final Vector2f screen = new Vector2f(x, y);
         final Vector2f world = new Vector2f();
-        coordinatesTransformer.convertToWorld(screen, world);
-        return activeTool.execute(Position.from(world));
+        coordinatesTransformer.convertScreenToWorld(screen, world);
+        return toolPreview.getTool().execute(Position.from(world));
     }
 
 
@@ -43,7 +41,12 @@ public class WorldInputListener extends InputListener {
     public boolean mouseMoved(final InputEvent event, final float x, final float y) {
         mouseScreen.x = x;
         mouseScreen.y = y;
-        coordinatesTransformer.convertToWorld(mouseScreen, mouseWorld);
+        coordinatesTransformer.convertScreenToWorld(mouseScreen, mouseWorld);
+        toolPreview.setWorldPosition(mouseWorld);
         return false;
+    }
+
+    public void setActiveTool(final Tool tool) {
+        toolPreview.setTool(tool);
     }
 }

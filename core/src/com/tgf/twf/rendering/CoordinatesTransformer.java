@@ -40,19 +40,37 @@ public class CoordinatesTransformer {
         return new Vector2f(tileSize);
     }
 
-    public void convertToScreen(final Vector2 input, final Vector2f output) {
-        final float x = input.x;
-        final float y = input.y;
-        output.x = (x + y) * (tileSize.x / 2) + cameraPan.x;
-        output.y = (-x + y) * (tileSize.y / 2) + cameraPan.y;
+    public void convertWorldToScreen(final Vector2 world, final Vector2f screen) {
+        final float x = world.x;
+        final float y = world.y;
+        screen.x = (x + y) * (tileSize.x / 2) + cameraPan.x;
+        screen.y = (-x + y) * (tileSize.y / 2) + cameraPan.y;
     }
 
-    public void convertToWorld(final Vector2f input, final Vector2f output) {
-        final float x = input.x;
-        final float y = input.y;
+    public void convertWorldToScreen(final Vector2f world, final Vector2f screen, final boolean snap) {
+        final float x = snap ? Math.round(world.x) : world.x;
+        final float y = snap ? Math.round(world.y) : world.y;
+        screen.x = (x + y) * (tileSize.x / 2) + cameraPan.x;
+        screen.y = (-x + y) * (tileSize.y / 2) + cameraPan.y;
+    }
+
+    public void convertScreenToWorld(final Vector2f screen, final Vector2f world) {
+        final float x = screen.x;
+        final float y = screen.y;
         final float tmpX = (x - (offset.x + cameraPan.x)) / (tileSize.x);
         final float tmpY = ((offset.y + cameraPan.y) - y) / (tileSize.y);
-        output.x = tmpX + tmpY;
-        output.y = tmpX - tmpY;
+        world.x = tmpX + tmpY;
+        world.y = tmpX - tmpY;
+    }
+
+    public void convertScreenToRender(final Vector2f screen, final Vector2f render) {
+        render.x = screen.x - tileSize.x / 2;
+        render.y = screen.y - tileSize.y / 2;
+    }
+
+    public void convertWorldToRender(final Vector2f world, final Vector2f render) {
+        final Vector2f screen = new Vector2f();
+        convertWorldToScreen(world, screen, true);
+        convertScreenToRender(screen, render);
     }
 }

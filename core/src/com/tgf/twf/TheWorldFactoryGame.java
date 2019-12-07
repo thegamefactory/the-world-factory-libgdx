@@ -20,7 +20,10 @@ import com.tgf.twf.core.world.PlayerIntentionApi;
 import com.tgf.twf.core.world.World;
 import com.tgf.twf.input.BuildingToolButtonListener;
 import com.tgf.twf.input.GameInputProcessor;
+import com.tgf.twf.input.Tool;
+import com.tgf.twf.input.ToolPreview;
 import com.tgf.twf.input.WorldInputListener;
+import com.tgf.twf.rendering.BuildingTextures;
 import com.tgf.twf.rendering.CoordinatesTransformer;
 import com.tgf.twf.rendering.WorldActor;
 
@@ -41,6 +44,7 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
     private WorldInputListener worldInputListener;
     private Stage gameStage;
     private Table uiLayout;
+    private BuildingTextures buildingTextures;
 
     private Label debugLabel;
 
@@ -66,17 +70,19 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         gameInputProcessor = new GameInputProcessor(gameStage);
         Gdx.input.setInputProcessor(gameInputProcessor);
 
-        worldActor = new WorldActor(world, coordinatesTransformer);
-        worldInputListener = new WorldInputListener(playerIntentionApi, coordinatesTransformer);
+        final ToolPreview toolPreview = new ToolPreview(Tool.DEFAULT_TOOL, new Vector2f(), coordinatesTransformer);
+        worldActor = new WorldActor(world, coordinatesTransformer, toolPreview);
+        worldInputListener = new WorldInputListener(playerIntentionApi, coordinatesTransformer, toolPreview);
         worldActor.addListener(worldInputListener);
         gameStage.addActor(worldActor);
 
+        buildingTextures = new BuildingTextures();
         final Texture fieldButtonTexture = new Texture("field_button.png");
         final ImageButton fieldButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(fieldButtonTexture)));
-        fieldButton.addListener(new BuildingToolButtonListener(worldInputListener, BuildingType.FIELD, playerIntentionApi));
+        fieldButton.addListener(new BuildingToolButtonListener(worldInputListener, BuildingType.FIELD, playerIntentionApi, buildingTextures));
         final Texture farmButtonTexture = new Texture("farm_button.png");
         final ImageButton farmButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(farmButtonTexture)));
-        farmButton.addListener(new BuildingToolButtonListener(worldInputListener, BuildingType.FARM, playerIntentionApi));
+        farmButton.addListener(new BuildingToolButtonListener(worldInputListener, BuildingType.FARM, playerIntentionApi, buildingTextures));
 
         final Label.LabelStyle defaultStyle = new Label.LabelStyle();
         final BitmapFont defaultFont = new BitmapFont();
