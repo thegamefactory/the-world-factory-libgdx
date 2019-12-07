@@ -3,7 +3,6 @@ package com.tgf.twf.core.world.task;
 import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.ResourceType;
-import javafx.util.Pair;
 
 import java.time.Duration;
 
@@ -33,7 +32,7 @@ public final class MoveActionFactory {
                 },
                 moveType.equals(MoveType.HOME) ?
                         Action.Cost.FREE :
-                        new Pair<>(ResourceType.FOOD, foodCostForPath(startPosition, targetPosition))
+                        Action.Cost.of(ResourceType.FOOD, foodCostForPath(startPosition, targetPosition))
         );
     }
 

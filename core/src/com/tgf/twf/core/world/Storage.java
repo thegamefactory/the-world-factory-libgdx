@@ -5,18 +5,19 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A component to model a capacity to store resources and the actual quantity of stored resources.
- * The capacity of the storage is modeled in {@link StorageCapacity}.
+ * The capacity of the storage is modeled in {@link Capacity}, while the actual stock is modeled in the {@link Inventory}.
  */
 @RequiredArgsConstructor
 public class Storage extends Component {
-    private final Map<ResourceType, Integer> storedItems = new HashMap<>();
-    private final StorageCapacity storageCapacity;
+    private final MutableInventory inventory = new MutableInventory();
+    private final Capacity capacity;
 
     public int getStoredQuantity(final ResourceType resourceType) {
-        return storedItems.getOrDefault(resourceType, 0);
+        return inventory.getStoredQuantity(resourceType);
     }
 
     /**
@@ -26,10 +27,10 @@ public class Storage extends Component {
      */
     public int store(final ResourceType resourceType, final int offeredQuantity) {
         int stored = 0;
-        final int remainingCapacity = storageCapacity.getRemainingCapacity(this, resourceType);
+        final int remainingCapacity = capacity.getRemainingCapacity(this, resourceType);
         if (remainingCapacity > 0) {
             stored = Math.min(remainingCapacity, offeredQuantity);
-            storedItems.put(resourceType, getStoredQuantity(resourceType) + stored);
+            inventory.store(resourceType, stored);
         }
         return stored;
     }
@@ -39,15 +40,72 @@ public class Storage extends Component {
      * @return true if the storage had enough resources in store to satisfy the demand. If true, the resources are removed from the storage. If
      * false, the storage is left untouched.
      */
-    public boolean tryConsumeResources(final Map<ResourceType, Integer> resources) {
-        final boolean canAllocate = resources.entrySet().stream().allMatch(c -> getStoredQuantity(c.getKey()) >= c.getValue());
+    public boolean tryConsumeResources(final Inventory resources) {
+        final boolean canAllocate = resources.getStoredResourceTypes().stream()
+                .allMatch(resourceType -> inventory.getStoredQuantity(resourceType) >= resources.getStoredQuantity(resourceType));
         if (canAllocate) {
-            resources.forEach(this::forceConsume);
+            resources.getStoredResourceTypes()
+                    .forEach(resourceType -> forceConsume(resourceType, resources.getStoredQuantity(resourceType)));
         }
         return canAllocate;
     }
 
     private void forceConsume(final ResourceType resourceType, final int requestedQuantity) {
-        storedItems.put(resourceType, getStoredQuantity(resourceType) - requestedQuantity);
+        inventory.retrieve(resourceType, requestedQuantity);
+    }
+
+    /**
+     * Defines a storage capacity.
+     * The capacity defines the quantity of resources of a {@link ResourceType }that a given {@link Storage} can stock, on top of the resources that
+     * the storage already has in stock.
+     */
+    @FunctionalInterface
+    public interface Capacity {
+        int getRemainingCapacity(final Storage currentStorage, final ResourceType resourceType);
+    }
+
+    /**
+     * An interface to represent the inventory of the {@link Storage}.
+     */
+    public interface Inventory {
+        int getStoredQuantity(ResourceType resourceType);
+
+        Set<ResourceType> getStoredResourceTypes();
+    }
+
+    public static class MutableInventory implements Inventory {
+        private final Map<ResourceType, Integer> stock = new HashMap<>();
+
+        @Override
+        public int getStoredQuantity(final ResourceType resourceType) {
+            return stock.getOrDefault(resourceType, 0);
+        }
+
+        @Override
+        public Set<ResourceType> getStoredResourceTypes() {
+            return stock.keySet();
+        }
+
+        public void store(final ResourceType resourceType, final int quantity) {
+            this.stock.put(resourceType, this.stock.getOrDefault(resourceType, 0) + quantity);
+        }
+
+        public void store(final Inventory inventory) {
+            for (final ResourceType resourceType : inventory.getStoredResourceTypes()) {
+                store(resourceType, inventory.getStoredQuantity(resourceType));
+            }
+        }
+
+        public void retrieve(final ResourceType resourceType, final int quantity) {
+            final int currentStock = this.stock.getOrDefault(resourceType, 0);
+            if (currentStock < quantity) {
+                throw new IllegalStateException("Cannot retrieve " + quantity + " of " + resourceType + "; only " + currentStock + " available");
+            }
+            this.stock.put(resourceType, currentStock - quantity);
+        }
+
+        public void clear() {
+            stock.clear();
+        }
     }
 }

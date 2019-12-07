@@ -3,16 +3,12 @@ package com.tgf.twf.core.world.task;
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.Entities;
 import com.tgf.twf.core.ecs.System;
-import com.tgf.twf.core.world.ResourceType;
 import com.tgf.twf.core.world.Storage;
-import javafx.util.Pair;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -51,15 +47,16 @@ public class TaskSystem implements System {
     }
 
     private void assignTaskToIdleAgents() {
-        final Map<ResourceType, Integer> costMap = new HashMap<>();
+        final Storage.MutableInventory cost = new Storage.MutableInventory();
         final Queue<Task> deadLetterQueue = new LinkedList<>();
 
         while (!idleAgents.isEmpty() && !unassignedTasks.isEmpty()) {
             final Agent idleAgent = idleAgents.poll();
             final Task unassignedTask = unassignedTasks.poll();
             final List<Action> actions = unassignedTask.createActions(idleAgent);
-            collectCost(actions, costMap);
-            if (idleAgent.getHomePosition().getRelatedComponent(Storage.class).tryConsumeResources(costMap)) {
+            cost.clear();
+            collectCost(actions, cost);
+            if (idleAgent.getHomePosition().getRelatedComponent(Storage.class).tryConsumeResources(cost)) {
                 idleAgent.addActions(actions);
                 busyAgents.add(idleAgent);
             } else {
@@ -70,11 +67,10 @@ public class TaskSystem implements System {
         this.unassignedTasks = deadLetterQueue;
     }
 
-    private void collectCost(final List<Action> actions, final Map<ResourceType, Integer> costMap) {
-        costMap.clear();
+    private void collectCost(final List<Action> actions, final Storage.MutableInventory cost) {
         for (final Action action : actions) {
-            final Pair<ResourceType, Integer> cost = action.getCost();
-            costMap.put(cost.getKey(), costMap.getOrDefault(cost.getKey(), 0) + cost.getValue());
+            final Storage.Inventory actionCost = action.getCost();
+            cost.store(actionCost);
         }
     }
 

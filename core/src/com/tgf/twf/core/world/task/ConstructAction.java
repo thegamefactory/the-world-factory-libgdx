@@ -1,8 +1,7 @@
 package com.tgf.twf.core.world.task;
 
 import com.tgf.twf.core.world.Building;
-import com.tgf.twf.core.world.ResourceType;
-import javafx.util.Pair;
+import com.tgf.twf.core.world.Storage;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Duration;
@@ -25,7 +24,7 @@ public class ConstructAction implements Action {
     }
 
     @Override
-    public Pair<ResourceType, Integer> getCost() {
+    public Storage.Inventory getCost() {
         return Cost.ONE_FOOD;
     }
 }

@@ -9,7 +9,7 @@ import java.time.Duration;
  * A {@link BuildingType} defines the behavior of {@link Building} instances that are constructed from it.
  */
 @RequiredArgsConstructor
-public class BuildingType implements StorageCapacity {
+public class BuildingType implements Storage.Capacity {
     public static BuildingType FARM = new BuildingType(Duration.ofSeconds(15), 20);
     public static BuildingType FIELD = new BuildingType(Duration.ofSeconds(15), 5);
 

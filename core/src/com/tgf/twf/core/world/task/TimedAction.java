@@ -1,7 +1,6 @@
 package com.tgf.twf.core.world.task;
 
-import com.tgf.twf.core.world.ResourceType;
-import javafx.util.Pair;
+import com.tgf.twf.core.world.Storage;
 import lombok.AllArgsConstructor;
 
 import java.time.Duration;
@@ -14,7 +13,7 @@ import java.time.Duration;
 public class TimedAction implements Action {
     private Duration remainingDuration;
     private final CompletionCallback completionCallback;
-    private final Pair<ResourceType, Integer> cost;
+    private final Storage.Inventory cost;
 
     @FunctionalInterface
     public interface CompletionCallback {
@@ -37,7 +36,7 @@ public class TimedAction implements Action {
     }
 
     @Override
-    public Pair<ResourceType, Integer> getCost() {
+    public Storage.Inventory getCost() {
         return cost;
     }
 }
