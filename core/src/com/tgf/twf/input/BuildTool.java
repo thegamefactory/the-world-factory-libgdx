@@ -5,7 +5,7 @@ import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.BuildingType;
 import com.tgf.twf.core.world.PlayerIntentionApi;
-import com.tgf.twf.rendering.TransparentTexture;
+import com.tgf.twf.rendering.TransparentSprite;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class BuildTool implements Tool {
     private final PlayerIntentionApi playerIntentionApi;
     private final BuildingType buildingType;
-    private final TransparentTexture buildingTexture;
+    private final TransparentSprite buildingSprite;
 
     @Override
     public boolean execute(final Position worldPosition) {
@@ -25,7 +25,7 @@ public class BuildTool implements Tool {
     @Override
     public void preview(final Batch batch, final Vector2f renderPos) {
         batch.setColor(1.0f, 1.0f, 1.0f, 0.7f);
-        batch.draw(buildingTexture, renderPos.x, renderPos.y);
+        batch.draw(buildingSprite.getSprite(), renderPos.x, renderPos.y);
         batch.setColor(1.0f, 1.0f, 1.0f, 1f);
     }
 }

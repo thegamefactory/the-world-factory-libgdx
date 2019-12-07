@@ -1,4 +1,8 @@
 buildscript {
+    ext {
+        gdxVersion = '1.9.10'
+    }
+
     repositories {
         mavenLocal()
         mavenCentral()
@@ -8,14 +12,14 @@ buildscript {
         google()
     }
     dependencies {
+        classpath "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
     }
 }
 
 allprojects {
     version = '1.0'
     ext {
-        appName = "the-world-factory"
-        gdxVersion = '1.9.10'
+        appName = 'the-world-factory'
         roboVMVersion = '2.3.8'
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
@@ -47,5 +51,21 @@ project(":core") {
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
+    }
+}
+
+// Store the parameters you want to pass the texturePacker here...
+project.ext.texturePacker = ["core/assets/images/", "core/assets/packedimages/", "pack"]
+
+// Import the texture packer
+import com.badlogic.gdx.tools.texturepacker.TexturePacker
+
+// Add a new task that packs the textures for you
+task texturePacker {
+    doLast {
+        if (project.ext.has('texturePacker')) {
+            logger.info "Calling TexturePacker: " + texturePacker
+            TexturePacker.process(texturePacker[0], texturePacker[1], texturePacker[2])
+        }
     }
 }

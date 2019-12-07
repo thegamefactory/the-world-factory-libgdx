@@ -3,7 +3,10 @@ package com.tgf.twf.rendering;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.utils.Disposable;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
@@ -12,13 +15,20 @@ import java.util.BitSet;
 /**
  * {@link Texture} maintaining a {@link Mask} which can be queried to define if the image is opaque or not at a certain pixel.
  */
-public class TransparentTexture extends Texture {
+public class TransparentSprite implements Disposable {
+    @Getter
+    private final Sprite sprite;
     @Getter
     private final Mask mask;
 
-    public TransparentTexture(final String path) {
-        super(path);
-        this.mask = fromTexture(this);
+    public TransparentSprite(@NonNull final Sprite sprite) {
+        this.sprite = sprite;
+        this.mask = fromTexture(sprite.getTexture());
+    }
+
+    @Override
+    public void dispose() {
+        this.sprite.getTexture().dispose();
     }
 
     public interface Mask {
@@ -65,10 +75,10 @@ public class TransparentTexture extends Texture {
     public static class Component extends com.tgf.twf.core.ecs.Component {
         @Getter
         @Setter
-        private TransparentTexture transparentTexture;
+        private TransparentSprite transparentSprite;
 
-        public Component(final TransparentTexture transparentTexture) {
-            this.transparentTexture = transparentTexture;
+        public Component(final TransparentSprite transparentSprite) {
+            this.transparentSprite = transparentSprite;
         }
     }
 }

@@ -1,8 +1,10 @@
 package com.tgf.twf.rendering;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable;
+import com.badlogic.gdx.utils.Disposable;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.World;
@@ -13,17 +15,27 @@ import lombok.Builder;
 /**
  * A drawable that draws the world in the given {@link Batch}.
  */
-@Builder
-public class WorldDrawable extends BaseDrawable {
+public class WorldDrawable extends BaseDrawable implements Disposable {
     private final World world;
     private final CoordinatesTransformer coordinatesTransformer;
 
-    // TODO: make this a texture component of the agent entity
-    private final Texture agent;
-    private final Texture agentIdle;
+    @Builder
+    public WorldDrawable(
+            final World world,
+            final CoordinatesTransformer coordinatesTransformer,
+            final ToolPreview toolPreview,
+            final TextureAtlas textureAtlas) {
+        this.world = world;
+        this.coordinatesTransformer = coordinatesTransformer;
+        this.toolPreview = toolPreview;
+        this.agent = textureAtlas.createSprite("agent");
+        this.agentIdle = textureAtlas.createSprite("agent_idle");
+        this.grass = new TransparentSprite(textureAtlas.createSprite("grass_tile"));
+    }
 
-    // TODO: terrain
-    private final TransparentTexture grass;
+    private final Sprite agent;
+    private final Sprite agentIdle;
+    private final TransparentSprite grass;
 
     private final ToolPreview toolPreview;
 
@@ -44,7 +56,7 @@ public class WorldDrawable extends BaseDrawable {
                 batch.draw(imageAt(pos), renderPos.x, renderPos.y);
                 world.getGeoMap().getAgentsAt(pos.x, pos.y, agents);
                 for (int i = 0; i < agents.length && agents[i] != null; i++) {
-                    final Texture agentTexture;
+                    final Sprite agentTexture;
                     if (agents[i].isIdle()) {
                         agentTexture = agentIdle;
                     } else {
@@ -63,10 +75,18 @@ public class WorldDrawable extends BaseDrawable {
         toolPreview.preview(batch);
     }
 
-    private TransparentTexture imageAt(final Vector2 pos) {
+    private Sprite imageAt(final Vector2 pos) {
         return world.getGeoMap().getBuildingAt(pos.x, pos.y)
-                .map(building -> building.getRelatedComponent(TransparentTexture.Component.class))
-                .map(TransparentTexture.Component::getTransparentTexture)
-                .orElse(grass);
+                .map(building -> building.getRelatedComponent(TransparentSprite.Component.class))
+                .map(TransparentSprite.Component::getTransparentSprite)
+                .orElse(grass)
+                .getSprite();
+    }
+
+    @Override
+    public void dispose() {
+        this.grass.getSprite().getTexture().dispose();
+        this.agent.getTexture().dispose();
+        this.agentIdle.getTexture().dispose();
     }
 }

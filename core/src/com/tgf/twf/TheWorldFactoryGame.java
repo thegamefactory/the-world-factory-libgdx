@@ -4,8 +4,9 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL30;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.BuildingType;
@@ -27,6 +29,7 @@ import com.tgf.twf.input.WorldInputListener;
 import com.tgf.twf.rendering.BuildingTextures;
 import com.tgf.twf.rendering.CoordinatesTransformer;
 import com.tgf.twf.rendering.WorldActor;
+import com.tgf.twf.rendering.WorldDrawable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -86,23 +89,42 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         );
         Gdx.input.setInputProcessor(gameInputProcessor);
 
-        final PlayerIntentionApi playerIntentionApi = new PlayerIntentionApi(world);
+        final TextureAtlas textureAtlas;
+        try {
+            textureAtlas = new TextureAtlas(Gdx.files.internal("packedimages/pack.atlas"));
+        } catch (final GdxRuntimeException e) {
+            throw new IllegalStateException(
+                    "Could not load texture atlas, did you forget to pack the textures? Run './gradlew texturePacker' to pack the textures."
+            );
+        }
+
         final ToolPreview toolPreview = new ToolPreview(Tool.DEFAULT_TOOL, new Vector2f(), coordinatesTransformer);
-        final WorldInputListener worldInputListener = new WorldInputListener(playerIntentionApi, coordinatesTransformer, toolPreview);
-        final WorldActor worldActor = new WorldActor(world, coordinatesTransformer, toolPreview);
+
+        final WorldDrawable worldDrawable = WorldDrawable.builder()
+                .coordinatesTransformer(coordinatesTransformer)
+                .textureAtlas(textureAtlas)
+                .toolPreview(toolPreview)
+                .world(world)
+                .build();
+        disposables.add(worldDrawable);
+
+        final WorldActor worldActor = new WorldActor(world, worldDrawable);
         resizeCallbacks.add((width, height) -> worldActor.setBounds(-width * 0.5f, -height * 0.5f, width, height));
-        disposables.add(worldActor);
-        worldActor.addListener(worldInputListener);
         gameStage.addActor(worldActor);
 
-        final BuildingTextures buildingTextures = new BuildingTextures();
+        final PlayerIntentionApi playerIntentionApi = new PlayerIntentionApi(world);
+
+        final WorldInputListener worldInputListener = new WorldInputListener(playerIntentionApi, coordinatesTransformer, toolPreview);
+        worldActor.addListener(worldInputListener);
+
+        final BuildingTextures buildingTextures = new BuildingTextures(textureAtlas);
         disposables.add(buildingTextures);
-        final Texture fieldButtonTexture = new Texture("field_button.png");
-        disposables.add(fieldButtonTexture);
+        final Sprite fieldButtonTexture = textureAtlas.createSprite("field_button");
+        disposables.add(fieldButtonTexture.getTexture());
         final ImageButton fieldButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(fieldButtonTexture)));
         fieldButton.addListener(new BuildingToolButtonListener(worldInputListener, BuildingType.FIELD, playerIntentionApi, buildingTextures));
-        final Texture farmButtonTexture = new Texture("farm_button.png");
-        disposables.add(farmButtonTexture);
+        final Sprite farmButtonTexture = textureAtlas.createSprite("farm_button");
+        disposables.add(farmButtonTexture.getTexture());
         final ImageButton farmButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(farmButtonTexture)));
         farmButton.addListener(new BuildingToolButtonListener(worldInputListener, BuildingType.FARM, playerIntentionApi, buildingTextures));
 
