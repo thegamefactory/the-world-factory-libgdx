@@ -27,6 +27,9 @@ import com.tgf.twf.rendering.BuildingTextures;
 import com.tgf.twf.rendering.CoordinatesTransformer;
 import com.tgf.twf.rendering.WorldActor;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Entry point; loads assets, create systems responsible for rendering and input processing, implements game loop and ticks systems.
  */
@@ -35,48 +38,60 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
     private static final float CAMERA_SPEED_PIXELS_PER_SECONDS = 1000.0f;
 
     private final World world;
-    private WorldActor worldActor;
-    private final PlayerIntentionApi playerIntentionApi;
 
-    private GameInputProcessor gameInputProcessor;
-    private final CoordinatesTransformer coordinatesTransformer;
+    private final List<ResizeCallback> resizeCallbacks = new LinkedList<>();
+    private final List<RenderCallback> renderCallbacks = new LinkedList<>();
 
-    private WorldInputListener worldInputListener;
-    private Stage gameStage;
-    private Table uiLayout;
-    private BuildingTextures buildingTextures;
+    @FunctionalInterface
+    private interface ResizeCallback {
+        void resize(final int width, final int height);
+    }
 
-    private Label debugLabel;
+    @FunctionalInterface
+    private interface RenderCallback {
+        void render();
+    }
 
     public TheWorldFactoryGame(final World world) {
         this.world = world;
-        this.playerIntentionApi = new PlayerIntentionApi(world);
-        this.coordinatesTransformer = CoordinatesTransformer.ofTileSize(TILE_SIZE);
-    }
-
-    @Override
-    public void resize(final int width, final int height) {
-        gameStage.getViewport().update(width, height);
-        gameStage.getCamera().position.set(0f, 0f, 0f);
-        uiLayout.setBounds(-width * 0.5f, -height * 0.5f, width, height);
-        worldActor.setBounds(-width * 0.5f, -height * 0.5f, width, height);
-        coordinatesTransformer.setOffset(width * 0.5f, height * 0.5f);
-        coordinatesTransformer.centerCamera((world.getSize().x - 1) * 0.5f, (world.getSize().y - 1) * 0.5f);
     }
 
     @Override
     public void create() {
-        gameStage = new Stage(new ScreenViewport());
-        gameInputProcessor = new GameInputProcessor(gameStage);
+        final Stage gameStage = new Stage(new ScreenViewport());
+        resizeCallbacks.add((width, height) -> {
+            gameStage.getViewport().update(width, height);
+            gameStage.getCamera().position.set(0f, 0f, 0f);
+        });
+        renderCallbacks.add(() -> {
+            gameStage.act(Gdx.graphics.getDeltaTime());
+            gameStage.draw();
+        });
+
+        final CoordinatesTransformer coordinatesTransformer = CoordinatesTransformer.ofTileSize(TILE_SIZE);
+        resizeCallbacks.add((width, height) -> {
+            coordinatesTransformer.setOffset(width * 0.5f, height * 0.5f);
+            coordinatesTransformer.centerCamera((world.getSize().x - 1) * 0.5f, (world.getSize().y - 1) * 0.5f);
+        });
+
+        final GameInputProcessor gameInputProcessor = new GameInputProcessor(gameStage);
+        renderCallbacks.add(() ->
+                coordinatesTransformer.pan(
+                        CAMERA_SPEED_PIXELS_PER_SECONDS * gameInputProcessor.horizontalSpeed() * Gdx.graphics.getDeltaTime(),
+                        CAMERA_SPEED_PIXELS_PER_SECONDS * gameInputProcessor.verticalSpeed() * Gdx.graphics.getDeltaTime()
+                )
+        );
         Gdx.input.setInputProcessor(gameInputProcessor);
 
+        final PlayerIntentionApi playerIntentionApi = new PlayerIntentionApi(world);
         final ToolPreview toolPreview = new ToolPreview(Tool.DEFAULT_TOOL, new Vector2f(), coordinatesTransformer);
-        worldActor = new WorldActor(world, coordinatesTransformer, toolPreview);
-        worldInputListener = new WorldInputListener(playerIntentionApi, coordinatesTransformer, toolPreview);
+        final WorldInputListener worldInputListener = new WorldInputListener(playerIntentionApi, coordinatesTransformer, toolPreview);
+        final WorldActor worldActor = new WorldActor(world, coordinatesTransformer, toolPreview);
+        resizeCallbacks.add((width, height) -> worldActor.setBounds(-width * 0.5f, -height * 0.5f, width, height));
         worldActor.addListener(worldInputListener);
         gameStage.addActor(worldActor);
 
-        buildingTextures = new BuildingTextures();
+        final BuildingTextures buildingTextures = new BuildingTextures();
         final Texture fieldButtonTexture = new Texture("field_button.png");
         final ImageButton fieldButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(fieldButtonTexture)));
         fieldButton.addListener(new BuildingToolButtonListener(worldInputListener, BuildingType.FIELD, playerIntentionApi, buildingTextures));
@@ -89,9 +104,15 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         defaultStyle.font = defaultFont;
         defaultStyle.fontColor = Color.BLACK;
 
-        debugLabel = new Label("", defaultStyle);
+        final Label debugLabel = new Label("", defaultStyle);
+        this.renderCallbacks.add(() ->
+                debugLabel.setText("fps: " + Gdx.graphics.getFramesPerSecond() +
+                        "\nnativeHeap: " + Gdx.app.getNativeHeap() + "; javaHeap: " + Gdx.app.getJavaHeap() +
+                        "\nmouseWorld: " + worldInputListener.getMouseWorld().friendlyFormat() +
+                        ", mouseScreen: " + worldInputListener.getMouseScreen().friendlyFormat()));
 
-        uiLayout = new Table();
+        final Table uiLayout = new Table();
+        resizeCallbacks.add((width, height) -> uiLayout.setBounds(-width * 0.5f, -height * 0.5f, width, height));
         uiLayout.setDebug(true);
         uiLayout.row();
         uiLayout.add(debugLabel).align(Align.left).expandX();
@@ -106,21 +127,19 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
 
     @Override
     public void render() {
-        debugLabel.setText("fps: " + Gdx.graphics.getFramesPerSecond() +
-                "\nnativeHeap: " + Gdx.app.getNativeHeap() + "; javaHeap: " + Gdx.app.getJavaHeap() +
-                "\nmouseWorld: " + worldInputListener.getMouseWorld().friendlyFormat() +
-                ", mouseScreen: " + worldInputListener.getMouseScreen().friendlyFormat());
-
-        coordinatesTransformer.pan(
-                CAMERA_SPEED_PIXELS_PER_SECONDS * gameInputProcessor.horizontalSpeed() * Gdx.graphics.getDeltaTime(),
-                CAMERA_SPEED_PIXELS_PER_SECONDS * gameInputProcessor.verticalSpeed() * Gdx.graphics.getDeltaTime()
-        );
-
         Gdx.gl.glClearColor(0.5f, 0.5f, 0.5f, 1);
         Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
 
-        gameStage.act(Gdx.graphics.getDeltaTime());
-        gameStage.draw();
+        for (final RenderCallback renderCallback : renderCallbacks) {
+            renderCallback.render();
+        }
+    }
+
+    @Override
+    public void resize(final int width, final int height) {
+        for (final ResizeCallback resizeCallback : resizeCallbacks) {
+            resizeCallback.resize(width, height);
+        }
     }
 
     @Override
