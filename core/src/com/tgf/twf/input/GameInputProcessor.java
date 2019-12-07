@@ -14,6 +14,7 @@ import java.util.List;
  */
 public class GameInputProcessor implements InputProcessor {
     private final InputProcessor delegate;
+    private final ToolPreview toolPreview;
 
     private final List<Integer> leftKeys = new LinkedList<>();
     private final List<Integer> rightKeys = new LinkedList<>();
@@ -24,6 +25,19 @@ public class GameInputProcessor implements InputProcessor {
     private boolean isRightPressed = false;
     private boolean isUpPressed = false;
     private boolean isDownPressed = false;
+
+    public GameInputProcessor(final InputProcessor delegate, final ToolPreview toolPreview) {
+        this.delegate = delegate;
+        this.toolPreview = toolPreview;
+        this.leftKeys.add(Input.Keys.A);
+        this.leftKeys.add(Input.Keys.LEFT);
+        this.rightKeys.add(Input.Keys.D);
+        this.rightKeys.add(Input.Keys.RIGHT);
+        this.upKeys.add(Input.Keys.W);
+        this.upKeys.add(Input.Keys.UP);
+        this.downKeys.add(Input.Keys.S);
+        this.downKeys.add(Input.Keys.DOWN);
+    }
 
     public int horizontalSpeed() {
         if (isLeftPressed && !isRightPressed) {
@@ -45,22 +59,14 @@ public class GameInputProcessor implements InputProcessor {
         return 0;
     }
 
-    public GameInputProcessor(final InputProcessor delegate) {
-        this.delegate = delegate;
-        this.leftKeys.add(Input.Keys.A);
-        this.leftKeys.add(Input.Keys.LEFT);
-        this.rightKeys.add(Input.Keys.D);
-        this.rightKeys.add(Input.Keys.RIGHT);
-        this.upKeys.add(Input.Keys.W);
-        this.upKeys.add(Input.Keys.UP);
-        this.downKeys.add(Input.Keys.S);
-        this.downKeys.add(Input.Keys.DOWN);
-    }
-
     @Override
     public boolean keyDown(final int keycode) {
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-            Gdx.app.exit();
+            if (Tool.NULL_TOOL.equals(toolPreview.getTool())) {
+                Gdx.app.exit();
+            } else {
+                toolPreview.setTool(Tool.NULL_TOOL);
+            }
             return true;
         }
         return keyInput(keycode, true) || delegate.keyDown(keycode);

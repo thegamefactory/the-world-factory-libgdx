@@ -12,7 +12,7 @@ public interface Tool {
 
     void preview(Batch batch, Vector2f renderPos);
 
-    Tool DEFAULT_TOOL = new DefaultTool();
+    Tool NULL_TOOL = new DefaultTool();
 
     final class DefaultTool implements Tool {
 

@@ -80,7 +80,9 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
             coordinatesTransformer.centerCamera((world.getSize().x - 1) * 0.5f, (world.getSize().y - 1) * 0.5f);
         });
 
-        final GameInputProcessor gameInputProcessor = new GameInputProcessor(gameStage);
+        final ToolPreview toolPreview = new ToolPreview(Tool.NULL_TOOL, new Vector2f(), coordinatesTransformer);
+
+        final GameInputProcessor gameInputProcessor = new GameInputProcessor(gameStage, toolPreview);
         renderCallbacks.add(() ->
                 coordinatesTransformer.pan(
                         CAMERA_SPEED_PIXELS_PER_SECONDS * gameInputProcessor.horizontalSpeed() * Gdx.graphics.getDeltaTime(),
@@ -97,8 +99,6 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
                     "Could not load texture atlas, did you forget to pack the textures? Run './gradlew texturePacker' to pack the textures."
             );
         }
-
-        final ToolPreview toolPreview = new ToolPreview(Tool.DEFAULT_TOOL, new Vector2f(), coordinatesTransformer);
 
         final WorldDrawable worldDrawable = WorldDrawable.builder()
                 .coordinatesTransformer(coordinatesTransformer)
