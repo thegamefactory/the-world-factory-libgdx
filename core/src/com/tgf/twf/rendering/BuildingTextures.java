@@ -1,5 +1,6 @@
 package com.tgf.twf.rendering;
 
+import com.badlogic.gdx.utils.Disposable;
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.Entities;
 import com.tgf.twf.core.ecs.System;
@@ -13,7 +14,7 @@ import lombok.Builder;
  * component.
  */
 @Builder
-public class BuildingTextures {
+public class BuildingTextures implements Disposable {
     private final TransparentTexture dirt = new TransparentTexture("dirt_tile.png");
     private final TransparentTexture farm = new TransparentTexture("farm_tile.png");
     private final TransparentTexture field = new TransparentTexture("field_tile.png");
@@ -51,5 +52,12 @@ public class BuildingTextures {
             return field;
         }
         throw new IllegalStateException("Not a valid building type: " + buildingType);
+    }
+
+    @Override
+    public void dispose() {
+        this.field.dispose();
+        this.farm.dispose();
+        this.dirt.dispose();
     }
 }

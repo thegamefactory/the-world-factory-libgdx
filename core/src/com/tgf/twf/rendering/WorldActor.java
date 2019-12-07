@@ -3,6 +3,7 @@ package com.tgf.twf.rendering;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.Disposable;
 import com.tgf.twf.core.world.World;
 import com.tgf.twf.input.ToolPreview;
 import com.tgf.twf.input.WorldInputListener;
@@ -12,7 +13,7 @@ import java.time.Duration;
 /**
  * An {@link Actor} that ticks the {@link World}, draws it with a {@link WorldDrawable} and processes inputs with a {@link WorldInputListener}.
  */
-public class WorldActor extends Image {
+public class WorldActor extends Image implements Disposable {
     private final World world;
 
     private final CoordinatesTransformer coordinatesTransformer;
@@ -53,5 +54,12 @@ public class WorldActor extends Image {
         // TODO: then, if since the last update there was 0.02341384s, we would tick the world two times
         // TODO: this has nice properties that from the world point of view time is decomposed in discrete, constant intervals (1 tick)
         this.world.update(deltaDuration);
+    }
+
+    @Override
+    public void dispose() {
+        this.agent.dispose();
+        this.agentIdle.dispose();
+        this.grass.dispose();
     }
 }

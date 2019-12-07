@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.BuildingType;
@@ -41,6 +42,7 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
 
     private final List<ResizeCallback> resizeCallbacks = new LinkedList<>();
     private final List<RenderCallback> renderCallbacks = new LinkedList<>();
+    private final List<Disposable> disposables = new LinkedList<>();
 
     @FunctionalInterface
     private interface ResizeCallback {
@@ -67,6 +69,7 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
             gameStage.act(Gdx.graphics.getDeltaTime());
             gameStage.draw();
         });
+        disposables.add(gameStage);
 
         final CoordinatesTransformer coordinatesTransformer = CoordinatesTransformer.ofTileSize(TILE_SIZE);
         resizeCallbacks.add((width, height) -> {
@@ -88,19 +91,24 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         final WorldInputListener worldInputListener = new WorldInputListener(playerIntentionApi, coordinatesTransformer, toolPreview);
         final WorldActor worldActor = new WorldActor(world, coordinatesTransformer, toolPreview);
         resizeCallbacks.add((width, height) -> worldActor.setBounds(-width * 0.5f, -height * 0.5f, width, height));
+        disposables.add(worldActor);
         worldActor.addListener(worldInputListener);
         gameStage.addActor(worldActor);
 
         final BuildingTextures buildingTextures = new BuildingTextures();
+        disposables.add(buildingTextures);
         final Texture fieldButtonTexture = new Texture("field_button.png");
+        disposables.add(fieldButtonTexture);
         final ImageButton fieldButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(fieldButtonTexture)));
         fieldButton.addListener(new BuildingToolButtonListener(worldInputListener, BuildingType.FIELD, playerIntentionApi, buildingTextures));
         final Texture farmButtonTexture = new Texture("farm_button.png");
+        disposables.add(farmButtonTexture);
         final ImageButton farmButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(farmButtonTexture)));
         farmButton.addListener(new BuildingToolButtonListener(worldInputListener, BuildingType.FARM, playerIntentionApi, buildingTextures));
 
         final Label.LabelStyle defaultStyle = new Label.LabelStyle();
         final BitmapFont defaultFont = new BitmapFont();
+        disposables.add(defaultFont);
         defaultStyle.font = defaultFont;
         defaultStyle.fontColor = Color.BLACK;
 
@@ -144,5 +152,8 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
 
     @Override
     public void dispose() {
+        for (final Disposable disposable : disposables) {
+            disposable.dispose();
+        }
     }
 }
