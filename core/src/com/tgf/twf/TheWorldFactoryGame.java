@@ -57,6 +57,7 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         uiLayout.setBounds(-width * 0.5f, -height * 0.5f, width, height);
         worldActor.setBounds(-width * 0.5f, -height * 0.5f, width, height);
         coordinatesTransformer.setOffset(width * 0.5f, height * 0.5f);
+        coordinatesTransformer.centerCamera((world.getSize().x - 1) * 0.5f, (world.getSize().y - 1) * 0.5f);
     }
 
     @Override

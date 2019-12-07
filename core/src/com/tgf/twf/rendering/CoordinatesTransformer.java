@@ -31,6 +31,11 @@ public class CoordinatesTransformer {
         cameraPan.y = cameraPan.y + deltaY;
     }
 
+    public void centerCamera(final float worldX, final float worldY) {
+        cameraPan.x = -((worldX + worldY) * tileSize.x) / 2;
+        cameraPan.y = ((worldX - worldY) * tileSize.y) / 2;
+    }
+
     public Vector2f getTileSize() {
         return new Vector2f(tileSize);
     }
