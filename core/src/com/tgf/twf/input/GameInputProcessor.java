@@ -27,20 +27,20 @@ public class GameInputProcessor implements InputProcessor {
 
     public int horizontalSpeed() {
         if (isLeftPressed && !isRightPressed) {
-            return -1;
+            return 1;
         }
         if (isRightPressed && !isLeftPressed) {
-            return 1;
+            return -1;
         }
         return 0;
     }
 
     public int verticalSpeed() {
         if (isUpPressed && !isDownPressed) {
-            return 1;
+            return -1;
         }
         if (isDownPressed && !isUpPressed) {
-            return -1;
+            return 1;
         }
         return 0;
     }
