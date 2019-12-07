@@ -3,11 +3,16 @@ package com.tgf.twf.core.world.task;
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.Entities;
 import com.tgf.twf.core.ecs.System;
+import com.tgf.twf.core.world.ResourceType;
+import com.tgf.twf.core.world.Storage;
+import javafx.util.Pair;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -19,7 +24,7 @@ import java.util.Set;
  * {@link Action} queue of the {@link Agent}; if the queue is empty, it puts back the {@link Agent} into the idle {@link Agent} pool.
  */
 public class TaskSystem implements System {
-    private final Queue<Task> unassignedTasks = new LinkedList<>();
+    private Queue<Task> unassignedTasks = new LinkedList<>();
     private final Queue<Agent> idleAgents = new LinkedList<>();
     private final List<Agent> busyAgents = new LinkedList<>();
 
@@ -46,12 +51,30 @@ public class TaskSystem implements System {
     }
 
     private void assignTaskToIdleAgents() {
+        final Map<ResourceType, Integer> costMap = new HashMap<>();
+        final Queue<Task> deadLetterQueue = new LinkedList<>();
+
         while (!idleAgents.isEmpty() && !unassignedTasks.isEmpty()) {
             final Agent idleAgent = idleAgents.poll();
             final Task unassignedTask = unassignedTasks.poll();
             final List<Action> actions = unassignedTask.createActions(idleAgent);
-            idleAgent.addActions(actions);
-            busyAgents.add(idleAgent);
+            collectCost(actions, costMap);
+            if (idleAgent.getHomePosition().getRelatedComponent(Storage.class).tryConsumeResources(costMap)) {
+                idleAgent.addActions(actions);
+                busyAgents.add(idleAgent);
+            } else {
+                idleAgents.add(idleAgent);
+                deadLetterQueue.add(unassignedTask);
+            }
+        }
+        this.unassignedTasks = deadLetterQueue;
+    }
+
+    private void collectCost(final List<Action> actions, final Map<ResourceType, Integer> costMap) {
+        costMap.clear();
+        for (final Action action : actions) {
+            final Pair<ResourceType, Integer> cost = action.getCost();
+            costMap.put(cost.getKey(), costMap.getOrDefault(cost.getKey(), 0) + cost.getValue());
         }
     }
 

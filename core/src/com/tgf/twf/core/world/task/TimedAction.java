@@ -1,19 +1,20 @@
 package com.tgf.twf.core.world.task;
 
+import com.tgf.twf.core.world.ResourceType;
+import javafx.util.Pair;
+import lombok.AllArgsConstructor;
+
 import java.time.Duration;
 
 /**
  * A generic {@link Action} that waits the given {@link Duration}, and completes and invokes the {@link CompletionCallback} once the action has been
  * updated for a total time corresponding to the total duration.
  */
+@AllArgsConstructor
 public class TimedAction implements Action {
     private Duration remainingDuration;
     private final CompletionCallback completionCallback;
-
-    public TimedAction(final Duration totalTime, final CompletionCallback completionCallback) {
-        this.remainingDuration = totalTime;
-        this.completionCallback = completionCallback;
-    }
+    private final Pair<ResourceType, Integer> cost;
 
     @FunctionalInterface
     public interface CompletionCallback {
@@ -33,5 +34,10 @@ public class TimedAction implements Action {
             remainingDuration = Duration.ZERO;
             completionCallback.complete();
         }
+    }
+
+    @Override
+    public Pair<ResourceType, Integer> getCost() {
+        return cost;
     }
 }

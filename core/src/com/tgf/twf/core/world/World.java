@@ -35,16 +35,13 @@ public class World implements System {
         geoMap = new GeoMap(size);
         taskSystem = new TaskSystem();
 
-        final Building farmBuilding = new Building(BuildingType.FARM);
-        farmBuilding.setConstructed();
-        final Entity farm = Entity.builder()
-                .withComponent(farmBuilding)
-                .withComponent(Position.from(1, 1))
-                .buildAndAttach();
+        final Building farm = Building.createEntity(BuildingType.FARM, new Position(1, 1));
+        farm.setConstructed();
+        farm.getRelatedComponent(Storage.class).store(ResourceType.FOOD, 2);
 
         for (int i = 0; i < 3; i++) {
             Entity.builder()
-                    .withComponent(new Agent(farm.getComponent(Building.class)))
+                    .withComponent(new Agent(farm))
                     .withComponent(Position.from(1, 1))
                     .buildAndAttach();
         }

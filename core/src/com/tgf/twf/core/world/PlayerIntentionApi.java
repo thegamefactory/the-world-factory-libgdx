@@ -1,6 +1,5 @@
 package com.tgf.twf.core.world;
 
-import com.tgf.twf.core.ecs.Entity;
 import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.world.task.ConstructTask;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +16,7 @@ public class PlayerIntentionApi {
             return false;
         }
 
-        final Building building = new Building(buildingType);
-        Entity.builder()
-                .withComponent(building)
-                .withComponent(position)
-                .buildAndAttach();
-
+        final Building building = Building.createEntity(buildingType, position);
         world.getTaskSystem().addTask(
                 new ConstructTask(building, position)
         );

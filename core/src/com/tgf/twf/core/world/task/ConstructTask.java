@@ -22,9 +22,9 @@ public class ConstructTask implements Task {
         final Vector2 agentHomePos = agent.getHomePosition().toVector2();
         final Vector2 buildingPos = buildingPosition.toVector2();
         return ImmutableList.of(
-                MoveActionFactory.create(agent, agentHomePos, buildingPos),
+                MoveActionFactory.create(agent, agentHomePos, buildingPos, MoveActionFactory.MoveType.STANDARD),
                 new ConstructAction(building),
-                MoveActionFactory.create(agent, buildingPos, agentHomePos)
+                MoveActionFactory.create(agent, buildingPos, agentHomePos, MoveActionFactory.MoveType.HOME)
         );
     }
 }

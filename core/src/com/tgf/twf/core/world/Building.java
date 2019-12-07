@@ -1,6 +1,8 @@
 package com.tgf.twf.core.world;
 
 import com.tgf.twf.core.ecs.Component;
+import com.tgf.twf.core.ecs.Entity;
+import com.tgf.twf.core.geo.Position;
 import lombok.Getter;
 
 import java.time.Duration;
@@ -22,6 +24,16 @@ public class Building extends Component {
     public Building(final BuildingType buildingType) {
         this.buildingType = buildingType;
         this.buildingDurationRemaining = buildingType.getBuildTime();
+    }
+
+    public static Building createEntity(final BuildingType buildingType, final Position position) {
+        final Building building = new Building(buildingType);
+        Entity.builder()
+                .withComponent(building)
+                .withComponent(position)
+                .withComponent(new Storage(buildingType))
+                .buildAndAttach();
+        return building;
     }
 
     public void build(final Duration delta) {

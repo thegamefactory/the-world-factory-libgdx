@@ -44,13 +44,12 @@ public class BuildingTextures {
     }
 
     public TransparentTexture getBuildingTexture(final BuildingType buildingType) {
-        switch (buildingType) {
-            case FARM:
-                return farm;
-            case FIELD:
-                return field;
-            default:
-                throw new IllegalStateException("Not a valid building type: " + buildingType);
+        if (buildingType.equals(BuildingType.FARM)) {
+            return farm;
         }
+        if (buildingType.equals(BuildingType.FIELD)) {
+            return field;
+        }
+        throw new IllegalStateException("Not a valid building type: " + buildingType);
     }
 }
