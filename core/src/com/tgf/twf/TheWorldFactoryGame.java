@@ -135,11 +135,14 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         defaultStyle.fontColor = Color.BLACK;
 
         final Label debugLabel = new Label("", defaultStyle);
-        this.renderCallbacks.add(() ->
-                debugLabel.setText("fps: " + Gdx.graphics.getFramesPerSecond() +
-                        "\nnativeHeap: " + Gdx.app.getNativeHeap() + "; javaHeap: " + Gdx.app.getJavaHeap() +
-                        "\nmouseWorld: " + worldInputListener.getMouseWorld().friendlyFormat() +
-                        ", mouseScreen: " + worldInputListener.getMouseScreen().friendlyFormat()));
+        final Vector2f mouseWorld = new Vector2f();
+        this.renderCallbacks.add(() -> {
+            coordinatesTransformer.convertScreenToWorld(worldInputListener.getMouseScreen(), mouseWorld);
+            debugLabel.setText("fps: " + Gdx.graphics.getFramesPerSecond() +
+                    "\nnativeHeap: " + Gdx.app.getNativeHeap() + "; javaHeap: " + Gdx.app.getJavaHeap() +
+                    "\nmouseWorld: " + mouseWorld.friendlyFormat() +
+                    ", mouseScreen: " + worldInputListener.getMouseScreen().friendlyFormat());
+        });
 
         final Table uiLayout = new Table();
         resizeCallbacks.add((width, height) -> uiLayout.setBounds(-width * 0.5f, -height * 0.5f, width, height));

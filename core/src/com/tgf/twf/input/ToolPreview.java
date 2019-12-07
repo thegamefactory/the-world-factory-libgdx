@@ -14,12 +14,13 @@ import lombok.Data;
 @AllArgsConstructor
 public class ToolPreview {
     private Tool tool;
-    private Vector2f worldPosition;
+    private Vector2f screenPosition;
     private final CoordinatesTransformer coordinatesTransformer;
 
     public void preview(final Batch batch) {
         final Vector2f render = new Vector2f();
-        coordinatesTransformer.convertWorldToRender(worldPosition, render);
+        coordinatesTransformer.convertScreenToWorld(screenPosition, render);
+        coordinatesTransformer.convertWorldToRender(render, render);
         tool.preview(batch, render);
     }
 }

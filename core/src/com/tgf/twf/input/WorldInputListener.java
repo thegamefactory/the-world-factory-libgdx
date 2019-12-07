@@ -20,9 +20,6 @@ public class WorldInputListener extends InputListener {
     private final ToolPreview toolPreview;
 
     @Getter
-    private final Vector2f mouseWorld = new Vector2f();
-
-    @Getter
     private final Vector2f mouseScreen = new Vector2f();
 
     @Override
@@ -41,8 +38,7 @@ public class WorldInputListener extends InputListener {
     public boolean mouseMoved(final InputEvent event, final float x, final float y) {
         mouseScreen.x = x;
         mouseScreen.y = y;
-        coordinatesTransformer.convertScreenToWorld(mouseScreen, mouseWorld);
-        toolPreview.setWorldPosition(mouseWorld);
+        toolPreview.setScreenPosition(mouseScreen);
         return false;
     }
 
