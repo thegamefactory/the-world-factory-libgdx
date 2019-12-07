@@ -47,6 +47,7 @@ public class WorldDrawable extends BaseDrawable implements Disposable {
         final Vector2f screenPos = new Vector2f();
         final Vector2f renderPos = new Vector2f();
         final Vector2 worldSize = world.getSize();
+        final Vector2 toolPreviousPos = toolPreview.getWorldPosition();
 
         final Agent[] agents = new Agent[MAX_AGENTS_RENDERED_PER_TILE];
         for (pos.y = worldSize.y - 1; pos.y >= 0; --pos.y) {
@@ -66,13 +67,11 @@ public class WorldDrawable extends BaseDrawable implements Disposable {
                             screenPos.x + ((int) (agent.getWidth() * (i - 0.5))),
                             screenPos.y + (int) (agent.getHeight() * -0.5));
                 }
+                if (toolPreviousPos.x == pos.x && toolPreviousPos.y == pos.y) {
+                    toolPreview.preview(batch);
+                }
             }
         }
-        drawToolPreview(batch);
-    }
-
-    private void drawToolPreview(final Batch batch) {
-        toolPreview.preview(batch);
     }
 
     private Sprite imageAt(final Vector2 pos) {

@@ -63,6 +63,15 @@ public class CoordinatesTransformer {
         world.y = tmpX - tmpY;
     }
 
+    public void convertScreenToWorld(final Vector2f screen, final Vector2 world) {
+        final float x = screen.x;
+        final float y = screen.y;
+        final float tmpX = (x - (offset.x + cameraPan.x)) / (tileSize.x);
+        final float tmpY = ((offset.y + cameraPan.y) - y) / (tileSize.y);
+        world.x = Math.round(tmpX + tmpY);
+        world.y = Math.round(tmpX - tmpY);
+    }
+
     public void convertScreenToRender(final Vector2f screen, final Vector2f render) {
         render.x = screen.x - tileSize.x / 2;
         render.y = screen.y - tileSize.y / 2;

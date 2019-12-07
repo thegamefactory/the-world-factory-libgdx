@@ -1,6 +1,7 @@
 package com.tgf.twf.input;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.rendering.CoordinatesTransformer;
 import lombok.AllArgsConstructor;
@@ -22,5 +23,11 @@ public class ToolPreview {
         coordinatesTransformer.convertScreenToWorld(screenPosition, render);
         coordinatesTransformer.convertWorldToRender(render, render);
         tool.preview(batch, render);
+    }
+
+    public Vector2 getWorldPosition() {
+        final Vector2 worldPosition = new Vector2();
+        coordinatesTransformer.convertScreenToWorld(screenPosition, worldPosition);
+        return worldPosition;
     }
 }
