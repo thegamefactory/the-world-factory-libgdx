@@ -28,11 +28,11 @@ public class BuildingTextures implements Disposable {
         Entities.registerComponentEventListener(this::handle, Building.class, Building.ConstructedEvent.class);
     }
 
-    public void handle(final Building sender, final Component.CreationEvent event) {
+    private void handle(final Building sender, final Component.CreationEvent event) {
         attachTransparentTextureComponent(sender);
     }
 
-    public void handle(final Building sender, final Building.ConstructedEvent event) {
+    private void handle(final Building sender, final Building.ConstructedEvent event) {
         sender.getEntity().getComponent(TransparentSprite.Component.class).setTransparentSprite(getBuildingTexture(sender));
     }
 

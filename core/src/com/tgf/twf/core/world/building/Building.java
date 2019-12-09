@@ -46,7 +46,7 @@ public class Building extends Component {
         }
     }
 
-    private Duration safeMinus(final Duration buildingDurationRemaining, final Duration delta) {
+    private static Duration safeMinus(final Duration buildingDurationRemaining, final Duration delta) {
         final Duration result = buildingDurationRemaining.minus(delta);
         if (result.isNegative()) {
             return Duration.ZERO;

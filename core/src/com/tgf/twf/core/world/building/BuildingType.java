@@ -12,8 +12,8 @@ import java.time.Duration;
  */
 @RequiredArgsConstructor
 public class BuildingType implements Storage.Capacity {
-    public static BuildingType FARM = new BuildingType(Duration.ofSeconds(15), 20);
-    public static BuildingType FIELD = new BuildingType(Duration.ofSeconds(15), 5);
+    public static final BuildingType FARM = new BuildingType(Duration.ofSeconds(15), 20);
+    public static final BuildingType FIELD = new BuildingType(Duration.ofSeconds(15), 5);
 
     @Getter
     private final Duration buildTime;

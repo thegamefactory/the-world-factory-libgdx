@@ -2,6 +2,7 @@ package com.tgf.twf.core.world.task;
 
 import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
+import com.tgf.twf.core.util.Timer;
 import com.tgf.twf.core.world.storage.ResourceType;
 
 import java.time.Duration;
@@ -25,11 +26,13 @@ public final class MoveActionFactory {
             final Vector2 targetPosition,
             final MoveType moveType) {
         return new TimedAction(
-                Duration.ofMillis((long) (1000 * targetPosition.manatthanDistance(startPosition) / SPEED)),
-                () -> {
-                    final Position position = agent.getRelatedComponent(Position.class);
-                    position.setPosition(targetPosition);
-                },
+                new Timer(
+                        Duration.ofMillis((long) (1000 * targetPosition.manatthanDistance(startPosition) / SPEED)),
+                        () -> {
+                            final Position position = agent.getRelatedComponent(Position.class);
+                            position.setPosition(targetPosition);
+                        }
+                ),
                 moveType.equals(MoveType.HOME) ?
                         Action.Cost.FREE :
                         Action.Cost.of(ResourceType.FOOD, foodCostForPath(startPosition, targetPosition))

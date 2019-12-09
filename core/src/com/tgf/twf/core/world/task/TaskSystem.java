@@ -67,7 +67,7 @@ public class TaskSystem implements System {
         this.unassignedTasks = deadLetterQueue;
     }
 
-    private void collectCost(final List<Action> actions, final Storage.MutableInventory cost) {
+    private static void collectCost(final List<Action> actions, final Storage.MutableInventory cost) {
         for (final Action action : actions) {
             final Storage.Inventory actionCost = action.getCost();
             cost.store(actionCost);
