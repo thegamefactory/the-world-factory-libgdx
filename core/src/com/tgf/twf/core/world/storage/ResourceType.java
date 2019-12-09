@@ -1,4 +1,4 @@
-package com.tgf.twf.core.world;
+package com.tgf.twf.core.world.storage;
 
 /**
  * Identifies the resource types.

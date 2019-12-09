@@ -3,7 +3,7 @@ package com.tgf.twf.core.world.task;
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.Entities;
 import com.tgf.twf.core.ecs.System;
-import com.tgf.twf.core.world.Storage;
+import com.tgf.twf.core.world.storage.Storage;
 
 import java.time.Duration;
 import java.util.HashSet;

@@ -2,7 +2,7 @@ package com.tgf.twf.core.world.task;
 
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.geo.Position;
-import com.tgf.twf.core.world.Building;
+import com.tgf.twf.core.world.building.Building;
 
 import java.util.Collection;
 import java.util.LinkedList;

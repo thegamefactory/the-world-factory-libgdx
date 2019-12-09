@@ -1,5 +1,7 @@
-package com.tgf.twf.core.world;
+package com.tgf.twf.core.world.building;
 
+import com.tgf.twf.core.world.storage.ResourceType;
+import com.tgf.twf.core.world.storage.Storage;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

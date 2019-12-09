@@ -3,8 +3,8 @@ package com.tgf.twf.input;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
-import com.tgf.twf.core.world.BuildingType;
 import com.tgf.twf.core.world.PlayerIntentionApi;
+import com.tgf.twf.core.world.building.BuildingType;
 import com.tgf.twf.rendering.TransparentSprite;
 import lombok.RequiredArgsConstructor;
 

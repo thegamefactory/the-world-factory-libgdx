@@ -1,8 +1,8 @@
 package com.tgf.twf.core.world.task;
 
 import com.google.common.collect.ImmutableSet;
-import com.tgf.twf.core.world.ResourceType;
-import com.tgf.twf.core.world.Storage;
+import com.tgf.twf.core.world.storage.ResourceType;
+import com.tgf.twf.core.world.storage.Storage;
 
 import java.time.Duration;
 import java.util.Set;

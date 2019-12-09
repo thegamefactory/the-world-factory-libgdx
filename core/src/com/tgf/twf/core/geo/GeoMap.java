@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.Entities;
 import com.tgf.twf.core.ecs.Entity;
-import com.tgf.twf.core.world.Building;
+import com.tgf.twf.core.world.building.Building;
 import com.tgf.twf.core.world.task.Agent;
 
 import java.util.LinkedList;

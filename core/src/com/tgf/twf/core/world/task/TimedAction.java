@@ -1,6 +1,6 @@
 package com.tgf.twf.core.world.task;
 
-import com.tgf.twf.core.world.Storage;
+import com.tgf.twf.core.world.storage.Storage;
 import lombok.AllArgsConstructor;
 
 import java.time.Duration;

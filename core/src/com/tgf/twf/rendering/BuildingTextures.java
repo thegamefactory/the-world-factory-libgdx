@@ -5,8 +5,8 @@ import com.badlogic.gdx.utils.Disposable;
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.Entities;
 import com.tgf.twf.core.ecs.System;
-import com.tgf.twf.core.world.Building;
-import com.tgf.twf.core.world.BuildingType;
+import com.tgf.twf.core.world.building.Building;
+import com.tgf.twf.core.world.building.BuildingType;
 
 /**
  * {@link System} responsible for defining the {@link Building} textures.

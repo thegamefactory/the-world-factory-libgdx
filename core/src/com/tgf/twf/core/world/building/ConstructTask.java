@@ -1,8 +1,11 @@
-package com.tgf.twf.core.world.task;
+package com.tgf.twf.core.world.building;
 
 import com.google.common.collect.ImmutableList;
 import com.tgf.twf.core.geo.Vector2;
-import com.tgf.twf.core.world.Building;
+import com.tgf.twf.core.world.task.Action;
+import com.tgf.twf.core.world.task.Agent;
+import com.tgf.twf.core.world.task.MoveActionFactory;
+import com.tgf.twf.core.world.task.Task;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;

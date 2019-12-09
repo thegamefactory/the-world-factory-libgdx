@@ -2,7 +2,9 @@ package com.tgf.twf.core.world;
 
 import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
-import com.tgf.twf.core.world.task.ConstructTask;
+import com.tgf.twf.core.world.building.Building;
+import com.tgf.twf.core.world.building.BuildingType;
+import com.tgf.twf.core.world.building.ConstructTask;
 import com.tgf.twf.input.ExecutionMode;
 import lombok.RequiredArgsConstructor;
 

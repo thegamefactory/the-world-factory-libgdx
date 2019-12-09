@@ -1,4 +1,4 @@
-package com.tgf.twf.core.world;
+package com.tgf.twf.core.world.storage;
 
 import com.tgf.twf.core.ecs.Component;
 import lombok.RequiredArgsConstructor;

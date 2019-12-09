@@ -2,7 +2,7 @@ package com.tgf.twf.core.world.task;
 
 import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
-import com.tgf.twf.core.world.ResourceType;
+import com.tgf.twf.core.world.storage.ResourceType;
 
 import java.time.Duration;
 

@@ -1,8 +1,9 @@
-package com.tgf.twf.core.world;
+package com.tgf.twf.core.world.building;
 
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.Entity;
 import com.tgf.twf.core.geo.Position;
+import com.tgf.twf.core.world.storage.Storage;
 import lombok.Getter;
 
 import java.time.Duration;
