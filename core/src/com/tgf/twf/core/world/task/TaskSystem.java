@@ -64,7 +64,11 @@ public class TaskSystem implements System {
                 deadLetterQueue.add(unassignedTask);
             }
         }
-        this.unassignedTasks = deadLetterQueue;
+        if (!idleAgents.isEmpty()) {
+            this.unassignedTasks = deadLetterQueue;
+        } else {
+            this.unassignedTasks.addAll(deadLetterQueue);
+        }
     }
 
     private static void collectCost(final List<Action> actions, final Storage.MutableInventory cost) {
