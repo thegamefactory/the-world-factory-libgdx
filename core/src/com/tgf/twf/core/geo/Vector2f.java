@@ -24,10 +24,6 @@ public class Vector2f {
         this(other.x, other.y);
     }
 
-    public Vector2 snap() {
-        return new Vector2(Math.round(x), Math.round(y));
-    }
-
     public String friendlyFormat() {
         return String.format("[%.2f;%.2f]", x, y);
     }

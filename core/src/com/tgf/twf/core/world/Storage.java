@@ -41,17 +41,13 @@ public class Storage extends Component {
      * false, the storage is left untouched.
      */
     public boolean tryConsumeResources(final Inventory resources) {
-        final boolean canAllocate = resources.getStoredResourceTypes().stream()
+        final boolean canConsume = resources.getStoredResourceTypes().stream()
                 .allMatch(resourceType -> inventory.getStoredQuantity(resourceType) >= resources.getStoredQuantity(resourceType));
-        if (canAllocate) {
+        if (canConsume) {
             resources.getStoredResourceTypes()
-                    .forEach(resourceType -> forceConsume(resourceType, resources.getStoredQuantity(resourceType)));
+                    .forEach(resourceType -> inventory.retrieve(resourceType, resources.getStoredQuantity(resourceType)));
         }
-        return canAllocate;
-    }
-
-    private void forceConsume(final ResourceType resourceType, final int requestedQuantity) {
-        inventory.retrieve(resourceType, requestedQuantity);
+        return canConsume;
     }
 
     /**
