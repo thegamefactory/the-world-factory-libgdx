@@ -99,6 +99,7 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
                     "Could not load texture atlas, did you forget to pack the textures? Run './gradlew texturePacker' to pack the textures."
             );
         }
+        disposables.add(textureAtlas);
 
         final WorldDrawable worldDrawable = WorldDrawable.builder()
                 .coordinatesTransformer(coordinatesTransformer)
@@ -118,13 +119,10 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         worldActor.addListener(worldInputListener);
 
         final BuildingTextures buildingTextures = new BuildingTextures(textureAtlas);
-        disposables.add(buildingTextures);
         final Sprite fieldButtonTexture = textureAtlas.createSprite("field_button");
-        disposables.add(fieldButtonTexture.getTexture());
         final ImageButton fieldButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(fieldButtonTexture)));
         fieldButton.addListener(new BuildingToolButtonListener(worldInputListener, BuildingType.FIELD, playerIntentionApi, buildingTextures));
         final Sprite farmButtonTexture = textureAtlas.createSprite("farm_button");
-        disposables.add(farmButtonTexture.getTexture());
         final ImageButton farmButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(farmButtonTexture)));
         farmButton.addListener(new BuildingToolButtonListener(worldInputListener, BuildingType.FARM, playerIntentionApi, buildingTextures));
 

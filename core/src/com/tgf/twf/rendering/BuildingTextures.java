@@ -1,7 +1,6 @@
 package com.tgf.twf.rendering;
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.utils.Disposable;
 import com.google.common.collect.ImmutableMap;
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.Entities;
@@ -20,7 +19,7 @@ import java.util.Map;
  * It implements it by ensuring that each entity with a {@link Building} component is attached an up to date {@link TransparentSprite}
  * component.
  */
-public class BuildingTextures implements Disposable {
+public class BuildingTextures {
     private final TransparentSprite dirt;
     private final TransparentSprite error;
     private final TransparentSprite farm;
@@ -100,14 +99,5 @@ public class BuildingTextures implements Disposable {
         } else {
             return fieldSpriteMap.getOrDefault(field.getState().getClass(), error);
         }
-    }
-
-    @Override
-    public void dispose() {
-        this.growingField.dispose();
-        this.grownField.dispose();
-        this.uncultivatedFiled.dispose();
-        this.farm.dispose();
-        this.dirt.dispose();
     }
 }

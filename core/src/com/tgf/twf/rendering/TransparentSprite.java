@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.utils.Disposable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -14,7 +13,7 @@ import java.util.BitSet;
 /**
  * {@link Texture} maintaining a {@link Mask} which can be queried to define if the image is opaque or not at a certain pixel.
  */
-public class TransparentSprite implements Disposable {
+public class TransparentSprite {
     @Getter
     private final Sprite sprite;
     @Getter
@@ -30,11 +29,6 @@ public class TransparentSprite implements Disposable {
 
         this.sprite = sprite;
         this.mask = fromTexture(sprite.getTexture());
-    }
-
-    @Override
-    public void dispose() {
-        this.sprite.getTexture().dispose();
     }
 
     public interface Mask {
