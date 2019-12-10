@@ -4,7 +4,7 @@ import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.building.Building;
 import com.tgf.twf.core.world.building.BuildingType;
-import com.tgf.twf.core.world.building.ConstructTask;
+import com.tgf.twf.core.world.building.ConstructAction;
 import com.tgf.twf.input.ExecutionMode;
 import lombok.RequiredArgsConstructor;
 
@@ -25,10 +25,7 @@ public class PlayerIntentionApi {
 
         final Position pos = Position.from(position);
         final Building building = Building.createEntity(buildingType, pos);
-        world.getTaskSystem().addTask(
-                new ConstructTask(building, position)
-        );
-
+        world.getTaskSystem().addTask(new ConstructAction(building), position);
         return true;
     }
 }

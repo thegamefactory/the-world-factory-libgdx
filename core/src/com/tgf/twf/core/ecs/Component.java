@@ -68,4 +68,9 @@ public abstract class Component {
     public interface EventListener<ComponentT extends Component, EventT extends Component.Event> {
         void handle(final ComponentT sender, final EventT event);
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[" + this.entity.toString() + "]";
+    }
 }

@@ -25,4 +25,9 @@ public class GrowingState implements Field.State {
     public void onStateEnter() {
 
     }
+
+    @Override
+    public String toString() {
+        return "GrowingState[timer=" + timer + "]";
+    }
 }

@@ -27,4 +27,9 @@ public class ConstructAction implements Action {
     public Storage.Inventory getCost() {
         return Cost.ONE_FOOD;
     }
+
+    @Override
+    public String getName() {
+        return "construct";
+    }
 }

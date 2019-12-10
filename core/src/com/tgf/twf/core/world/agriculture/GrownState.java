@@ -1,14 +1,18 @@
 package com.tgf.twf.core.world.agriculture;
 
 import com.tgf.twf.core.geo.Vector2;
+import com.tgf.twf.core.world.task.Action;
+import com.tgf.twf.core.world.task.Task;
+import com.tgf.twf.core.world.task.TaskFactory;
 import com.tgf.twf.core.world.task.TaskSystem;
+import com.tgf.twf.core.world.task.TimedAction;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Duration;
 
 /**
  * The {@link Field.State}  of that field when it's grown.
- * The {@link Field} will remain in that {@link Field.State} until an agent performs an {@link HarvestTask} on the {@link Field}, at which point it
+ * The {@link Field} will remain in that {@link Field.State} until an agent performs a harvest task on the {@link Field}, at which point it
  * will transition back to {@link UncultivatedState}.
  */
 @RequiredArgsConstructor
@@ -24,10 +28,26 @@ public class GrownState implements Field.State {
 
     @Override
     public void onStateEnter() {
-        taskSystem.addTask(new HarvestTask(this, fieldPosition));
+        taskSystem.addTask(buildHarvestTask());
+    }
+
+    private Task buildHarvestTask() {
+        return TaskFactory.create(
+                TimedAction.builder()
+                        .name("harvest")
+                        .completionCallback(this::complete)
+                        .duration(Duration.ofSeconds(2))
+                        .cost(Action.Cost.ONE_FOOD)
+                        .build(),
+                fieldPosition);
     }
 
     void complete() {
         isComplete = true;
+    }
+
+    @Override
+    public String toString() {
+        return "GrownState[isComplete=" + isComplete + "]";
     }
 }

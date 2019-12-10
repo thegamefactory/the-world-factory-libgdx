@@ -17,6 +17,8 @@ public interface Action {
 
     Storage.Inventory getCost();
 
+    String getName();
+
     final class Cost {
         public static final Storage.Inventory FREE = new Storage.Inventory() {
             @Override

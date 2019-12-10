@@ -10,4 +10,6 @@ import java.util.List;
  */
 public interface Task {
     List<Action> createActions(final Agent agent);
+
+    String getName();
 }

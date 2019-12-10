@@ -4,6 +4,7 @@ import com.tgf.twf.core.ecs.Component;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.Duration;
 
@@ -13,6 +14,7 @@ import java.time.Duration;
  */
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 public class Field extends Component {
     private State state;

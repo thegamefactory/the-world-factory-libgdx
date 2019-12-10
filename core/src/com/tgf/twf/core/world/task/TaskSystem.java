@@ -3,6 +3,7 @@ package com.tgf.twf.core.world.task;
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.Entities;
 import com.tgf.twf.core.ecs.System;
+import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.storage.Storage;
 
 import java.time.Duration;
@@ -30,6 +31,10 @@ public class TaskSystem implements System {
 
     public void addTask(final Task task) {
         unassignedTasks.add(task);
+    }
+
+    public void addTask(final Action action, final Vector2 position) {
+        unassignedTasks.add(TaskFactory.create(action, position));
     }
 
     public void handle(final Agent sender, final Component.CreationEvent event) {
