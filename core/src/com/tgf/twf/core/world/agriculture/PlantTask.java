@@ -13,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import java.time.Duration;
 import java.util.List;
 
+/**
+ * A {@link Task} to plant an {@link UncultivatedState} {@link Field}.
+ */
 @RequiredArgsConstructor
 public class PlantTask implements Task {
     private final UncultivatedState uncultivatedState;

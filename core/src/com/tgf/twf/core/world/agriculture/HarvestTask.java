@@ -13,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import java.time.Duration;
 import java.util.List;
 
+/**
+ * A {@link Task} to harvest a {@link GrownState} {@link Field}.
+ */
 @RequiredArgsConstructor
 public class HarvestTask implements Task {
     private final GrownState grownState;

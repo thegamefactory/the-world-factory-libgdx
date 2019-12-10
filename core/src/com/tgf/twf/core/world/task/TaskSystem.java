@@ -64,7 +64,7 @@ public class TaskSystem implements System {
                 deadLetterQueue.add(unassignedTask);
             }
         }
-        if (!idleAgents.isEmpty()) {
+        if (unassignedTasks.isEmpty()) {
             this.unassignedTasks = deadLetterQueue;
         } else {
             this.unassignedTasks.addAll(deadLetterQueue);

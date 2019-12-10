@@ -13,6 +13,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * A system managing the lifecycle of {@link Field} components.
+ */
 public class AgricultureSystem implements System {
     private final List<Field> fields = new LinkedList<>();
     private final TaskSystem taskSystem;
@@ -43,8 +46,13 @@ public class AgricultureSystem implements System {
     public void update(final Duration delta) {
         for (final Field field : fields) {
             final Class<? extends Field.State> nextState = field.getState().tick(delta);
-            if (nextState != field.getState().getClass()) {
-                final Field.State state = stateFactories.get(nextState).apply(field);
+            if (nextState != null) {
+                final Field.State state = stateFactories.getOrDefault(
+                        nextState,
+                        (f) -> {
+                            throw new IllegalStateException("No state factory for " + String.valueOf(nextState));
+                        }
+                ).apply(field);
                 field.setState(state);
                 state.onStateEnter();
             }
