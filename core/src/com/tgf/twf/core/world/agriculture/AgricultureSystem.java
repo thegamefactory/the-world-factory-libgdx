@@ -18,6 +18,7 @@ import java.util.function.Function;
  * A system managing the lifecycle of {@link Field} components.
  */
 public class AgricultureSystem implements System {
+
     private final List<Field> fields = new LinkedList<>();
     private final TaskSystem taskSystem;
 
@@ -55,6 +56,7 @@ public class AgricultureSystem implements System {
                         }
                 ).apply(field);
                 field.setState(state);
+                field.notify(Field.StateChangeEvent.INSTANCE);
                 state.onStateEnter();
             }
         }

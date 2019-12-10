@@ -27,7 +27,7 @@ public class BuildingToolButtonListener extends InputListener {
         this.buildingType = buildingType;
         this.playerIntentionApi = playerIntentionApi;
         this.buildingTextures = buildingTextures;
-        this.buildTool = new BuildTool(playerIntentionApi, buildingType, buildingTextures.getBuildingTexture(buildingType));
+        this.buildTool = new BuildTool(playerIntentionApi, buildingType, buildingTextures.getBuildingTextureForPreview(buildingType));
     }
 
     @Override

@@ -24,4 +24,11 @@ public class Field extends Component {
 
         void onStateEnter();
     }
+
+    /**
+     * An event emitted when the {@link Field.State} of a {@link Field} changes.
+     */
+    public static final class StateChangeEvent implements Component.Event {
+        public static final StateChangeEvent INSTANCE = new StateChangeEvent();
+    }
 }

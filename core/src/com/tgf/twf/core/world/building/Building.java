@@ -65,6 +65,9 @@ public class Building extends Component {
         }
     }
 
+    /**
+     * An event emitted when a {@link Building} construction completes.
+     */
     public static final class ConstructedEvent implements Component.Event {
         private ConstructedEvent() {
 

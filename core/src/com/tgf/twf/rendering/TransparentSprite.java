@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Disposable;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
@@ -21,7 +20,14 @@ public class TransparentSprite implements Disposable {
     @Getter
     private final Mask mask;
 
-    public TransparentSprite(@NonNull final Sprite sprite) {
+    public TransparentSprite(final Sprite sprite) {
+        if (null == sprite) {
+            throw new IllegalStateException(
+                    "Attempting to create null transparent sprite. Did you forget to repack the textures?"
+                            + " Run './gradlew texturePacker' to pack the textures."
+            );
+        }
+
         this.sprite = sprite;
         this.mask = fromTexture(sprite.getTexture());
     }
