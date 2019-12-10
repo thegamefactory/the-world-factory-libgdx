@@ -63,6 +63,10 @@ public class Entities {
         return new EntityId(nextId++);
     }
 
+    Entity getEntity(final EntityId entityId) {
+        return entities.get(entityId);
+    }
+
     /**
      * Attaches an entity
      * If the entity contains components, all corresponding components attachment events will be fired.

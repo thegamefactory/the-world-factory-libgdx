@@ -13,4 +13,9 @@ public class EntityId {
     EntityId(final int id) {
         this.id = id;
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(id);
+    }
 }

@@ -6,17 +6,13 @@ import lombok.Data;
 /**
  * An immutable {@link Component} containing 2d coordinates.
  */
-public final class Position extends Component {
+public final class Position extends Component implements Cloneable {
     public int x;
     public int y;
 
     public Position(final int x, final int y) {
         this.x = x;
         this.y = y;
-    }
-
-    public static Position from(final int x, final int y) {
-        return new Position(x, y);
     }
 
     public static Position from(final Vector2 position) {
@@ -39,11 +35,21 @@ public final class Position extends Component {
         this.y = newPosition.y;
     }
 
+    @Override
+    public Position clone() {
+        return new Position(x, y);
+    }
+
     /**
      * {@link Component.Event} fired immediately before updating the state of a {@link Position} {@link Component}.
      */
     @Data
-    public final class MoveEvent implements Component.Event {
+    public final static class MoveEvent implements Component.Event {
         private final Vector2 newPosition;
+    }
+
+    @Override
+    public String toString() {
+        return "position[" + getEntityId() + "](" + x + ";" + y + ")";
     }
 }

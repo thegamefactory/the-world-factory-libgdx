@@ -1,5 +1,6 @@
 package com.tgf.twf.core.world.building;
 
+import com.tgf.twf.core.world.rules.Rules;
 import com.tgf.twf.core.world.storage.ResourceType;
 import com.tgf.twf.core.world.storage.Storage;
 import lombok.Getter;
@@ -12,8 +13,8 @@ import java.time.Duration;
  */
 @RequiredArgsConstructor
 public class BuildingType implements Storage.Capacity {
-    public static final BuildingType FARM = new BuildingType(Duration.ofSeconds(15), 20);
-    public static final BuildingType FIELD = new BuildingType(Duration.ofSeconds(15), 5);
+    public static final BuildingType FARM = new BuildingType(Rules.FARM_BUILD_DURATION, Rules.FARM_STORAGE_CAPACITY);
+    public static final BuildingType FIELD = new BuildingType(Rules.FIELD_BUILD_DURATION, Rules.FIELD_STORAGE_CAPACITY);
 
     @Getter
     private final Duration buildTime;

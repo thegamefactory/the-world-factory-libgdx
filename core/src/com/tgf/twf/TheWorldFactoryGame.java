@@ -21,6 +21,7 @@ import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.PlayerIntentionApi;
 import com.tgf.twf.core.world.World;
 import com.tgf.twf.core.world.building.BuildingType;
+import com.tgf.twf.core.world.rules.Rules;
 import com.tgf.twf.input.BuildingToolButtonListener;
 import com.tgf.twf.input.GameInputProcessor;
 import com.tgf.twf.input.Tool;
@@ -41,8 +42,6 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
     private static final Vector2f TILE_SIZE = new Vector2f(90, 54);
     private static final float CAMERA_SPEED_PIXELS_PER_SECONDS = 1000.0f;
 
-    private final World world;
-
     private final List<ResizeCallback> resizeCallbacks = new LinkedList<>();
     private final List<RenderCallback> renderCallbacks = new LinkedList<>();
     private final List<Disposable> disposables = new LinkedList<>();
@@ -57,8 +56,7 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         void render();
     }
 
-    public TheWorldFactoryGame(final World world) {
-        this.world = world;
+    public TheWorldFactoryGame() {
     }
 
     @Override
@@ -73,6 +71,8 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
             gameStage.draw();
         });
         disposables.add(gameStage);
+
+        final World world = new World(Rules.WORLD_SIZE);
 
         final CoordinatesTransformer coordinatesTransformer = CoordinatesTransformer.ofTileSize(TILE_SIZE);
         resizeCallbacks.add((width, height) -> {

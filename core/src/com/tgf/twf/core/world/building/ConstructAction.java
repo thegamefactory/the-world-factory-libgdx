@@ -1,5 +1,6 @@
 package com.tgf.twf.core.world.building;
 
+import com.tgf.twf.core.world.rules.Rules;
 import com.tgf.twf.core.world.storage.Storage;
 import com.tgf.twf.core.world.task.Action;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class ConstructAction implements Action {
 
     @Override
     public Storage.Inventory getCost() {
-        return Cost.ONE_FOOD;
+        return Rules.CONSTRUCT_COST;
     }
 
     @Override

@@ -20,6 +20,10 @@ public abstract class Component {
     public Component() {
     }
 
+    public EntityId getEntityId() {
+        return entity.getEntityId();
+    }
+
     // package private
     void setEntity(final Entity entity) {
         this.entity = entity;
@@ -71,6 +75,6 @@ public abstract class Component {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[" + this.entity.toString() + "]";
+        return getClass().getSimpleName() + "[" + this.entity.getEntityId() + "]";
     }
 }

@@ -55,12 +55,13 @@ public class Entity {
 
     @Override
     public String toString() {
-        return entityId.toString();
+        return "entity(id=" + entityId.toString() + ", components=" + components.toString() + ")";
     }
 
     public void attachComponent(final Component component) {
         if (component.getEntity() != null) {
-            throw new IllegalArgumentException("Component is already attached to " + getEntityId());
+            throw new IllegalArgumentException("Cannot attach to " + toString() + " because component " + component.getClass() +
+                    " is already attached to " + component.getEntity());
         }
         if (components.containsKey(component.getClass())) {
             throw new IllegalArgumentException("Entity " + entityId + " already contains component " + component.getClass().getSimpleName());

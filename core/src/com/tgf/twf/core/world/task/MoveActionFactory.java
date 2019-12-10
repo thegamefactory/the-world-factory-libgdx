@@ -2,6 +2,7 @@ package com.tgf.twf.core.world.task;
 
 import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
+import com.tgf.twf.core.world.rules.Rules;
 import com.tgf.twf.core.world.storage.ResourceType;
 
 import java.time.Duration;
@@ -12,8 +13,6 @@ import java.time.Duration;
  * for a dedicated MoveAction class yet.
  */
 public final class MoveActionFactory {
-    private static final double SPEED = 1.0;
-
     public enum MoveType {
         STANDARD,
         HOME
@@ -26,7 +25,7 @@ public final class MoveActionFactory {
             final MoveType moveType) {
         return TimedAction.builder()
                 .name("move")
-                .duration(Duration.ofMillis((long) (1000 * targetPosition.manatthanDistance(startPosition) / SPEED)))
+                .duration(Duration.ofMillis((long) (1000 * targetPosition.manatthanDistance(startPosition) / Rules.AGENT_SPEED_TILE_PER_SECONDS)))
                 .completionCallback(() -> {
                     final Position position = agent.getRelatedComponent(Position.class);
                     position.setPosition(targetPosition);
