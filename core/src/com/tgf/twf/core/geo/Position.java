@@ -15,12 +15,13 @@ public final class Position extends Component implements Cloneable {
         this.y = y;
     }
 
-    public static Position from(final Vector2 position) {
-        return new Position(position.x, position.y);
+    public Position(final Position other) {
+        this.x = other.x;
+        this.y = other.y;
     }
 
-    public static Position from(final Vector2f position) {
-        return new Position(Math.round(position.x), Math.round(position.y));
+    public static Position from(final Vector2 position) {
+        return new Position(position.x, position.y);
     }
 
     public Vector2 toVector2() {
@@ -33,11 +34,6 @@ public final class Position extends Component implements Cloneable {
         }
         this.x = newPosition.x;
         this.y = newPosition.y;
-    }
-
-    @Override
-    public Position clone() {
-        return new Position(x, y);
     }
 
     /**

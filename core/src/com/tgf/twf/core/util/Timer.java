@@ -20,14 +20,6 @@ public class Timer {
         completionCallback = CompletionCallback.IDENTITY;
     }
 
-    @FunctionalInterface
-    public interface CompletionCallback {
-        CompletionCallback IDENTITY = () -> {
-        };
-
-        void complete();
-    }
-
     public boolean isComplete() {
         return remainingDuration.isZero() || remainingDuration.isNegative();
     }

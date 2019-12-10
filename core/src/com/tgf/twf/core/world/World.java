@@ -43,12 +43,12 @@ public class World implements System {
         final Position initialPosition = new Position(size.x / 2, size.y / 2);
         final Building farm = Building.createEntity(BuildingType.FARM, initialPosition);
         farm.setConstructed();
-        farm.getRelatedComponent(Storage.class).store(ResourceType.FOOD, Rules.INITIAL_FOOD_STORAGE);
+        farm.getRelatedComponent(Storage.class).forceStore(ResourceType.FOOD, Rules.INITIAL_FOOD_STORAGE);
 
         for (int i = 0; i < Rules.INITIAL_AGENT_COUNT; i++) {
             Entity.builder()
                     .withComponent(new Agent(farm))
-                    .withComponent(initialPosition.clone())
+                    .withComponent(new Position(initialPosition))
                     .buildAndAttach();
         }
     }

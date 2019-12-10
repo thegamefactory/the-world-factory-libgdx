@@ -1,5 +1,6 @@
 package com.tgf.twf.core.world.task;
 
+import com.tgf.twf.core.util.CompletionCallback;
 import com.tgf.twf.core.util.Timer;
 import com.tgf.twf.core.world.storage.Storage;
 import lombok.AllArgsConstructor;
@@ -20,7 +21,7 @@ public class TimedAction implements Action {
     public static TimedAction create(
             final String name,
             final Duration duration,
-            final Timer.CompletionCallback completionCallback,
+            final CompletionCallback completionCallback,
             final Storage.Inventory cost) {
         return new TimedAction(name, new Timer(duration, completionCallback), cost);
     }

@@ -20,6 +20,11 @@ public class Vector2 {
         this.y = y;
     }
 
+    public Vector2(final Vector2 other) {
+        this.x = other.x;
+        this.y = other.y;
+    }
+
     public int manatthanDistance(final Vector2 other) {
         return Math.abs(x - other.x) + Math.abs(y - other.y);
     }

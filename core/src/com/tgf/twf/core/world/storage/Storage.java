@@ -36,6 +36,16 @@ public class Storage extends Component {
     }
 
     /**
+     * Force to store the given quantity of {@link ResourceType}, even if it overflows the capacity.
+     *
+     * @param quantity     The quantity offered to the storage.
+     * @param resourceType The type of resource offered to the storage.
+     */
+    public void forceStore(final ResourceType resourceType, final int quantity) {
+        inventory.store(resourceType, quantity);
+    }
+
+    /**
      * @param resources The quantity of resources to consume, per resource type.
      * @return true if the storage had enough resources in store to satisfy the demand. If true, the resources are removed from the storage. If
      * false, the storage is left untouched.
