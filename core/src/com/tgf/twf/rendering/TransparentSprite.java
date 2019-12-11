@@ -80,5 +80,9 @@ public class TransparentSprite {
         public Component(final TransparentSprite transparentSprite) {
             this.transparentSprite = transparentSprite;
         }
+
+        public Sprite getSprite() {
+            return transparentSprite.getSprite();
+        }
     }
 }

@@ -2,7 +2,9 @@ package com.tgf.twf.core.world.task;
 
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.geo.Position;
+import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.building.Building;
+import lombok.Getter;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -15,6 +17,13 @@ import java.util.Queue;
 public class Agent extends Component {
     private final Building home;
     private final Queue<Action> actions = new LinkedList<>();
+
+    /**
+     * The position of the agent, relative to the center of the tile. Purely used for rendering.
+     * Each component of the vector should remain between -0.5 and 0.5, otherwise the agent will appear to be in a different tile.
+     */
+    @Getter
+    private final Vector2f subTilePosition = new Vector2f();
 
     public Agent(final Building home) {
         this.home = home;

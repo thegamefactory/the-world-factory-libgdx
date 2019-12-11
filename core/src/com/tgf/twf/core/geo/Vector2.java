@@ -25,7 +25,8 @@ public class Vector2 {
         this.y = other.y;
     }
 
-    public int manatthanDistance(final Vector2 other) {
-        return Math.abs(x - other.x) + Math.abs(y - other.y);
+    public static void minus(final Vector2 left, final Vector2 right, final Vector2 out) {
+        out.x = left.x - right.x;
+        out.y = left.y - right.y;
     }
 }

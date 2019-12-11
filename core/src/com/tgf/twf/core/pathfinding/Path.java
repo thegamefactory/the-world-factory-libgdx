@@ -31,7 +31,7 @@ public class Path implements Closeable {
      */
     public PathWalker forwardWalker() {
         return new PathWalker() {
-            PathNode iterator = head;
+            PathNode iterator;
 
             @Override
             public boolean hasNext() {
@@ -40,7 +40,11 @@ public class Path implements Closeable {
 
             @Override
             public Vector2 next() {
-                iterator = iterator.next;
+                if (iterator == null) {
+                    iterator = head;
+                } else {
+                    iterator = iterator.next;
+                }
                 return iterator.pos;
             }
 
@@ -56,7 +60,7 @@ public class Path implements Closeable {
      */
     public PathWalker backwardsWalker() {
         return new PathWalker() {
-            PathNode iterator = tail;
+            PathNode iterator = null;
 
             @Override
             public boolean hasNext() {
@@ -65,7 +69,11 @@ public class Path implements Closeable {
 
             @Override
             public Vector2 next() {
-                iterator = iterator.previous;
+                if (iterator == null) {
+                    iterator = tail;
+                } else {
+                    iterator = iterator.previous;
+                }
                 return iterator.pos;
             }
 

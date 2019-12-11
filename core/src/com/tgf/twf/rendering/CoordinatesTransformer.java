@@ -71,4 +71,12 @@ public class CoordinatesTransformer {
         convertWorldToScreen(world, screen);
         convertScreenToRender(screen, render);
     }
+
+    public float convertVectorToScreenX(final Vector2f vector) {
+        return (vector.x + vector.y) * (tileSize.x / 2);
+    }
+
+    public float convertVectorToScreenY(final Vector2f vector) {
+        return (-vector.x + vector.y) * (tileSize.y / 2);
+    }
 }

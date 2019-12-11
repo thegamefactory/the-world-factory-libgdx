@@ -27,19 +27,23 @@ public class GeoMap {
         Entities.registerComponentEventListener(this::handle, Position.class, Position.MoveEvent.class);
     }
 
-    public Optional<Building> getBuildingAt(final int x, final int y) {
+    public Building getBuildingAt(final Vector2 position) {
+        return getBuildingAt(position.x, position.y);
+    }
+
+    public Building getBuildingAt(final int x, final int y) {
         final List<Entity> entities = getEntityAt(x, y);
 
         for (final Entity entity : entities) {
             final Building building = entity.getComponent(Building.class);
             if (null != building) {
-                return Optional.of(building);
+                return building;
             }
         }
-        return Optional.empty();
+        return null;
     }
 
-    public void getAgentsAt(final int x, final int y, final Agent[] agents) {
+    public int getAgentsAt(final int x, final int y, final Agent[] agents) {
         final List<Entity> entities = getEntityAt(x, y);
 
         int i = 0;
@@ -55,6 +59,11 @@ public class GeoMap {
         if (i != agents.length) {
             agents[i] = null;
         }
+        return i;
+    }
+
+    public boolean isPositionOccupied(final Vector2 position) {
+        return isPositionOccupied(position.x, position.y);
     }
 
     public boolean isPositionOccupied(final int x, final int y) {
