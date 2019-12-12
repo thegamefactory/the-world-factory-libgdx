@@ -13,6 +13,7 @@ import com.tgf.twf.core.world.storage.ResourceType;
 import com.tgf.twf.core.world.storage.Storage;
 import com.tgf.twf.core.world.task.Agent;
 import com.tgf.twf.core.world.task.TaskSystem;
+import com.tgf.twf.core.world.terrain.CoastTerrainGenerator;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -37,6 +38,8 @@ public class World implements System {
         this.size = size;
 
         geoMap = new GeoMap(size);
+        new CoastTerrainGenerator().generate(geoMap);
+
         taskSystem = new TaskSystem();
         agricultureSystem = new AgricultureSystem(taskSystem);
 

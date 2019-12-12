@@ -6,7 +6,11 @@ import com.tgf.twf.core.ecs.Entities;
 import com.tgf.twf.core.ecs.Entity;
 import com.tgf.twf.core.world.building.Building;
 import com.tgf.twf.core.world.task.Agent;
+import com.tgf.twf.core.world.terrain.TerrainMap;
+import com.tgf.twf.core.world.terrain.TerrainType;
+import lombok.Getter;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -15,13 +19,17 @@ import java.util.Optional;
  * A class for geographical position lookups.
  * It is kept up to date with the world by listening to the attachment and detachment of entities {@link Position}s.
  */
-public class GeoMap {
+public class GeoMap implements TerrainMap {
+    @Getter
     private final Vector2 size;
     private final List<Entity>[] entities;
+    private final TerrainType[] terrain;
 
     public GeoMap(final Vector2 size) {
         this.size = size;
         entities = new List[size.x * size.y];
+        terrain = new TerrainType[size.x * size.y];
+        Arrays.fill(terrain, TerrainType.GRASS);
 
         Entities.registerComponentEventListener(this::handle, Position.class, Component.CreationEvent.class);
         Entities.registerComponentEventListener(this::handle, Position.class, Position.MoveEvent.class);
@@ -62,17 +70,30 @@ public class GeoMap {
         return i;
     }
 
-    public boolean isPositionOccupied(final Vector2 position) {
-        return isPositionOccupied(position.x, position.y);
+    @Override
+    public TerrainType getTerrainAt(final Vector2 position) {
+        return terrain[getIndex(position)];
     }
 
-    public boolean isPositionOccupied(final int x, final int y) {
-        if (x < 0 || x >= size.x || y < 0 || y >= size.y) {
-            return true;
-        }
+    @Override
+    public void setTerrainAt(final Vector2 position, final TerrainType terrainType) {
+        terrain[getIndex(position)] = terrainType;
+    }
 
-        return getEntityAt(x, y).stream()
-                .anyMatch(e -> e.hasComponent(Building.class));
+    public boolean isInBounds(final Vector2 position) {
+        return isInBounds(position.x, position.y);
+    }
+
+    public boolean isInBounds(final int x, final int y) {
+        return x >= 0 && x < size.x && y > 0 && y < size.y;
+    }
+
+    public boolean isBuildingAt(final Vector2 position) {
+        return isBuildingAt(position.x, position.y);
+    }
+
+    public boolean isBuildingAt(final int x, final int y) {
+        return getBuildingAt(x, y) != null;
     }
 
     public List<Entity> getEntityAt(final int x, final int y) {
@@ -94,6 +115,10 @@ public class GeoMap {
             entities[index] = new LinkedList<>();
         }
         entities[index].add(entity);
+    }
+
+    private int getIndex(final Vector2 position) {
+        return position.x * size.y + position.y;
     }
 
     private int getIndex(final int x, final int y) {

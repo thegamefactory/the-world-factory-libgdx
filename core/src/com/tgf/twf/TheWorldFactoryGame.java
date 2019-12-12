@@ -107,8 +107,6 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
                 .toolPreview(toolPreview)
                 .world(world)
                 .build();
-        disposables.add(worldDrawable);
-
         final WorldActor worldActor = new WorldActor(world, worldDrawable);
         resizeCallbacks.add((width, height) -> worldActor.setBounds(-width * 0.5f, -height * 0.5f, width, height));
         gameStage.addActor(worldActor);
