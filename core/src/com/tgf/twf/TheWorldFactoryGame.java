@@ -66,10 +66,6 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
             gameStage.getViewport().update(width, height);
             gameStage.getCamera().position.set(0f, 0f, 0f);
         });
-        renderCallbacks.add(() -> {
-            gameStage.act(Gdx.graphics.getDeltaTime());
-            gameStage.draw();
-        });
         disposables.add(gameStage);
 
         final World world = new World(Rules.WORLD_SIZE);
@@ -83,10 +79,14 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         final ToolPreview toolPreview = new ToolPreview(Tool.NULL_TOOL, new Vector2f(), coordinatesTransformer);
 
         final GameInputProcessor gameInputProcessor = new GameInputProcessor(gameStage, toolPreview);
+        renderCallbacks.add(() -> {
+            gameStage.act(Gdx.graphics.getDeltaTime() * (float) Math.pow(2, gameInputProcessor.getSpeedFactor()));
+            gameStage.draw();
+        });
         renderCallbacks.add(() ->
                 coordinatesTransformer.pan(
-                        CAMERA_SPEED_PIXELS_PER_SECONDS * gameInputProcessor.horizontalSpeed() * Gdx.graphics.getDeltaTime(),
-                        CAMERA_SPEED_PIXELS_PER_SECONDS * gameInputProcessor.verticalSpeed() * Gdx.graphics.getDeltaTime()
+                        CAMERA_SPEED_PIXELS_PER_SECONDS * gameInputProcessor.getHorizontalSpeed() * Gdx.graphics.getDeltaTime(),
+                        CAMERA_SPEED_PIXELS_PER_SECONDS * gameInputProcessor.getVerticalSpeed() * Gdx.graphics.getDeltaTime()
                 )
         );
         Gdx.input.setInputProcessor(gameInputProcessor);

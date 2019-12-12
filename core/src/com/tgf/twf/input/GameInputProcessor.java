@@ -3,6 +3,7 @@ package com.tgf.twf.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import lombok.Getter;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +27,9 @@ public class GameInputProcessor implements InputProcessor {
     private boolean isUpPressed = false;
     private boolean isDownPressed = false;
 
+    @Getter
+    private int speedFactor = 0;
+
     public GameInputProcessor(final InputProcessor delegate, final ToolPreview toolPreview) {
         this.delegate = delegate;
         this.toolPreview = toolPreview;
@@ -39,7 +43,7 @@ public class GameInputProcessor implements InputProcessor {
         this.downKeys.add(Input.Keys.DOWN);
     }
 
-    public int horizontalSpeed() {
+    public int getHorizontalSpeed() {
         if (isLeftPressed && !isRightPressed) {
             return 1;
         }
@@ -49,7 +53,7 @@ public class GameInputProcessor implements InputProcessor {
         return 0;
     }
 
-    public int verticalSpeed() {
+    public int getVerticalSpeed() {
         if (isUpPressed && !isDownPressed) {
             return -1;
         }
@@ -61,7 +65,7 @@ public class GameInputProcessor implements InputProcessor {
 
     @Override
     public boolean keyDown(final int keycode) {
-        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+        if (keycode == Input.Keys.ESCAPE) {
             if (Tool.NULL_TOOL.equals(toolPreview.getTool())) {
                 Gdx.app.exit();
             } else {
@@ -93,6 +97,12 @@ public class GameInputProcessor implements InputProcessor {
         if (downKeys.contains(keycode)) {
             isDownPressed = isPressed;
             return true;
+        }
+        if (keycode == Input.Keys.PLUS) {
+            speedFactor++;
+        }
+        if (keycode == Input.Keys.MINUS) {
+            speedFactor--;
         }
         return false;
     }
