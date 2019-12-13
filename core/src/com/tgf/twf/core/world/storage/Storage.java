@@ -27,7 +27,7 @@ public class Storage extends Component {
      */
     public int store(final ResourceType resourceType, final int offeredQuantity) {
         int stored = 0;
-        final int remainingCapacity = capacity.getRemainingCapacity(this, resourceType);
+        final int remainingCapacity = capacity.getRemainingCapacity(inventory, resourceType);
         if (remainingCapacity > 0) {
             stored = Math.min(remainingCapacity, offeredQuantity);
             inventory.store(resourceType, stored);
@@ -62,12 +62,12 @@ public class Storage extends Component {
 
     /**
      * Defines a storage capacity.
-     * The capacity defines the quantity of resources of a {@link ResourceType }that a given {@link Storage} can stock, on top of the resources that
-     * the storage already has in stock.
+     * The capacity defines the quantity of resources of a {@link ResourceType} that a given {@link Inventory} can stock, on top of the resources that
+     * the {@link Inventory} already has in stock.
      */
     @FunctionalInterface
     public interface Capacity {
-        int getRemainingCapacity(final Storage currentStorage, final ResourceType resourceType);
+        int getRemainingCapacity(final Inventory currentInventory, final ResourceType resourceType);
     }
 
     /**
@@ -76,15 +76,23 @@ public class Storage extends Component {
     public interface Inventory {
         int getStoredQuantity(ResourceType resourceType);
 
+        int getTotalStoredQuantity();
+
         Set<ResourceType> getStoredResourceTypes();
     }
 
     public static class MutableInventory implements Inventory {
         private final Map<ResourceType, Integer> stock = new HashMap<>();
+        private int totalStoredQuantity = 0;
 
         @Override
         public int getStoredQuantity(final ResourceType resourceType) {
             return stock.getOrDefault(resourceType, 0);
+        }
+
+        @Override
+        public int getTotalStoredQuantity() {
+            return 0;
         }
 
         @Override
@@ -93,7 +101,8 @@ public class Storage extends Component {
         }
 
         public void store(final ResourceType resourceType, final int quantity) {
-            this.stock.put(resourceType, this.stock.getOrDefault(resourceType, 0) + quantity);
+            stock.put(resourceType, stock.getOrDefault(resourceType, 0) + quantity);
+            totalStoredQuantity += quantity;
         }
 
         public void store(final Inventory inventory) {
@@ -103,11 +112,12 @@ public class Storage extends Component {
         }
 
         public void retrieve(final ResourceType resourceType, final int quantity) {
-            final int currentStock = this.stock.getOrDefault(resourceType, 0);
+            final int currentStock = stock.getOrDefault(resourceType, 0);
             if (currentStock < quantity) {
                 throw new IllegalStateException("Cannot retrieve " + quantity + " of " + resourceType + "; only " + currentStock + " available");
             }
-            this.stock.put(resourceType, currentStock - quantity);
+            stock.put(resourceType, currentStock - quantity);
+            totalStoredQuantity -= quantity;
         }
 
         public void clear() {

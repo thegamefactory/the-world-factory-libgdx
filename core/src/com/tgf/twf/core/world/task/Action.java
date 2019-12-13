@@ -27,6 +27,11 @@ public interface Action {
             }
 
             @Override
+            public int getTotalStoredQuantity() {
+                return 0;
+            }
+
+            @Override
             public Set<ResourceType> getStoredResourceTypes() {
                 return ImmutableSet.of();
             }
@@ -41,6 +46,11 @@ public interface Action {
                 @Override
                 public int getStoredQuantity(final ResourceType resourceType) {
                     return resourceType.equals(resourceType) ? quantity : 0;
+                }
+
+                @Override
+                public int getTotalStoredQuantity() {
+                    return quantity;
                 }
 
                 @Override

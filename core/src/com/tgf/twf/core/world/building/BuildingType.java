@@ -21,9 +21,9 @@ public class BuildingType implements Storage.Capacity {
     private final int foodCapacity;
 
     @Override
-    public int getRemainingCapacity(final Storage storage, final ResourceType resourceType) {
+    public int getRemainingCapacity(final Storage.Inventory currentInventory, final ResourceType resourceType) {
         if (ResourceType.FOOD.equals(resourceType)) {
-            return Math.max(foodCapacity - storage.getStoredQuantity(resourceType), 0);
+            return Math.max(foodCapacity - currentInventory.getStoredQuantity(resourceType), 0);
         } else {
             return 0;
         }

@@ -9,6 +9,7 @@ import com.tgf.twf.core.world.agriculture.AgricultureSystem;
 import com.tgf.twf.core.world.building.Building;
 import com.tgf.twf.core.world.building.BuildingType;
 import com.tgf.twf.core.world.rules.Rules;
+import com.tgf.twf.core.world.storage.AnyResourceTypeFixedCapacity;
 import com.tgf.twf.core.world.storage.ResourceType;
 import com.tgf.twf.core.world.storage.Storage;
 import com.tgf.twf.core.world.task.Agent;
@@ -52,6 +53,7 @@ public class World implements System {
             Entity.builder()
                     .withComponent(new Agent(farm))
                     .withComponent(new Position(initialPosition))
+                    .withComponent(new Storage(new AnyResourceTypeFixedCapacity(Rules.AGENT_STORAGE_CAPACITY)))
                     .buildAndAttach();
         }
     }

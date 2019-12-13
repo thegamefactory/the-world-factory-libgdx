@@ -30,9 +30,9 @@ public final class TaskFactory {
                 }
 
                 return ImmutableList.of(
-                        new MoveAction(agent, path.forwardWalker(), CompletionCallback.IDENTITY),
+                        new MoveAction(agent, path.forwardWalker(), CompletionCallback.IDENTITY, MoveAction.MoveTarget.ACTION),
                         action,
-                        new MoveAction(agent, path.backwardsWalker(), path::close)
+                        new MoveAction(agent, path.backwardsWalker(), path::close, MoveAction.MoveTarget.HOME)
                 );
             }
 

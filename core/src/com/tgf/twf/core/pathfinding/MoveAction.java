@@ -67,19 +67,27 @@ public class MoveAction implements Action {
         UPDATE_DIRECTION
     }
 
+    public enum MoveTarget {
+        ACTION,
+        HOME
+    }
+
     private Event nextEvent;
     private int elapsedNanosSinceLastStateChange = 0;
     private boolean isComplete = false;
     private Vector2 currentPosition;
     private Vector2 nextPosition;
     private final Vector2 currentDirection = new Vector2();
+    private final MoveTarget moveTarget;
 
     public MoveAction(final Agent agent,
                       final Path.PathWalker pathWalker,
-                      final CompletionCallback completionCallback) {
+                      final CompletionCallback completionCallback,
+                      final MoveTarget moveTarget) {
         this.agent = agent;
         this.pathWalker = pathWalker;
         this.completionCallback = completionCallback;
+        this.moveTarget = moveTarget;
 
         this.elapsedNanosSinceLastStateChange = 0;
         this.nextEvent = Event.CROSS_TILE_BORDER;
@@ -123,7 +131,10 @@ public class MoveAction implements Action {
 
     @Override
     public Storage.Inventory getCost() {
-        return Action.Cost.of(ResourceType.FOOD, Math.max(pathWalker.getLength() - 1, 0));
+        if (moveTarget == MoveTarget.ACTION) {
+            return Action.Cost.of(ResourceType.FOOD, Math.max(pathWalker.getLength() - 1, 0));
+        }
+        return Cost.FREE;
     }
 
     @Override

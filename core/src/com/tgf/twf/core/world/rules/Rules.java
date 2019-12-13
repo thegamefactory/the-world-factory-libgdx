@@ -8,6 +8,7 @@ import java.time.Duration;
 
 public class Rules {
     public static final int AGENT_NANOS_PER_TILE = 1_000_000_000;
+    public static final int AGENT_STORAGE_CAPACITY = 5;
     public static final Storage.Inventory CONSTRUCT_COST = Action.Cost.ONE_FOOD;
     public static final Duration FARM_BUILD_DURATION = Duration.ofSeconds(5);
     public static final int FARM_STORAGE_CAPACITY = 20;
