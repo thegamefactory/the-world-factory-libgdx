@@ -8,11 +8,8 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public enum TerrainType {
-    GRASS(0, "grass"),
-    WATER(1, "water");
-
-    @Getter
-    private final int index;
+    GRASS("grass"),
+    WATER("water");
 
     @Getter
     private final String name;

@@ -3,9 +3,9 @@ package com.tgf.twf.core.pathfinding;
 import com.tgf.twf.core.geo.Vector2;
 
 /**
- * An implentation of {@link Pathfinder} which finds a straight line path, regardless of any obstacles that may be present.
+ * An implentation of {@link PathFinder} which finds a straight line path, regardless of any obstacles that may be present.
  */
-public class StraightLinePathFinder implements Pathfinder {
+public class StraightLinePathFinder implements PathFinder {
     @Override
     public Path find(final Vector2 origin, final Vector2 target) {
         final int deltaX = target.x - origin.x;
@@ -26,10 +26,11 @@ public class StraightLinePathFinder implements Pathfinder {
          * X: 0.2, 0.4, 0.6, 0.8
          * Y: 0.5
          *
+         * The changes in X and Y are then sequenced based on these floats as below
          * For every step forward we pick the lowest segment value:
          * X (0.2), X(0.4), Y(0.5), X(0.6), X(0.8)
          *
-         * To avoid dealing with floats we multiply everything by (deltaX + 1) * (deltaY + 1).
+         * To avoid dealing with floats we multiply everything by (abs(deltaX) + 1) * (abs(deltaY) + 1).
          * X: 2, 4, 6, 8
          * Y: 5
          */
@@ -40,7 +41,7 @@ public class StraightLinePathFinder implements Pathfinder {
 
         int currentX = origin.x;
         int currentY = origin.y;
-        final PathNode start = PathNode.borrow(currentX, currentY);
+        final PathNode start = PathNode.from(currentX, currentY);
         PathNode current = start;
 
         while (current.pos.x != target.x || current.pos.y != target.y) {

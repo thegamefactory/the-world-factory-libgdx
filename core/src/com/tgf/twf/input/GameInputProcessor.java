@@ -98,10 +98,10 @@ public class GameInputProcessor implements InputProcessor {
             isDownPressed = isPressed;
             return true;
         }
-        if (keycode == Input.Keys.PLUS) {
+        if (keycode == Input.Keys.valueOf("]") || keycode == Input.Keys.PLUS) {
             speedFactor++;
         }
-        if (keycode == Input.Keys.MINUS) {
+        if (keycode == Input.Keys.valueOf("[") || keycode == Input.Keys.MINUS) {
             speedFactor--;
         }
         return false;

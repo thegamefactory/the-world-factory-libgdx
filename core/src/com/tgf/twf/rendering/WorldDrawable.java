@@ -48,7 +48,7 @@ public class WorldDrawable extends BaseDrawable {
         this.agentIdle = textureAtlas.createSprite("agent_idle");
         this.terrainSprites = new TransparentSprite[TerrainType.values().length];
         for (final TerrainType terrainType : TerrainType.values()) {
-            terrainSprites[terrainType.getIndex()] = new TransparentSprite(textureAtlas.createSprite(terrainType.getName() + "_tile"));
+            terrainSprites[terrainType.ordinal()] = new TransparentSprite(textureAtlas.createSprite(terrainType.getName() + "_tile"));
         }
     }
 
@@ -65,7 +65,7 @@ public class WorldDrawable extends BaseDrawable {
                     final TerrainType terrainType = geoMap.getTerrainAt(pos);
                     coordinatesTransformer.convertWorldToScreen(pos, screenPos);
                     coordinatesTransformer.convertScreenToRender(screenPos, renderPos);
-                    batch.draw(terrainSprites[terrainType.getIndex()].getSprite(), renderPos.x, renderPos.y);
+                    batch.draw(terrainSprites[terrainType.ordinal()].getSprite(), renderPos.x, renderPos.y);
                 }
             }
         }
@@ -114,8 +114,8 @@ public class WorldDrawable extends BaseDrawable {
             }
             final Vector2f subTilePosition = agents[i].getSubTilePosition();
             batch.draw(agent,
-                    screenPos.x + ((int) (agent.getWidth() * -0.5)) + coordinatesTransformer.convertVectorToScreenX(subTilePosition),
-                    screenPos.y + (int) (agent.getHeight() * -0.5) + coordinatesTransformer.convertVectorToScreenY(subTilePosition));
+                    screenPos.x + ((int) (agent.getWidth() * -0.5)) + coordinatesTransformer.convertWorldToScreenXWithoutOffset(subTilePosition),
+                    screenPos.y + (int) (agent.getHeight() * -0.5) + coordinatesTransformer.convertWorldToScreenYWithoutOffset(subTilePosition));
         }
         for (int i = 0; i < idleAgentCount; i++) {
             batch.draw(agentIdle,

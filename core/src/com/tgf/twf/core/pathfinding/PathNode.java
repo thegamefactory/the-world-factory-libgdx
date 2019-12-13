@@ -15,7 +15,14 @@ class PathNode implements Closeable {
     public PathNode next = null;
     public PathNode previous = null;
 
-    public static PathNode borrow(final int x, final int y) {
+    /**
+     * Should only be used from the {@link PathNodePool}
+     */
+    PathNode() {
+        // no-op
+    }
+
+    public static PathNode from(final int x, final int y) {
         final PathNode result = PathNodePool.INSTANCE.borrow();
         result.pos.x = x;
         result.pos.y = y;
@@ -23,7 +30,7 @@ class PathNode implements Closeable {
     }
 
     public PathNode setNext(final int x, final int y) {
-        final PathNode next = borrow(x, y);
+        final PathNode next = from(x, y);
         next.previous = this;
         this.next = next;
         return next;

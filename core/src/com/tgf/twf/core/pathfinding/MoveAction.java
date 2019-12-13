@@ -35,18 +35,18 @@ public class MoveAction implements Action {
      *    currentTile is set to (0,0), nextPosition is set to (1,0), currentDirection is set to (1,0)
      *
      * 1. Cross tile border event
-     *    nextEvent is set to WALK_PATH
+     *    nextEvent is set to UPDATE_DIRECTION
      *    the agent position is set to nextPosition (1,0)
      *
-     * 2. Walk path event
+     * 2. Update direction event
      *    nextEvent is set to CROSS_TILE_BORDER
      *    currentTile is set to nextPosition (1,0), nextPosition is set to (1,1), currentDirection is set to (0,1)
      *
      * 3. Cross tile border event
-     *    nextEvent is set to WALK_PATH
+     *    nextEvent is set to UPDATE_DIRECTION
      *    the agent position is set to nextPosition (1,1)
      *
-     * 4. Walk path
+     * 4. Update direction
      *    because there's no nextPosition, the isComplete flag is set to true
      *
      *           *---------*
@@ -64,11 +64,11 @@ public class MoveAction implements Action {
      */
     private enum Event {
         CROSS_TILE_BORDER,
-        WALK_PATH
+        UPDATE_DIRECTION
     }
 
     private Event nextEvent;
-    private int ellapsedNanosSinceLastStateChange = 0;
+    private int elapsedNanosSinceLastStateChange = 0;
     private boolean isComplete = false;
     private Vector2 currentPosition;
     private Vector2 nextPosition;
@@ -81,10 +81,10 @@ public class MoveAction implements Action {
         this.pathWalker = pathWalker;
         this.completionCallback = completionCallback;
 
-        this.ellapsedNanosSinceLastStateChange = 0;
+        this.elapsedNanosSinceLastStateChange = 0;
         this.nextEvent = Event.CROSS_TILE_BORDER;
         this.nextPosition = pathWalker.next();
-        walkPath();
+        updateDirection();
     }
 
     @Override
@@ -98,25 +98,25 @@ public class MoveAction implements Action {
             return;
         }
 
-        ellapsedNanosSinceLastStateChange = ellapsedNanosSinceLastStateChange + delta.getNano();
+        elapsedNanosSinceLastStateChange = elapsedNanosSinceLastStateChange + delta.getNano();
 
-        while (ellapsedNanosSinceLastStateChange > halfTileInNanos()) {
-            ellapsedNanosSinceLastStateChange = ellapsedNanosSinceLastStateChange - halfTileInNanos();
+        while (elapsedNanosSinceLastStateChange > halfTileInNanos()) {
+            elapsedNanosSinceLastStateChange = elapsedNanosSinceLastStateChange - halfTileInNanos();
             if (Event.CROSS_TILE_BORDER == nextEvent) {
                 agent.getRelatedComponent(Position.class).setPosition(nextPosition);
-                nextEvent = Event.WALK_PATH;
+                nextEvent = Event.UPDATE_DIRECTION;
             } else {
-                walkPath();
+                updateDirection();
                 if (nextPosition == null) {
                     isComplete = true;
-                    ellapsedNanosSinceLastStateChange = 0;
+                    elapsedNanosSinceLastStateChange = 0;
                     completionCallback.complete();
                 }
                 nextEvent = Event.CROSS_TILE_BORDER;
             }
         }
 
-        final float tileLerpFactor = tileLerpFactor(ellapsedNanosSinceLastStateChange, nextEvent);
+        final float tileLerpFactor = tileLerpFactor(elapsedNanosSinceLastStateChange, nextEvent);
         agent.getSubTilePosition().x = currentDirection.x * tileLerpFactor;
         agent.getSubTilePosition().y = currentDirection.y * tileLerpFactor;
     }
@@ -131,7 +131,7 @@ public class MoveAction implements Action {
         return "move";
     }
 
-    private void walkPath() {
+    private void updateDirection() {
         currentPosition = nextPosition;
         if (pathWalker.hasNext()) {
             nextPosition = pathWalker.next();
