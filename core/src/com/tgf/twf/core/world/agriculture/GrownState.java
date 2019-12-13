@@ -2,6 +2,9 @@ package com.tgf.twf.core.world.agriculture;
 
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.rules.Rules;
+import com.tgf.twf.core.world.storage.ResourceType;
+import com.tgf.twf.core.world.storage.Storage;
+import com.tgf.twf.core.world.task.Agent;
 import com.tgf.twf.core.world.task.Task;
 import com.tgf.twf.core.world.task.TaskFactory;
 import com.tgf.twf.core.world.task.TaskSystem;
@@ -33,17 +36,18 @@ public class GrownState implements Field.State {
 
     private Task buildHarvestTask() {
         return TaskFactory.create(
-                TimedAction.builder()
+                (agent) -> TimedAction.builder()
                         .name("harvest")
-                        .completionCallback(this::complete)
+                        .completionCallback(() -> this.complete(agent))
                         .duration(Rules.HARVEST_DURATION)
                         .cost(Rules.HARVEST_COST)
                         .build(),
                 fieldPosition);
     }
 
-    void complete() {
+    void complete(final Agent agent) {
         isComplete = true;
+        assert agent.getRelatedComponent(Storage.class).store(ResourceType.FOOD, Rules.FIELD_YIELD) == Rules.FIELD_YIELD;
     }
 
     @Override

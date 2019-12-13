@@ -2,6 +2,7 @@ package com.tgf.twf.core.world.agriculture;
 
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.rules.Rules;
+import com.tgf.twf.core.world.task.Agent;
 import com.tgf.twf.core.world.task.Task;
 import com.tgf.twf.core.world.task.TaskFactory;
 import com.tgf.twf.core.world.task.TaskSystem;
@@ -42,7 +43,7 @@ public class UncultivatedState implements Field.State {
                 fieldPosition);
     }
 
-    void complete() {
+    void complete(final Agent agent) {
         isComplete = true;
     }
 }

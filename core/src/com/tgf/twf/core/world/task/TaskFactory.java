@@ -8,7 +8,7 @@ import com.tgf.twf.core.pathfinding.PathFinder;
 import com.tgf.twf.core.pathfinding.StraightLinePathFinder;
 import com.tgf.twf.core.util.CompletionCallback;
 
-import java.util.List;
+import java.util.function.Function;
 
 /**
  * A factory to build a {@link Task} that chains an action to move to the action position, execute the given action, and move back the the agent home.
@@ -16,30 +16,26 @@ import java.util.List;
 public final class TaskFactory {
     private static final PathFinder DEFAULT_PATH_FINDER = new StraightLinePathFinder();
 
-    public static Task create(final Action action, final Vector2 actionPosition) {
+    public static Task create(final Function<Agent, Action> action, final Vector2 actionPosition) {
         return create(action, actionPosition, DEFAULT_PATH_FINDER);
     }
 
-    public static Task create(final Action action, final Vector2 actionPosition, final PathFinder pathfinder) {
-        return new Task() {
-            @Override
-            public List<Action> createActions(final Agent agent) {
-                final Path path = pathfinder.find(agent.getHomePosition().toVector2(), actionPosition);
-                if (path == null) {
-                    return null;
-                }
-
-                return ImmutableList.of(
-                        new MoveAction(agent, path.forwardWalker(), CompletionCallback.IDENTITY, MoveAction.MoveTarget.ACTION),
-                        action,
-                        new MoveAction(agent, path.backwardsWalker(), path::close, MoveAction.MoveTarget.HOME)
-                );
+    public static Task create(final Function<Agent, Action> action, final Vector2 actionPosition, final PathFinder pathfinder) {
+        return agent -> {
+            final Path path = pathfinder.find(agent.getHomePosition().toVector2(), actionPosition);
+            if (path == null) {
+                return null;
             }
 
-            @Override
-            public String getName() {
-                return action.getName();
-            }
+            return ImmutableList.of(
+                    new MoveAction(agent, path.forwardWalker(), CompletionCallback.IDENTITY, MoveAction.MoveTarget.ACTION),
+                    action.apply(agent),
+                    new MoveAction(agent, path.backwardsWalker(), path::close, MoveAction.MoveTarget.HOME)
+            );
         };
+    }
+
+    public static Task create(final Action action, final Vector2 actionPosition) {
+        return create(agent -> action, actionPosition);
     }
 }

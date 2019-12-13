@@ -15,6 +15,7 @@ public class Rules {
     public static final Duration FIELD_BUILD_DURATION = Duration.ofSeconds(2);
     public static final Duration FIELD_GROWING_DURATION = Duration.ofSeconds(2);
     public static final int FIELD_STORAGE_CAPACITY = 5;
+    public static final int FIELD_YIELD = 5;
     public static final Storage.Inventory HARVEST_COST = Action.Cost.ONE_FOOD;
     public static final Duration HARVEST_DURATION = Duration.ofSeconds(2);
     public static final int INITIAL_AGENT_COUNT = 20;
