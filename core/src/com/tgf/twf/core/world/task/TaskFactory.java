@@ -7,6 +7,7 @@ import com.tgf.twf.core.pathfinding.Path;
 import com.tgf.twf.core.pathfinding.PathFinder;
 import com.tgf.twf.core.pathfinding.StraightLinePathFinder;
 import com.tgf.twf.core.util.CompletionCallback;
+import com.tgf.twf.core.world.storage.Storage;
 
 import java.util.function.Function;
 
@@ -22,7 +23,7 @@ public final class TaskFactory {
 
     public static Task create(final Function<Agent, Action> action, final Vector2 actionPosition, final PathFinder pathfinder) {
         return agent -> {
-            final Path path = pathfinder.find(agent.getHomePosition().toVector2(), actionPosition);
+            final Path path = pathfinder.find(agent.getHomePosition(), actionPosition);
             if (path == null) {
                 return null;
             }
@@ -30,9 +31,18 @@ public final class TaskFactory {
             return ImmutableList.of(
                     new MoveAction(agent, path.forwardWalker(), CompletionCallback.IDENTITY, MoveAction.MoveTarget.ACTION),
                     action.apply(agent),
-                    new MoveAction(agent, path.backwardsWalker(), path::close, MoveAction.MoveTarget.HOME)
+                    new MoveAction(agent, path.backwardsWalker(), () -> {
+                        storeAtHome(agent);
+                        path.close();
+                    }, MoveAction.MoveTarget.HOME)
             );
         };
+    }
+
+    private static void storeAtHome(final Agent agent) {
+        final Storage agentStorage = agent.getRelatedComponent(Storage.class);
+        final Storage agentHomeStorage = agent.getHome().getRelatedComponent(Storage.class);
+        agentStorage.transfer(agentHomeStorage);
     }
 
     public static Task create(final Action action, final Vector2 actionPosition) {

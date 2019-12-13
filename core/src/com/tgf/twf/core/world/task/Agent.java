@@ -2,6 +2,7 @@ package com.tgf.twf.core.world.task;
 
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.geo.Position;
+import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.building.Building;
 import lombok.Getter;
@@ -15,6 +16,7 @@ import java.util.Queue;
  * An {@link Agent} is attached to a {@link Building} home which it goes back to (via a move action) once other actions are completed.
  */
 public class Agent extends Component {
+    @Getter
     private final Building home;
     private final Queue<Action> actions = new LinkedList<>();
 
@@ -45,7 +47,7 @@ public class Agent extends Component {
         actions.poll();
     }
 
-    public Position getHomePosition() {
-        return home.getRelatedComponent(Position.class);
+    public Vector2 getHomePosition() {
+        return home.getRelatedComponent(Position.class).toVector2();
     }
 }

@@ -4,6 +4,7 @@ import com.tgf.twf.core.ecs.Component;
 import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,10 +16,6 @@ import java.util.Set;
 public class Storage extends Component {
     private final MutableInventory inventory = new MutableInventory();
     private final Capacity capacity;
-
-    public int getStoredQuantity(final ResourceType resourceType) {
-        return inventory.getStoredQuantity(resourceType);
-    }
 
     /**
      * @param offeredQuantity The quantity offered to the storage.
@@ -58,6 +55,18 @@ public class Storage extends Component {
                     .forEach(resourceType -> inventory.retrieve(resourceType, resources.getStoredQuantity(resourceType)));
         }
         return canConsume;
+    }
+
+    public void transfer(final Storage destinationStorage) {
+        final Set<ResourceType> emptyResourceTypes = new HashSet<>();
+        inventory.stock.forEach((key, value) -> {
+            final int actuallyStored = destinationStorage.store(key, value);
+            final boolean isEmpty = inventory.retrieve(key, actuallyStored, false);
+            if (isEmpty) {
+                emptyResourceTypes.add(key);
+            }
+        });
+        emptyResourceTypes.forEach(inventory.stock::remove);
     }
 
     /**
@@ -111,13 +120,26 @@ public class Storage extends Component {
             }
         }
 
-        public void retrieve(final ResourceType resourceType, final int quantity) {
+        private void retrieve(final ResourceType resourceType, final int quantity) {
+            retrieve(resourceType, quantity, true);
+        }
+
+        /**
+         * @return true if there are no resources of the specified type left
+         */
+        private boolean retrieve(final ResourceType resourceType, final int quantity, final boolean removeEntry) {
             final int currentStock = stock.getOrDefault(resourceType, 0);
-            if (currentStock < quantity) {
+            final int newStock = currentStock - quantity;
+            if (newStock < 0) {
                 throw new IllegalStateException("Cannot retrieve " + quantity + " of " + resourceType + "; only " + currentStock + " available");
             }
-            stock.put(resourceType, currentStock - quantity);
+            if (newStock == 0 && removeEntry) {
+                stock.remove(resourceType);
+            } else {
+                stock.put(resourceType, newStock);
+            }
             totalStoredQuantity -= quantity;
+            return newStock == 0;
         }
 
         public void clear() {

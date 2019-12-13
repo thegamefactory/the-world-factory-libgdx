@@ -61,7 +61,7 @@ public class TaskSystem implements System {
             final List<Action> actions = unassignedTask.createActions(idleAgent);
             cost.clear();
             collectCost(actions, cost);
-            if (idleAgent.getHomePosition().getRelatedComponent(Storage.class).tryConsumeResources(cost)) {
+            if (idleAgent.getHome().getRelatedComponent(Storage.class).tryConsumeResources(cost)) {
                 idleAgent.addActions(actions);
                 busyAgents.add(idleAgent);
             } else {

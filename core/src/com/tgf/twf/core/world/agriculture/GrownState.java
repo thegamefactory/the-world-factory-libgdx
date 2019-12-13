@@ -47,7 +47,7 @@ public class GrownState implements Field.State {
 
     void complete(final Agent agent) {
         isComplete = true;
-        assert agent.getRelatedComponent(Storage.class).store(ResourceType.FOOD, Rules.FIELD_YIELD) == Rules.FIELD_YIELD;
+        agent.getRelatedComponent(Storage.class).store(ResourceType.FOOD, Rules.FIELD_YIELD);
     }
 
     @Override
