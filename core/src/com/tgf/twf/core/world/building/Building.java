@@ -32,7 +32,7 @@ public class Building extends Component {
         Entity.builder()
                 .withComponent(building)
                 .withComponent(position)
-                .withComponent(new Storage(buildingType))
+                .withComponent(new Storage(buildingType.getCapacity()))
                 .buildAndAttach();
         return building;
     }
