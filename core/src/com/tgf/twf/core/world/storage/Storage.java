@@ -4,8 +4,6 @@ import com.tgf.twf.core.ecs.Component;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Set;
-
 /**
  * A component to model a capacity to store resources and the actual quantity of stored resources.
  * The capacity of the storage is modeled in {@link Capacity}, while the actual stock is modeled in the {@link Inventory}.
@@ -124,18 +122,4 @@ public class Storage extends Component {
         }
         return canStore;
     }
-
-    /**
-     * Defines a storage capacity.
-     * The capacity defines the quantity of resources of a {@link ResourceType} that a given {@link Inventory} can stock, on top of the resources that
-     * the {@link Inventory} already has in stock.
-     */
-    public interface Capacity {
-        int getRemainingCapacity(final Inventory currentInventory, final ResourceType resourceType);
-
-        int getTotalCapacity(final ResourceType resourceType);
-
-        Set<ResourceType> getStorableResourceTypes();
-    }
-
 }

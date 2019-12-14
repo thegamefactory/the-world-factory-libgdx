@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 import java.util.Set;
 
 /**
- * {@link Storage.Capacity} which is agnostic of resource type i.e. treats all resource types the same.
+ * {@link Capacity} which is agnostic of resource type i.e. treats all resource types the same.
  */
 @RequiredArgsConstructor
-public class AnyResourceTypeFixedCapacity implements Storage.Capacity {
+public class AnyResourceTypeFixedCapacity implements Capacity {
     final int capacity;
     private static final Set<ResourceType> STORABLE_RESOURCE_TYPES = ImmutableSet.copyOf(ResourceType.values());
 
@@ -19,7 +19,7 @@ public class AnyResourceTypeFixedCapacity implements Storage.Capacity {
     }
 
     @Override
-    public int getTotalCapacity(ResourceType resourceType) {
+    public int getTotalCapacity(final ResourceType resourceType) {
         return capacity;
     }
 

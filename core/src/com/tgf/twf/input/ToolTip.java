@@ -7,6 +7,7 @@ import com.tgf.twf.core.geo.GeoMap;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.building.Building;
+import com.tgf.twf.core.world.storage.Capacity;
 import com.tgf.twf.core.world.storage.ResourceType;
 import com.tgf.twf.core.world.storage.Storage;
 import com.tgf.twf.rendering.CoordinatesTransformer;
@@ -44,8 +45,8 @@ public class ToolTip {
 
         final GlyphLayout layout = getToolTipText(optionalBuilding.get());
         font.draw(batch, layout,
-          renderPosition.x - layout.width * 0.5f,
-          renderPosition.y + layout.height);
+                renderPosition.x - layout.width * 0.5f,
+                renderPosition.y + layout.height);
     }
 
     private Optional<Building> getBuilding() {
@@ -59,20 +60,20 @@ public class ToolTip {
 
     private GlyphLayout getToolTipText(final Building building) {
         final Storage storage = building.getRelatedComponent(Storage.class);
-        final Storage.Capacity capacity = storage.getCapacity();
+        final Capacity capacity = storage.getCapacity();
 
         final StringBuilder text = new StringBuilder()
-          .append(building.getBuildingType().getName()).append("\n");
+                .append(building.getBuildingType().getName()).append("\n");
 
-        for (ResourceType storableResourceType : capacity.getStorableResourceTypes()) {
+        for (final ResourceType storableResourceType : capacity.getStorableResourceTypes()) {
             final int totalCapacity = capacity.getTotalCapacity(storableResourceType);
             final int storedCapacity = storage.getStored(storableResourceType);
             text.append(storableResourceType.toString())
-              .append(": ")
-              .append(storedCapacity)
-              .append("/")
-              .append(totalCapacity)
-              .append("\n");
+                    .append(": ")
+                    .append(storedCapacity)
+                    .append("/")
+                    .append(totalCapacity)
+                    .append("\n");
         }
 
         return new GlyphLayout(font, text);
