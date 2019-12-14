@@ -2,7 +2,7 @@ package com.tgf.twf.core.world.task;
 
 import com.tgf.twf.core.util.CompletionCallback;
 import com.tgf.twf.core.util.Timer;
-import com.tgf.twf.core.world.storage.Storage;
+import com.tgf.twf.core.world.storage.Inventory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
@@ -15,14 +15,14 @@ import java.time.Duration;
 public class TimedAction implements Action {
     private final String name;
     private final Timer timer;
-    private final Storage.Inventory cost;
+    private final Inventory cost;
 
     @Builder
     public static TimedAction create(
             final String name,
             final Duration duration,
             final CompletionCallback completionCallback,
-            final Storage.Inventory cost) {
+            final Inventory cost) {
         return new TimedAction(name, new Timer(duration, completionCallback), cost);
     }
 
@@ -37,7 +37,7 @@ public class TimedAction implements Action {
     }
 
     @Override
-    public Storage.Inventory getCost() {
+    public Inventory getCost() {
         return cost;
     }
 

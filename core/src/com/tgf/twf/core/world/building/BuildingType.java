@@ -1,6 +1,7 @@
 package com.tgf.twf.core.world.building;
 
 import com.tgf.twf.core.world.rules.Rules;
+import com.tgf.twf.core.world.storage.Inventory;
 import com.tgf.twf.core.world.storage.ResourceType;
 import com.tgf.twf.core.world.storage.Storage;
 import lombok.Getter;
@@ -21,7 +22,7 @@ public class BuildingType implements Storage.Capacity {
     private final int foodCapacity;
 
     @Override
-    public int getRemainingCapacity(final Storage.Inventory currentInventory, final ResourceType resourceType) {
+    public int getRemainingCapacity(final Inventory currentInventory, final ResourceType resourceType) {
         if (ResourceType.FOOD.equals(resourceType)) {
             return Math.max(foodCapacity - currentInventory.getStoredQuantity(resourceType), 0);
         } else {
