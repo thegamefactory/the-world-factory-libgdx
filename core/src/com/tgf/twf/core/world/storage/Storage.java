@@ -55,8 +55,9 @@ public class Storage extends Component {
     }
 
     /**
-     * @param resources The quantity of resources to store. {@link #canStore(Inventory)} should be called first to check if the
-     *                  storage can accept the offer or not. {@link Capacity} overflow will throw an {@link IllegalStateException}.
+     * Store the resources in the inventory. {@link #canStore(Inventory)} should be called first to check if the storage can accept the offer or not.
+     *
+     * @param resources The quantity of resources to store.
      */
     public void store(final Inventory resources) {
         if (!inventory.store(resources)) {
@@ -75,9 +76,10 @@ public class Storage extends Component {
     }
 
     /**
-     * @param resources The quantity of resources to reservation. {@link #canReserve(Inventory)} should be called first to check if the
-     *                  storage can accept the offer or not. {@link Capacity} overflow will throw an {@link IllegalStateException}.
-     *                  The effect of this call is to reserve capacity in the storage for a future {@link #store(Inventory)} call.
+     * Reserve capacity in the storage for a future {@link #store(Inventory)} call. {@link #canReserve(Inventory)} should be called first to check
+     * if the storage can accept the offer or not.
+     *
+     * @param resources The quantity of resources to reservation.
      */
     public void reserve(final Inventory resources) {
         if (!inventory.reserve(resources)) {

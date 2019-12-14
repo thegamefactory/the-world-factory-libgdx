@@ -63,14 +63,20 @@ public class TaskSystem implements System {
             final List<Action> actions = unassignedTask.createActions(idleAgent);
             final Storage homeStorage = idleAgent.getHome().getRelatedComponent(Storage.class);
 
-            final MutableInventory cost = new HashMapInventory();
-            final MutableInventory production = new HashMapInventory();
-            if (canCostBePaid(actions, homeStorage, cost) && canProductionBeStored(actions, homeStorage, production)) {
-                homeStorage.retrieve(cost);
-                homeStorage.reserve(production);
-                idleAgent.addActions(actions);
-                busyAgents.add(idleAgent);
-            } else {
+            boolean success = false;
+            final MutableInventory cost = computeCost(actions);
+            if (canCostBePaid(homeStorage, cost)) {
+                final MutableInventory production = computeProduction(actions);
+                if (canProductionBeStored(homeStorage, production)) {
+                    homeStorage.retrieve(cost);
+                    homeStorage.reserve(production);
+                    idleAgent.addActions(actions);
+                    busyAgents.add(idleAgent);
+                    success = true;
+                }
+            }
+
+            if (!success) {
                 idleAgents.add(idleAgent);
                 deadLetterQueue.add(unassignedTask);
             }
@@ -82,11 +88,12 @@ public class TaskSystem implements System {
         }
     }
 
-    private static boolean canCostBePaid(final List<Action> actions, final Storage homeStorage, final MutableInventory cost) {
-        return homeStorage.canRetrieve(computeCost(actions, cost));
+    private static boolean canCostBePaid(final Storage homeStorage, final MutableInventory cost) {
+        return homeStorage.canRetrieve(cost);
     }
 
-    private static MutableInventory computeCost(final List<Action> actions, final MutableInventory cost) {
+    private static MutableInventory computeCost(final List<Action> actions) {
+        final MutableInventory cost = new HashMapInventory();
         for (final Action action : actions) {
             final Inventory actionCost = action.getCost();
             cost.store(actionCost);
@@ -94,11 +101,12 @@ public class TaskSystem implements System {
         return cost;
     }
 
-    private static boolean canProductionBeStored(final List<Action> actions, final Storage homeStorage, final MutableInventory production) {
-        return homeStorage.canReserve(computeProduction(actions, production));
+    private static boolean canProductionBeStored(final Storage homeStorage, final MutableInventory production) {
+        return homeStorage.canReserve(production);
     }
 
-    private static MutableInventory computeProduction(final List<Action> actions, final MutableInventory production) {
+    private static MutableInventory computeProduction(final List<Action> actions) {
+        final MutableInventory production = new HashMapInventory();
         for (final Action action : actions) {
             final Inventory actionProduction = action.getProduction();
             production.store(actionProduction);
