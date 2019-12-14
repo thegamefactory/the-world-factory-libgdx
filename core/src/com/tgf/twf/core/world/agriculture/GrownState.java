@@ -2,6 +2,7 @@ package com.tgf.twf.core.world.agriculture;
 
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.rules.Rules;
+import com.tgf.twf.core.world.storage.Storage;
 import com.tgf.twf.core.world.task.Task;
 import com.tgf.twf.core.world.task.TaskFactory;
 import com.tgf.twf.core.world.task.TaskSystem;
@@ -20,6 +21,7 @@ public class GrownState implements Field.State {
     private boolean isComplete = false;
     private final TaskSystem taskSystem;
     private final Vector2 fieldPosition;
+    private final Storage fieldStorage;
 
     @Override
     public Class<? extends Field.State> tick(final Duration delta) {
@@ -28,6 +30,7 @@ public class GrownState implements Field.State {
 
     @Override
     public void onStateEnter() {
+        fieldStorage.store(Rules.FIELD_YIELD);
         taskSystem.addTask(buildHarvestTask());
     }
 
@@ -35,7 +38,10 @@ public class GrownState implements Field.State {
         return TaskFactory.create(
                 TimedAction.builder()
                         .name("harvest")
-                        .completionCallback(() -> isComplete = true)
+                        .completionCallback(() -> {
+                            fieldStorage.clear();
+                            isComplete = true;
+                        })
                         .duration(Rules.HARVEST_DURATION)
                         .cost(Rules.HARVEST_COST)
                         .prodction(Rules.FIELD_YIELD)

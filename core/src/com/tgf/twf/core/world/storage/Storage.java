@@ -28,6 +28,13 @@ public class Storage extends Component {
     }
 
     /**
+     * Clears the {@link Inventory}.
+     */
+    public void clear() {
+        inventory.clear();
+    }
+
+    /**
      * @param resourceType The resource type whose capacity is being queried.
      * @return The remaining capacity of the storage for this capacity.
      */

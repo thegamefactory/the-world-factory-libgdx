@@ -7,6 +7,7 @@ import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.world.building.Building;
 import com.tgf.twf.core.world.building.BuildingType;
 import com.tgf.twf.core.world.rules.Rules;
+import com.tgf.twf.core.world.storage.Storage;
 import com.tgf.twf.core.world.task.TaskSystem;
 
 import java.time.Duration;
@@ -29,7 +30,10 @@ public class AgricultureSystem implements System {
         this.stateFactories = ImmutableMap.of(
                 UncultivatedState.class, field -> new UncultivatedState(taskSystem, field.getRelatedComponent(Position.class).toVector2()),
                 GrowingState.class, field -> new GrowingState(Rules.FIELD_GROWING_DURATION),
-                GrownState.class, field -> new GrownState(taskSystem, field.getRelatedComponent(Position.class).toVector2())
+                GrownState.class, field -> new GrownState(
+                        taskSystem,
+                        field.getRelatedComponent(Position.class).toVector2(),
+                        field.getRelatedComponent(Storage.class))
         );
         Entities.registerComponentEventListener(this::handle, Building.class, Building.ConstructedEvent.class);
     }
