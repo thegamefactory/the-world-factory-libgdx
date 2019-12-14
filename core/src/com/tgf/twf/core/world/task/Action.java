@@ -14,5 +14,7 @@ public interface Action {
 
     Inventory getCost();
 
+    Inventory getProduction();
+
     String getName();
 }

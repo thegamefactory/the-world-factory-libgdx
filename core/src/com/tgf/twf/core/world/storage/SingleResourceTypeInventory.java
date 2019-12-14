@@ -57,6 +57,11 @@ public class SingleResourceTypeInventory implements MutableInventory {
     }
 
     @Override
+    public boolean isEmpty() {
+        return true;
+    }
+
+    @Override
     public int getStoredQuantity(final ResourceType resourceType) {
         if (resourceType == this.resourceType) {
             return quantity;

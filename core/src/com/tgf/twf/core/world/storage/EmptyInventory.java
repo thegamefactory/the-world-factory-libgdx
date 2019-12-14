@@ -9,10 +9,14 @@ import java.util.Set;
  */
 public class EmptyInventory implements Inventory {
     private EmptyInventory() {
-
     }
 
     public static EmptyInventory INSTANCE = new EmptyInventory();
+
+    @Override
+    public boolean isEmpty() {
+        return true;
+    }
 
     @Override
     public int getStoredQuantity(final ResourceType resourceType) {

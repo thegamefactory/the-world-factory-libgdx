@@ -24,36 +24,7 @@ public class Storage extends Component {
      * @return True if the {@link Inventory} contains 0 resources.
      */
     public boolean isEmpty() {
-        return inventory.getTotalStoredQuantity() == 0;
-    }
-
-    /**
-     * @param quantity     The quantity added to the storage.
-     * @param resourceType The type of resource offered to the storage.
-     * @return The true if the resources are stored, if the capacity permits it.
-     */
-    public boolean store(final ResourceType resourceType, final int quantity) {
-        final int remainingCapacity = capacity.getRemainingCapacity(inventory, resourceType);
-        if (remainingCapacity >= quantity) {
-            if (!inventory.store(resourceType, quantity)) {
-                throw new IllegalStateException("Storage unexpectedly rejected " + quantity + " " + resourceType);
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Force to store the given quantity of {@link ResourceType}, even if it overflows the capacity.
-     *
-     * @param quantity     The quantity offered to the storage.
-     * @param resourceType The type of resource offered to the storage.
-     */
-    public void forceStore(final ResourceType resourceType, final int quantity) {
-        if (!inventory.store(resourceType, quantity)) {
-            throw new IllegalStateException("Inventory rejected storage");
-        }
+        return inventory.isEmpty();
     }
 
     /**
@@ -65,22 +36,59 @@ public class Storage extends Component {
     }
 
     /**
-     * @param resources The quantity of resources to consume, per resource type.
-     * @return true if the storage had enough resources in store to satisfy the demand. If true, the resources are removed from the storage. If
-     * false, the storage is left untouched.
+     * Force to store the given quantity of {@link ResourceType}, regardless of the {@link Capacity}.
+     *
+     * @param quantity     The quantity offered to the storage.
+     * @param resourceType The type of resource offered to the storage.
      */
-    public boolean tryConsumeResources(final Inventory resources) {
-        final boolean canConsume = resources.getStoredResourceTypes().stream()
-                .allMatch(resourceType -> inventory.getStoredQuantity(resourceType) >= resources.getStoredQuantity(resourceType));
-        if (canConsume) {
-            resources.getStoredResourceTypes()
-                    .forEach(resourceType -> {
-                        if (!inventory.retrieve(resourceType, resources.getStoredQuantity(resourceType))) {
-                            throw new IllegalStateException("Storage rejected retrieval of " + resourceType);
-                        }
-                    });
+    public void forceStore(final ResourceType resourceType, final int quantity) {
+        if (!inventory.store(resourceType, quantity)) {
+            throw new IllegalStateException("Inventory rejected storage of " + quantity + " " + resourceType);
         }
-        return canConsume;
+    }
+
+    /**
+     * @param resources The quantity of resources to store. {@link #canStore(Inventory)} (Inventory)} should be called first to check if the
+     *                  storage can accept the offer or not. {@link Capacity} overflow will throw an {@link IllegalStateException}.
+     */
+    public void store(final Inventory resources) {
+        resources.getStoredResourceTypes()
+                .forEach(resourceType -> {
+                    if (!inventory.store(resourceType, resources.getStoredQuantity(resourceType))) {
+                        throw new IllegalStateException("Storage rejected storage of " + resourceType);
+                    }
+                });
+    }
+
+    /**
+     * @param resources The quantity of resources to store, per resource type.
+     * @return true if the storage have enough capacity in store to satisfy the offer.
+     */
+    public boolean canStore(final Inventory resources) {
+        return resources.getStoredResourceTypes().stream()
+                .allMatch(resourceType -> capacity.getRemainingCapacity(inventory, resourceType) >= resources.getStoredQuantity(resourceType));
+    }
+
+    /**
+     * @param resources The quantity of resources to consume.
+     * @return true if the storage have enough resources in store to satisfy the demand.
+     */
+    public boolean canRetrieve(final Inventory resources) {
+        return resources.getStoredResourceTypes().stream()
+                .allMatch(resourceType -> inventory.getStoredQuantity(resourceType) >= resources.getStoredQuantity(resourceType));
+    }
+
+    /**
+     * @param resources The quantity of resources to consume. {@link #canRetrieve(Inventory)} should be called first to check if the storage can
+     *                  satisfy the demand or not. Insufficient capacity will throw an {@link IllegalStateException}.
+     */
+    public void retrieve(final Inventory resources) {
+        resources.getStoredResourceTypes()
+                .forEach(resourceType -> {
+                    if (!inventory.retrieve(resourceType, resources.getStoredQuantity(resourceType))) {
+                        throw new IllegalStateException("Storage rejected retrieval of " + resourceType);
+                    }
+                });
     }
 
     /**
@@ -105,6 +113,24 @@ public class Storage extends Component {
             inventory.clear();
         }
         return canStore;
+    }
+
+
+    /**
+     * @param quantity     The quantity added to the storage.
+     * @param resourceType The type of resource offered to the storage.
+     * @return The true if the resources are stored, if the capacity permits it.
+     */
+    private boolean store(final ResourceType resourceType, final int quantity) {
+        final int remainingCapacity = capacity.getRemainingCapacity(inventory, resourceType);
+        if (remainingCapacity >= quantity) {
+            if (!inventory.store(resourceType, quantity)) {
+                throw new IllegalStateException("Storage unexpectedly rejected " + quantity + " " + resourceType);
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

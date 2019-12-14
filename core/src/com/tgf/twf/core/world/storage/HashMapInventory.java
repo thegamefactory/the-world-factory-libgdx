@@ -12,6 +12,11 @@ public class HashMapInventory implements MutableInventory {
     private int totalStoredQuantity = 0;
 
     @Override
+    public boolean isEmpty() {
+        return totalStoredQuantity == 0;
+    }
+
+    @Override
     public int getStoredQuantity(final ResourceType resourceType) {
         return stock.getOrDefault(resourceType, 0);
     }

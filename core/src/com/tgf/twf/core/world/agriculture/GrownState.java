@@ -2,9 +2,6 @@ package com.tgf.twf.core.world.agriculture;
 
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.rules.Rules;
-import com.tgf.twf.core.world.storage.ResourceType;
-import com.tgf.twf.core.world.storage.Storage;
-import com.tgf.twf.core.world.task.Agent;
 import com.tgf.twf.core.world.task.Task;
 import com.tgf.twf.core.world.task.TaskFactory;
 import com.tgf.twf.core.world.task.TaskSystem;
@@ -36,20 +33,14 @@ public class GrownState implements Field.State {
 
     private Task buildHarvestTask() {
         return TaskFactory.create(
-                (agent) -> TimedAction.builder()
+                TimedAction.builder()
                         .name("harvest")
-                        .completionCallback(() -> this.complete(agent))
+                        .completionCallback(() -> isComplete = true)
                         .duration(Rules.HARVEST_DURATION)
                         .cost(Rules.HARVEST_COST)
+                        .prodction(Rules.FIELD_YIELD)
                         .build(),
                 fieldPosition);
-    }
-
-    void complete(final Agent agent) {
-        isComplete = true;
-        if (!agent.getRelatedComponent(Storage.class).store(ResourceType.FOOD, Rules.FIELD_YIELD)) {
-            throw new IllegalStateException("Agent rejected harvest");
-        }
     }
 
     @Override

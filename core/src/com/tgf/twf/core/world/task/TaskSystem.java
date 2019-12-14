@@ -55,16 +55,17 @@ public class TaskSystem implements System {
     }
 
     private void assignTaskToIdleAgents() {
-        final MutableInventory cost = new HashMapInventory();
         final Queue<Task> deadLetterQueue = new LinkedList<>();
 
         while (!idleAgents.isEmpty() && !unassignedTasks.isEmpty()) {
             final Agent idleAgent = idleAgents.poll();
             final Task unassignedTask = unassignedTasks.poll();
             final List<Action> actions = unassignedTask.createActions(idleAgent);
-            cost.clear();
-            collectCost(actions, cost);
-            if (idleAgent.getHome().getRelatedComponent(Storage.class).tryConsumeResources(cost)) {
+            final Storage homeStorage = idleAgent.getHome().getRelatedComponent(Storage.class);
+
+            final MutableInventory cost = new HashMapInventory();
+            if (canCostBePaid(actions, homeStorage, cost) && canProductionBeStored(actions, homeStorage)) {
+                homeStorage.retrieve(cost);
                 idleAgent.addActions(actions);
                 busyAgents.add(idleAgent);
             } else {
@@ -79,11 +80,29 @@ public class TaskSystem implements System {
         }
     }
 
-    private static void collectCost(final List<Action> actions, final MutableInventory cost) {
+    private static boolean canCostBePaid(final List<Action> actions, final Storage homeStorage, final MutableInventory cost) {
+        return homeStorage.canRetrieve(computeCost(actions, cost));
+    }
+
+    private static MutableInventory computeCost(final List<Action> actions, final MutableInventory cost) {
         for (final Action action : actions) {
             final Inventory actionCost = action.getCost();
             cost.store(actionCost);
         }
+        return cost;
+    }
+
+    private static boolean canProductionBeStored(final List<Action> actions, final Storage homeStorage) {
+        return homeStorage.canStore(computeProduction(actions));
+    }
+
+    private static MutableInventory computeProduction(final List<Action> actions) {
+        final MutableInventory production = new HashMapInventory();
+        for (final Action action : actions) {
+            final Inventory actionProduction = action.getProduction();
+            production.store(actionProduction);
+        }
+        return production;
     }
 
     public void executeTasks(final Duration delta) {
@@ -94,6 +113,7 @@ public class TaskSystem implements System {
                     activeAction.update(delta);
                     if (activeAction.isComplete()) {
                         agent.completeAction();
+                        agent.getRelatedComponent(Storage.class).store(activeAction.getProduction());
                     }
                     if (agent.isIdle()) {
                         idlingAgents.add(agent);

@@ -2,6 +2,7 @@ package com.tgf.twf.core.world.rules;
 
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.storage.Inventory;
+import com.tgf.twf.core.world.storage.ResourceType;
 import com.tgf.twf.core.world.storage.SingleResourceTypeInventory;
 
 import java.time.Duration;
@@ -15,7 +16,7 @@ public class Rules {
     public static final Duration FIELD_BUILD_DURATION = Duration.ofSeconds(2);
     public static final Duration FIELD_GROWING_DURATION = Duration.ofSeconds(2);
     public static final int FIELD_STORAGE_CAPACITY = 5;
-    public static final int FIELD_YIELD = 5;
+    public static final Inventory FIELD_YIELD = SingleResourceTypeInventory.of(ResourceType.FOOD, 5);
     public static final Inventory HARVEST_COST = SingleResourceTypeInventory.ONE_FOOD;
     public static final Duration HARVEST_DURATION = Duration.ofSeconds(2);
     public static final int INITIAL_AGENT_COUNT = 2;
