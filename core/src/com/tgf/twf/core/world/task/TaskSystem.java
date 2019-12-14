@@ -64,8 +64,10 @@ public class TaskSystem implements System {
             final Storage homeStorage = idleAgent.getHome().getRelatedComponent(Storage.class);
 
             final MutableInventory cost = new HashMapInventory();
-            if (canCostBePaid(actions, homeStorage, cost) && canProductionBeStored(actions, homeStorage)) {
+            final MutableInventory production = new HashMapInventory();
+            if (canCostBePaid(actions, homeStorage, cost) && canProductionBeStored(actions, homeStorage, production)) {
                 homeStorage.retrieve(cost);
+                homeStorage.reserve(production);
                 idleAgent.addActions(actions);
                 busyAgents.add(idleAgent);
             } else {
@@ -92,12 +94,11 @@ public class TaskSystem implements System {
         return cost;
     }
 
-    private static boolean canProductionBeStored(final List<Action> actions, final Storage homeStorage) {
-        return homeStorage.canStore(computeProduction(actions));
+    private static boolean canProductionBeStored(final List<Action> actions, final Storage homeStorage, final MutableInventory production) {
+        return homeStorage.canStore(computeProduction(actions, production));
     }
 
-    private static MutableInventory computeProduction(final List<Action> actions) {
-        final MutableInventory production = new HashMapInventory();
+    private static MutableInventory computeProduction(final List<Action> actions, final MutableInventory production) {
         for (final Action action : actions) {
             final Inventory actionProduction = action.getProduction();
             production.store(actionProduction);

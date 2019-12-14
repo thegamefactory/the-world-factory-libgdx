@@ -36,6 +36,37 @@ public class Storage extends Component {
     }
 
     /**
+     * @param resources The quantity of resources to store, per resource type.
+     * @return true if the storage have enough capacity in store to satisfy the offer.
+     */
+    public boolean canStore(final Inventory resources) {
+        return resources.getStoredResourceTypes().stream()
+                .allMatch(resourceType -> capacity.getRemainingCapacity(inventory, resourceType) >= resources.getStoredQuantity(resourceType));
+    }
+
+    /**
+     * @param resources The quantity of resources to store. {@link #canStore(Inventory)} (Inventory)} should be called first to check if the
+     *                  storage can accept the offer or not. {@link Capacity} overflow will throw an {@link IllegalStateException}.
+     */
+    public void store(final Inventory resources) {
+        if (!inventory.store(resources)) {
+            throw new IllegalStateException("Storage rejected storage of " + resources);
+        }
+    }
+
+    /**
+     * @param resources The quantity of resources to reservation. {@link #canStore(Inventory)} (Inventory)} should be called first to check if the
+     *                  storage can accept the offer or not. {@link Capacity} overflow will throw an {@link IllegalStateException}.
+     *                  The effect of this call is to reserve capacity in the storage for a future {@link #store(Inventory)} call.
+     */
+    public void reserve(final Inventory resources) {
+        if (!inventory.reserve(resources)) {
+            throw new IllegalStateException("Storage rejected reservation of " + resources);
+        }
+    }
+
+
+    /**
      * Force to store the given quantity of {@link ResourceType}, regardless of the {@link Capacity}.
      *
      * @param quantity     The quantity offered to the storage.
@@ -45,28 +76,6 @@ public class Storage extends Component {
         if (!inventory.store(resourceType, quantity)) {
             throw new IllegalStateException("Inventory rejected storage of " + quantity + " " + resourceType);
         }
-    }
-
-    /**
-     * @param resources The quantity of resources to store. {@link #canStore(Inventory)} (Inventory)} should be called first to check if the
-     *                  storage can accept the offer or not. {@link Capacity} overflow will throw an {@link IllegalStateException}.
-     */
-    public void store(final Inventory resources) {
-        resources.getStoredResourceTypes()
-                .forEach(resourceType -> {
-                    if (!inventory.store(resourceType, resources.getStoredQuantity(resourceType))) {
-                        throw new IllegalStateException("Storage rejected storage of " + resourceType);
-                    }
-                });
-    }
-
-    /**
-     * @param resources The quantity of resources to store, per resource type.
-     * @return true if the storage have enough capacity in store to satisfy the offer.
-     */
-    public boolean canStore(final Inventory resources) {
-        return resources.getStoredResourceTypes().stream()
-                .allMatch(resourceType -> capacity.getRemainingCapacity(inventory, resourceType) >= resources.getStoredQuantity(resourceType));
     }
 
     /**
@@ -100,37 +109,13 @@ public class Storage extends Component {
         if (inventory.getTotalStoredQuantity() == 0) {
             return true;
         }
-
         final boolean canStore = inventory.getStoredResourceTypes().stream()
                 .allMatch(resourceType -> destinationStorage.getRemainingCapacity(resourceType) >= inventory.getStoredQuantity(resourceType));
         if (canStore) {
-            inventory.getStoredResourceTypes()
-                    .forEach(resourceType -> {
-                        if (!destinationStorage.store(resourceType, inventory.getStoredQuantity(resourceType))) {
-                            throw new IllegalStateException("Destination storage rejected " + resourceType);
-                        }
-                    });
+            destinationStorage.store(inventory);
             inventory.clear();
         }
         return canStore;
-    }
-
-
-    /**
-     * @param quantity     The quantity added to the storage.
-     * @param resourceType The type of resource offered to the storage.
-     * @return The true if the resources are stored, if the capacity permits it.
-     */
-    private boolean store(final ResourceType resourceType, final int quantity) {
-        final int remainingCapacity = capacity.getRemainingCapacity(inventory, resourceType);
-        if (remainingCapacity >= quantity) {
-            if (!inventory.store(resourceType, quantity)) {
-                throw new IllegalStateException("Storage unexpectedly rejected " + quantity + " " + resourceType);
-            }
-            return true;
-        } else {
-            return false;
-        }
     }
 
     /**
