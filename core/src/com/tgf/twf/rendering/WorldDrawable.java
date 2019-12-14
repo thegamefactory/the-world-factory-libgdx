@@ -9,6 +9,7 @@ import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.World;
 import com.tgf.twf.core.world.building.Building;
+import com.tgf.twf.core.world.storage.Storage;
 import com.tgf.twf.core.world.task.Agent;
 import com.tgf.twf.core.world.terrain.TerrainType;
 import com.tgf.twf.input.ToolPreview;
@@ -23,6 +24,7 @@ public class WorldDrawable extends BaseDrawable {
 
     private final Sprite agent;
     private final Sprite agentIdle;
+    private final Sprite agentCarrying;
     private final TransparentSprite[] terrainSprites;
 
     private final ToolPreview toolPreview;
@@ -46,6 +48,7 @@ public class WorldDrawable extends BaseDrawable {
         this.toolPreview = toolPreview;
         this.agent = textureAtlas.createSprite("agent");
         this.agentIdle = textureAtlas.createSprite("agent_idle");
+        this.agentCarrying = textureAtlas.createSprite("agent_carrying");
         this.terrainSprites = new TransparentSprite[TerrainType.values().length];
         for (final TerrainType terrainType : TerrainType.values()) {
             terrainSprites[terrainType.ordinal()] = new TransparentSprite(textureAtlas.createSprite(terrainType.getName() + "_tile"));
@@ -113,7 +116,9 @@ public class WorldDrawable extends BaseDrawable {
                 continue;
             }
             final Vector2f subTilePosition = agents[i].getSubTilePosition();
-            batch.draw(agent,
+            final boolean isCarrying = !agents[i].getRelatedComponent(Storage.class).isEmpty();
+
+            batch.draw(isCarrying ? agentCarrying : agent,
                     screenPos.x + ((int) (agent.getWidth() * -0.5)) + coordinatesTransformer.convertWorldToScreenXWithoutOffset(subTilePosition),
                     screenPos.y + (int) (agent.getHeight() * -0.5) + coordinatesTransformer.convertWorldToScreenYWithoutOffset(subTilePosition));
         }
