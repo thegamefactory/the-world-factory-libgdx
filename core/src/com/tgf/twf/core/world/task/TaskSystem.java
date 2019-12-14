@@ -4,6 +4,7 @@ import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.Entities;
 import com.tgf.twf.core.ecs.System;
 import com.tgf.twf.core.geo.Vector2;
+import com.tgf.twf.core.world.storage.HashMapInventory;
 import com.tgf.twf.core.world.storage.Inventory;
 import com.tgf.twf.core.world.storage.MutableInventory;
 import com.tgf.twf.core.world.storage.Storage;
@@ -54,7 +55,7 @@ public class TaskSystem implements System {
     }
 
     private void assignTaskToIdleAgents() {
-        final MutableInventory cost = new MutableInventory();
+        final MutableInventory cost = new HashMapInventory();
         final Queue<Task> deadLetterQueue = new LinkedList<>();
 
         while (!idleAgents.isEmpty() && !unassignedTasks.isEmpty()) {

@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public class Storage extends Component {
-    private final MutableInventory inventory = new MutableInventory();
+    private final MutableInventory inventory = new HashMapInventory();
     private final Capacity capacity;
 
     /**
