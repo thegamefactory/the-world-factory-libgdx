@@ -32,4 +32,14 @@ public class EmptyInventory implements Inventory {
     public Set<ResourceType> getStoredResourceTypes() {
         return ImmutableSet.of();
     }
+
+    @Override
+    public int getReservedQuantity(final ResourceType resourceType) {
+        return 0;
+    }
+
+    @Override
+    public int getTotalReservedQuantity() {
+        return 0;
+    }
 }

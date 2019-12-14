@@ -1,12 +1,14 @@
 package com.tgf.twf.core.world.storage;
 
 import com.google.common.collect.ImmutableSet;
+import lombok.ToString;
 
 import java.util.Set;
 
 /**
  * Inventory for a mutable quantity of a single {@link ResourceType}.
  */
+@ToString
 public class SingleResourceTypeInventory implements MutableInventory {
     public static final Inventory ONE_FOOD = SingleResourceTypeInventory.of(ResourceType.FOOD, 1);
 
@@ -21,6 +23,10 @@ public class SingleResourceTypeInventory implements MutableInventory {
 
     public static SingleResourceTypeInventory of(final ResourceType resourceType, final int quantity) {
         return new SingleResourceTypeInventory(resourceType, quantity);
+    }
+
+    public static SingleResourceTypeInventory empty(final ResourceType resourceType) {
+        return new SingleResourceTypeInventory(resourceType, 0);
     }
 
     @Override
@@ -60,7 +66,11 @@ public class SingleResourceTypeInventory implements MutableInventory {
 
     @Override
     public boolean reserve(final Inventory inventory) {
-        return false;
+        if (checkInventoryContainsOnlyResourceType(inventory)) {
+            return reserve(resourceType, inventory.getStoredQuantity(resourceType));
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -71,7 +81,7 @@ public class SingleResourceTypeInventory implements MutableInventory {
         if (resourceType != this.resourceType) {
             return false;
         }
-        if (quantity >= this.quantity - this.reservedQuantity) {
+        if (quantity <= this.quantity) {
             this.quantity -= quantity;
             return true;
         } else {
@@ -115,6 +125,11 @@ public class SingleResourceTypeInventory implements MutableInventory {
         } else {
             return 0;
         }
+    }
+
+    @Override
+    public int getTotalReservedQuantity() {
+        return reservedQuantity;
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.tgf.twf.core.world.storage;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.util.Set;
 
@@ -9,13 +10,18 @@ import java.util.Set;
  * {@link Capacity} which is agnostic of resource type i.e. treats all resource types the same.
  */
 @RequiredArgsConstructor
+@ToString
 public class AnyResourceTypeFixedCapacity implements Capacity {
     final int capacity;
     private static final Set<ResourceType> STORABLE_RESOURCE_TYPES = ImmutableSet.copyOf(ResourceType.values());
 
     @Override
-    public int getRemainingCapacity(final Inventory currentInventory, final ResourceType resourceType) {
-        return capacity - currentInventory.getTotalStoredQuantity();
+    public int getRemainingCapacity(final Inventory currentInventory, final ResourceType resourceType, final CapacityCountMode capacityCountMode) {
+        int currentInventoryUsage = currentInventory.getTotalStoredQuantity();
+        if (capacityCountMode.equals(CapacityCountMode.INCLUDE_RESERVATIONS)) {
+            currentInventoryUsage += currentInventory.getTotalReservedQuantity();
+        }
+        return Math.max(capacity - currentInventoryUsage, 0);
     }
 
     @Override
@@ -26,5 +32,10 @@ public class AnyResourceTypeFixedCapacity implements Capacity {
     @Override
     public Set<ResourceType> getStorableResourceTypes() {
         return STORABLE_RESOURCE_TYPES;
+    }
+
+    @Override
+    public MutableInventory buildMutableInventory() {
+        return new HashMapInventory();
     }
 }

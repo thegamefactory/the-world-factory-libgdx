@@ -95,7 +95,7 @@ public class TaskSystem implements System {
     }
 
     private static boolean canProductionBeStored(final List<Action> actions, final Storage homeStorage, final MutableInventory production) {
-        return homeStorage.canStore(computeProduction(actions, production));
+        return homeStorage.canReserve(computeProduction(actions, production));
     }
 
     private static MutableInventory computeProduction(final List<Action> actions, final MutableInventory production) {

@@ -1,6 +1,7 @@
 package com.tgf.twf.core.world.storage;
 
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Set;
 /**
  * Concrete implementation of {@link MutableInventory} based on a {@link HashMap} of {@link ResourceType} to integer quantity.
  */
+@ToString
 public class HashMapInventory implements MutableInventory {
     @Data
     private static class Stock {
@@ -31,6 +33,7 @@ public class HashMapInventory implements MutableInventory {
 
     private final Map<ResourceType, Stock> stocks = new HashMap<>();
     private int totalStoredQuantity = 0;
+    private int totalReservedQuantity = 0;
 
     @Override
     public boolean isEmpty() {
@@ -47,6 +50,11 @@ public class HashMapInventory implements MutableInventory {
     public int getReservedQuantity(final ResourceType resourceType) {
         final Stock stock = stocks.get(resourceType);
         return stock == null ? 0 : stock.reservedQuantity;
+    }
+
+    @Override
+    public int getTotalReservedQuantity() {
+        return totalReservedQuantity;
     }
 
     @Override
@@ -70,7 +78,9 @@ public class HashMapInventory implements MutableInventory {
             stocks.put(resourceType, stock);
         } else {
             stock.storedQuantity += quantity;
-            stock.reservedQuantity = Math.max(stock.reservedQuantity - quantity, 0);
+            final int removedReservedQuantity = Math.min(stock.reservedQuantity, quantity);
+            stock.reservedQuantity -= removedReservedQuantity;
+            totalReservedQuantity -= removedReservedQuantity;
         }
         totalStoredQuantity += quantity;
         return true;
@@ -94,6 +104,7 @@ public class HashMapInventory implements MutableInventory {
             stocks.put(resourceType, Stock.ofReservedQuantity(quantity));
         } else {
             stock.reservedQuantity += quantity;
+            totalReservedQuantity += quantity;
         }
         return true;
     }

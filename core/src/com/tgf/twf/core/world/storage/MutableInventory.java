@@ -20,12 +20,5 @@ public interface MutableInventory extends Inventory {
 
     boolean reserve(final Inventory inventory);
 
-    /**
-     * @param resourceType the given {@link ResourceType}.
-     * @return the quantity of resources with capacity reserved for the given {@link ResourceType}.
-     * Reserved capacity means that the inventory will keep available space for a future storage of that resource type.
-     */
-    int getReservedQuantity(ResourceType resourceType);
-
     void clear();
 }

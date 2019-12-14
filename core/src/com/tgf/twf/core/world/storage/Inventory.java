@@ -27,4 +27,16 @@ public interface Inventory {
      * @return all the {@link ResourceType}s with a non-zero stored quantity.
      */
     Set<ResourceType> getStoredResourceTypes();
+
+    /**
+     * @param resourceType the given {@link ResourceType}.
+     * @return the quantity of resources with capacity reserved for the given {@link ResourceType}.
+     * Reserved capacity means that the inventory will keep available space for a future storage of that resource type.
+     */
+    int getReservedQuantity(ResourceType resourceType);
+
+    /**
+     * @return the total quantity of resources reserved across all {@link ResourceType}s.
+     */
+    int getTotalReservedQuantity();
 }

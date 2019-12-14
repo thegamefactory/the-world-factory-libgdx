@@ -2,17 +2,20 @@ package com.tgf.twf.core.world.storage;
 
 import com.tgf.twf.core.ecs.Component;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * A component to model a capacity to store resources and the actual quantity of stored resources.
  * The capacity of the storage is modeled in {@link Capacity}, while the actual stock is modeled in the {@link Inventory}.
  */
-@RequiredArgsConstructor
 public class Storage extends Component {
-    private final MutableInventory inventory = new HashMapInventory();
+    private final MutableInventory inventory;
     @Getter
     private final Capacity capacity;
+
+    public Storage(final Capacity capacity) {
+        this.capacity = capacity;
+        this.inventory = capacity.buildMutableInventory();
+    }
 
     public int getStored(final ResourceType resourceType) {
         return inventory.getStoredQuantity(resourceType);
@@ -33,11 +36,12 @@ public class Storage extends Component {
     }
 
     /**
-     * @param resourceType The resource type whose capacity is being queried.
+     * @param resourceType      The resource type whose capacity is being queried.
+     * @param capacityCountMode Whether or not consider reservations to evaluate the remaining capacity.
      * @return The remaining capacity of the storage for this capacity.
      */
-    public int getRemainingCapacity(final ResourceType resourceType) {
-        return capacity.getRemainingCapacity(inventory, resourceType);
+    public int getRemainingCapacity(final ResourceType resourceType, final Capacity.CapacityCountMode capacityCountMode) {
+        return capacity.getRemainingCapacity(inventory, resourceType, capacityCountMode);
     }
 
     /**
@@ -46,11 +50,12 @@ public class Storage extends Component {
      */
     public boolean canStore(final Inventory resources) {
         return resources.getStoredResourceTypes().stream()
-                .allMatch(resourceType -> capacity.getRemainingCapacity(inventory, resourceType) >= resources.getStoredQuantity(resourceType));
+                .allMatch(resourceType -> capacity.getRemainingCapacity(inventory, resourceType, Capacity.CapacityCountMode.EXCLUDE_RESERATIONS)
+                        >= resources.getStoredQuantity(resourceType));
     }
 
     /**
-     * @param resources The quantity of resources to store. {@link #canStore(Inventory)} (Inventory)} should be called first to check if the
+     * @param resources The quantity of resources to store. {@link #canStore(Inventory)} should be called first to check if the
      *                  storage can accept the offer or not. {@link Capacity} overflow will throw an {@link IllegalStateException}.
      */
     public void store(final Inventory resources) {
@@ -60,7 +65,17 @@ public class Storage extends Component {
     }
 
     /**
-     * @param resources The quantity of resources to reservation. {@link #canStore(Inventory)} (Inventory)} should be called first to check if the
+     * @param resources The quantity of resources to store, per resource type.
+     * @return true if the storage have enough capacity in store to satisfy the offer.
+     */
+    public boolean canReserve(final Inventory resources) {
+        return resources.getStoredResourceTypes().stream()
+                .allMatch(resourceType -> capacity.getRemainingCapacity(inventory, resourceType, Capacity.CapacityCountMode.INCLUDE_RESERVATIONS)
+                        >= resources.getStoredQuantity(resourceType));
+    }
+
+    /**
+     * @param resources The quantity of resources to reservation. {@link #canReserve(Inventory)} should be called first to check if the
      *                  storage can accept the offer or not. {@link Capacity} overflow will throw an {@link IllegalStateException}.
      *                  The effect of this call is to reserve capacity in the storage for a future {@link #store(Inventory)} call.
      */
@@ -115,11 +130,17 @@ public class Storage extends Component {
             return true;
         }
         final boolean canStore = inventory.getStoredResourceTypes().stream()
-                .allMatch(resourceType -> destinationStorage.getRemainingCapacity(resourceType) >= inventory.getStoredQuantity(resourceType));
+                .allMatch(resourceType -> destinationStorage.getRemainingCapacity(
+                        resourceType, Capacity.CapacityCountMode.EXCLUDE_RESERATIONS) >= inventory.getStoredQuantity(resourceType));
         if (canStore) {
             destinationStorage.store(inventory);
             inventory.clear();
         }
         return canStore;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + "(capacity=" + capacity + ", inventory=" + inventory + ")";
     }
 }
