@@ -66,6 +66,11 @@ public class CoordinatesTransformer {
         render.y = screen.y - tileSize.y / 2;
     }
 
+    public void convertMouseToRender(final Vector2f mouse, final Vector2f render) {
+        render.x = mouse.x - offset.x;
+        render.y = mouse.y - offset.y;
+    }
+
     public void convertWorldToRender(final Vector2 world, final Vector2f render) {
         final Vector2f screen = new Vector2f();
         convertWorldToScreen(world, screen);

@@ -18,6 +18,7 @@ public class WorldInputListener extends InputListener {
     private final PlayerIntentionApi playerIntentionApi;
     private final CoordinatesTransformer coordinatesTransformer;
     private final ToolPreview toolPreview;
+    private final ToolTip toolTip;
 
     @Getter
     private final Vector2f mouseScreen = new Vector2f();
@@ -39,6 +40,7 @@ public class WorldInputListener extends InputListener {
         mouseScreen.x = x;
         mouseScreen.y = y;
         toolPreview.setScreenPosition(mouseScreen);
+        toolTip.setScreenPosition(mouseScreen);
         return false;
     }
 

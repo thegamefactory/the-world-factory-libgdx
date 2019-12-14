@@ -9,4 +9,5 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:1.18.10"
     compileOnly "org.projectlombok:lombok:1.18.10"
     compile "com.google.guava:guava:28.1-jre"
+    compile "org.apache.commons:commons-lang3:3.9"
 }

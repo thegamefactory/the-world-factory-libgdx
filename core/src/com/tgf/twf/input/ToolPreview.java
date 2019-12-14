@@ -18,7 +18,7 @@ public class ToolPreview {
     private Vector2f screenPosition;
     private final CoordinatesTransformer coordinatesTransformer;
 
-    public boolean preview(final Batch batch) {
+    public void preview(final Batch batch) {
         final Vector2f renderPosition = new Vector2f();
         final Vector2 worldPosition = new Vector2();
         coordinatesTransformer.convertScreenToWorld(screenPosition, worldPosition);
@@ -31,7 +31,6 @@ public class ToolPreview {
         }
         tool.preview(batch, renderPosition);
         batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-        return isSuccess;
     }
 
     public Vector2 getWorldPosition() {

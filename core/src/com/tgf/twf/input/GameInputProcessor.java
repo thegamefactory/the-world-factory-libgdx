@@ -16,6 +16,7 @@ import java.util.List;
 public class GameInputProcessor implements InputProcessor {
     private final InputProcessor delegate;
     private final ToolPreview toolPreview;
+    private final ToolTip toolTip;
 
     private final List<Integer> leftKeys = new LinkedList<>();
     private final List<Integer> rightKeys = new LinkedList<>();
@@ -30,9 +31,10 @@ public class GameInputProcessor implements InputProcessor {
     @Getter
     private int speedFactor = 0;
 
-    public GameInputProcessor(final InputProcessor delegate, final ToolPreview toolPreview) {
+    public GameInputProcessor(final InputProcessor delegate, final ToolPreview toolPreview, final ToolTip toolTip) {
         this.delegate = delegate;
         this.toolPreview = toolPreview;
+        this.toolTip = toolTip;
         this.leftKeys.add(Input.Keys.A);
         this.leftKeys.add(Input.Keys.LEFT);
         this.rightKeys.add(Input.Keys.D);
@@ -98,11 +100,17 @@ public class GameInputProcessor implements InputProcessor {
             isDownPressed = isPressed;
             return true;
         }
+        if (keycode == Input.Keys.CONTROL_LEFT) {
+            toolTip.setIntrospectionKeyModifierPressed(isPressed);
+            return true;
+        }
         if (keycode == Input.Keys.valueOf("]") || keycode == Input.Keys.PLUS) {
             speedFactor++;
+            return true;
         }
         if (keycode == Input.Keys.valueOf("[") || keycode == Input.Keys.MINUS) {
             speedFactor--;
+            return true;
         }
         return false;
     }

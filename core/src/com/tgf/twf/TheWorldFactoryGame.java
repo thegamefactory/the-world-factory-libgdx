@@ -26,6 +26,7 @@ import com.tgf.twf.input.BuildingToolButtonListener;
 import com.tgf.twf.input.GameInputProcessor;
 import com.tgf.twf.input.Tool;
 import com.tgf.twf.input.ToolPreview;
+import com.tgf.twf.input.ToolTip;
 import com.tgf.twf.input.WorldInputListener;
 import com.tgf.twf.rendering.BuildingTextures;
 import com.tgf.twf.rendering.CoordinatesTransformer;
@@ -77,8 +78,11 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         });
 
         final ToolPreview toolPreview = new ToolPreview(Tool.NULL_TOOL, new Vector2f(), coordinatesTransformer);
+        final BitmapFont toolTipFont = new BitmapFont();
+        disposables.add(toolTipFont);
+        final ToolTip toolTip = new ToolTip(coordinatesTransformer, world.getGeoMap(), toolTipFont);
 
-        final GameInputProcessor gameInputProcessor = new GameInputProcessor(gameStage, toolPreview);
+        final GameInputProcessor gameInputProcessor = new GameInputProcessor(gameStage, toolPreview, toolTip);
         renderCallbacks.add(() -> {
             gameStage.act(Gdx.graphics.getDeltaTime() * (float) Math.pow(2, gameInputProcessor.getSpeedFactor()));
             gameStage.draw();
@@ -105,6 +109,7 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
                 .coordinatesTransformer(coordinatesTransformer)
                 .textureAtlas(textureAtlas)
                 .toolPreview(toolPreview)
+                .toolTip(toolTip)
                 .world(world)
                 .build();
         final WorldActor worldActor = new WorldActor(world, worldDrawable);
@@ -113,7 +118,7 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
 
         final PlayerIntentionApi playerIntentionApi = new PlayerIntentionApi(world);
 
-        final WorldInputListener worldInputListener = new WorldInputListener(playerIntentionApi, coordinatesTransformer, toolPreview);
+        final WorldInputListener worldInputListener = new WorldInputListener(playerIntentionApi, coordinatesTransformer, toolPreview, toolTip);
         worldActor.addListener(worldInputListener);
 
         final BuildingTextures buildingTextures = new BuildingTextures(textureAtlas);

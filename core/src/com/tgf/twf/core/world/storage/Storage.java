@@ -1,7 +1,10 @@
 package com.tgf.twf.core.world.storage;
 
 import com.tgf.twf.core.ecs.Component;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Set;
 
 /**
  * A component to model a capacity to store resources and the actual quantity of stored resources.
@@ -10,7 +13,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class Storage extends Component {
     private final MutableInventory inventory = new HashMapInventory();
+    @Getter
     private final Capacity capacity;
+
+    public int getStored(final ResourceType resourceType) {
+        return inventory.getStoredQuantity(resourceType);
+    }
 
     /**
      * @param offeredQuantity The quantity offered to the storage.
@@ -61,9 +69,10 @@ public class Storage extends Component {
      * The capacity defines the quantity of resources of a {@link ResourceType} that a given {@link Inventory} can stock, on top of the resources that
      * the {@link Inventory} already has in stock.
      */
-    @FunctionalInterface
     public interface Capacity {
         int getRemainingCapacity(final Inventory currentInventory, final ResourceType resourceType);
+        int getTotalCapacity(final ResourceType resourceType);
+        Set<ResourceType> getStorableResourceTypes();
     }
 
 }
