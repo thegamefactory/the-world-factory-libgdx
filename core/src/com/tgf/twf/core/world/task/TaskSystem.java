@@ -4,6 +4,9 @@ import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.Entities;
 import com.tgf.twf.core.ecs.System;
 import com.tgf.twf.core.geo.Vector2;
+import com.tgf.twf.core.world.storage.HashMapInventory;
+import com.tgf.twf.core.world.storage.Inventory;
+import com.tgf.twf.core.world.storage.MutableInventory;
 import com.tgf.twf.core.world.storage.Storage;
 
 import java.time.Duration;
@@ -52,7 +55,7 @@ public class TaskSystem implements System {
     }
 
     private void assignTaskToIdleAgents() {
-        final Storage.MutableInventory cost = new Storage.MutableInventory();
+        final MutableInventory cost = new HashMapInventory();
         final Queue<Task> deadLetterQueue = new LinkedList<>();
 
         while (!idleAgents.isEmpty() && !unassignedTasks.isEmpty()) {
@@ -76,9 +79,9 @@ public class TaskSystem implements System {
         }
     }
 
-    private static void collectCost(final List<Action> actions, final Storage.MutableInventory cost) {
+    private static void collectCost(final List<Action> actions, final MutableInventory cost) {
         for (final Action action : actions) {
-            final Storage.Inventory actionCost = action.getCost();
+            final Inventory actionCost = action.getCost();
             cost.store(actionCost);
         }
     }

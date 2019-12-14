@@ -1,8 +1,8 @@
 package com.tgf.twf.core.world.task;
 
 import com.google.common.collect.ImmutableSet;
+import com.tgf.twf.core.world.storage.Inventory;
 import com.tgf.twf.core.world.storage.ResourceType;
-import com.tgf.twf.core.world.storage.Storage;
 
 import java.time.Duration;
 import java.util.Set;
@@ -15,12 +15,12 @@ public interface Action {
 
     void update(final Duration delta);
 
-    Storage.Inventory getCost();
+    Inventory getCost();
 
     String getName();
 
     final class Cost {
-        public static final Storage.Inventory FREE = new Storage.Inventory() {
+        public static final Inventory FREE = new Inventory() {
             @Override
             public int getStoredQuantity(final ResourceType resourceType) {
                 return 0;
@@ -37,10 +37,10 @@ public interface Action {
             }
         };
 
-        public static final Storage.Inventory ONE_FOOD = Cost.of(ResourceType.FOOD, 1);
+        public static final Inventory ONE_FOOD = Cost.of(ResourceType.FOOD, 1);
 
-        public static Storage.Inventory of(final ResourceType resourceType, final int quantity) {
-            return new Storage.Inventory() {
+        public static Inventory of(final ResourceType resourceType, final int quantity) {
+            return new Inventory() {
                 final Set<ResourceType> stored = ImmutableSet.of(resourceType);
 
                 @Override
