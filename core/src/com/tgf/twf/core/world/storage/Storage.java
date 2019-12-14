@@ -13,18 +13,17 @@ public class Storage extends Component {
     private final Capacity capacity;
 
     /**
-     * @param offeredQuantity The quantity offered to the storage.
-     * @param resourceType    The type of resource offered to the storage.
-     * @return The number of stored resource. Will be equals to the quantity parameter if the storage capacity allows.
+     * @param quantity     The quantity added to the storage.
+     * @param resourceType The type of resource offered to the storage.
+     * @return The true if the resources are stored, if the capacity permits it.
      */
-    public int store(final ResourceType resourceType, final int offeredQuantity) {
-        int stored = 0;
+    public boolean store(final ResourceType resourceType, final int quantity) {
         final int remainingCapacity = capacity.getRemainingCapacity(inventory, resourceType);
-        if (remainingCapacity > 0) {
-            stored = Math.min(remainingCapacity, offeredQuantity);
-            inventory.store(resourceType, stored);
+        if (remainingCapacity >= quantity) {
+            inventory.store(resourceType, quantity);
+            return true;
         }
-        return stored;
+        return false;
     }
 
     /**
@@ -35,6 +34,14 @@ public class Storage extends Component {
      */
     public void forceStore(final ResourceType resourceType, final int quantity) {
         inventory.store(resourceType, quantity);
+    }
+
+    /**
+     * @param resourceType The resource type whose capacity is being queried.
+     * @return The remaining capacity of the storage for this capacity.
+     */
+    public int getRemainingCapacity(final ResourceType resourceType) {
+        return capacity.getRemainingCapacity(inventory, resourceType);
     }
 
     /**
@@ -52,8 +59,19 @@ public class Storage extends Component {
         return canConsume;
     }
 
-    public void transfer(final Storage destinationStorage) {
-        inventory.transfer(destinationStorage);
+    /**
+     * Transfer the whole inventory to the destination storage.
+     *
+     * @return true if the inventory was transferred, depending on destination storage capacity.
+     */
+    public boolean transfer(final Storage destinationStorage) {
+        final boolean canStore = inventory.getStoredResourceTypes().stream()
+                .allMatch(resourceType -> destinationStorage.getRemainingCapacity(resourceType) >= inventory.getStoredQuantity(resourceType));
+        if (canStore) {
+            inventory.getStoredResourceTypes()
+                    .forEach(resourceType -> destinationStorage.store(resourceType, inventory.getStoredQuantity(resourceType)));
+        }
+        return canStore;
     }
 
     /**

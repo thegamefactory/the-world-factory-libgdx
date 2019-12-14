@@ -4,8 +4,10 @@ import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.util.CompletionCallback;
 import com.tgf.twf.core.world.rules.Rules;
+import com.tgf.twf.core.world.storage.EmptyInventory;
 import com.tgf.twf.core.world.storage.Inventory;
 import com.tgf.twf.core.world.storage.ResourceType;
+import com.tgf.twf.core.world.storage.SingleResourceInventory;
 import com.tgf.twf.core.world.task.Action;
 import com.tgf.twf.core.world.task.Agent;
 import lombok.RequiredArgsConstructor;
@@ -132,9 +134,9 @@ public class MoveAction implements Action {
     @Override
     public Inventory getCost() {
         if (moveTarget == MoveTarget.ACTION) {
-            return Action.Cost.of(ResourceType.FOOD, Math.max(pathWalker.getLength() - 1, 0));
+            return SingleResourceInventory.of(ResourceType.FOOD, Math.max(pathWalker.getLength() - 1, 0));
         }
-        return Cost.FREE;
+        return EmptyInventory.INSTANCE;
     }
 
     @Override
