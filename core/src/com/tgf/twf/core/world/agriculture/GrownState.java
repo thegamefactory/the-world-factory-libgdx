@@ -47,7 +47,9 @@ public class GrownState implements Field.State {
 
     void complete(final Agent agent) {
         isComplete = true;
-        agent.getRelatedComponent(Storage.class).store(ResourceType.FOOD, Rules.FIELD_YIELD);
+        if (!agent.getRelatedComponent(Storage.class).store(ResourceType.FOOD, Rules.FIELD_YIELD)) {
+            throw new IllegalStateException("Agent rejected harvest");
+        }
     }
 
     @Override

@@ -18,7 +18,7 @@ public class HashMapInventory implements MutableInventory {
 
     @Override
     public int getTotalStoredQuantity() {
-        return 0;
+        return totalStoredQuantity;
     }
 
     @Override
@@ -35,10 +35,11 @@ public class HashMapInventory implements MutableInventory {
 
     @Override
     public boolean store(final Inventory inventory) {
+        boolean result = true;
         for (final ResourceType resourceType : inventory.getStoredResourceTypes()) {
-            store(resourceType, inventory.getStoredQuantity(resourceType));
+            result &= store(resourceType, inventory.getStoredQuantity(resourceType));
         }
-        return true;
+        return result;
     }
 
 
@@ -47,7 +48,7 @@ public class HashMapInventory implements MutableInventory {
         final int currentStock = stock.getOrDefault(resourceType, 0);
         final int newStock = currentStock - quantity;
         if (newStock < 0) {
-            throw new IllegalStateException("Cannot retrieve " + quantity + " of " + resourceType + "; only " + currentStock + " available");
+            return false;
         }
         if (newStock == 0) {
             stock.remove(resourceType);
@@ -55,11 +56,12 @@ public class HashMapInventory implements MutableInventory {
             stock.put(resourceType, newStock);
         }
         totalStoredQuantity -= quantity;
-        return newStock == 0;
+        return true;
     }
 
     @Override
     public void clear() {
         stock.clear();
+        totalStoredQuantity = 0;
     }
 }

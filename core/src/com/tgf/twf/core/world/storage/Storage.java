@@ -21,6 +21,13 @@ public class Storage extends Component {
     }
 
     /**
+     * @return True if the {@link Inventory} contains 0 resources.
+     */
+    public boolean isEmpty() {
+        return inventory.getTotalStoredQuantity() == 0;
+    }
+
+    /**
      * @param quantity     The quantity added to the storage.
      * @param resourceType The type of resource offered to the storage.
      * @return The true if the resources are stored, if the capacity permits it.
@@ -28,10 +35,13 @@ public class Storage extends Component {
     public boolean store(final ResourceType resourceType, final int quantity) {
         final int remainingCapacity = capacity.getRemainingCapacity(inventory, resourceType);
         if (remainingCapacity >= quantity) {
-            inventory.store(resourceType, quantity);
+            if (!inventory.store(resourceType, quantity)) {
+                throw new IllegalStateException("Storage unexpectedly rejected " + quantity + " " + resourceType);
+            }
             return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
     /**
@@ -41,7 +51,9 @@ public class Storage extends Component {
      * @param resourceType The type of resource offered to the storage.
      */
     public void forceStore(final ResourceType resourceType, final int quantity) {
-        inventory.store(resourceType, quantity);
+        if (!inventory.store(resourceType, quantity)) {
+            throw new IllegalStateException("Inventory rejected storage");
+        }
     }
 
     /**
@@ -62,7 +74,11 @@ public class Storage extends Component {
                 .allMatch(resourceType -> inventory.getStoredQuantity(resourceType) >= resources.getStoredQuantity(resourceType));
         if (canConsume) {
             resources.getStoredResourceTypes()
-                    .forEach(resourceType -> inventory.retrieve(resourceType, resources.getStoredQuantity(resourceType)));
+                    .forEach(resourceType -> {
+                        if (!inventory.retrieve(resourceType, resources.getStoredQuantity(resourceType))) {
+                            throw new IllegalStateException("Storage rejected retrieval of " + resourceType);
+                        }
+                    });
         }
         return canConsume;
     }
@@ -73,11 +89,19 @@ public class Storage extends Component {
      * @return true if the inventory was transferred, depending on destination storage capacity.
      */
     public boolean transfer(final Storage destinationStorage) {
+        if (inventory.getTotalStoredQuantity() == 0) {
+            return true;
+        }
+
         final boolean canStore = inventory.getStoredResourceTypes().stream()
                 .allMatch(resourceType -> destinationStorage.getRemainingCapacity(resourceType) >= inventory.getStoredQuantity(resourceType));
         if (canStore) {
             inventory.getStoredResourceTypes()
-                    .forEach(resourceType -> destinationStorage.store(resourceType, inventory.getStoredQuantity(resourceType)));
+                    .forEach(resourceType -> {
+                        if (!destinationStorage.store(resourceType, inventory.getStoredQuantity(resourceType))) {
+                            throw new IllegalStateException("Destination storage rejected " + resourceType);
+                        }
+                    });
             inventory.clear();
         }
         return canStore;

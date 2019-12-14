@@ -42,7 +42,11 @@ public final class TaskFactory {
     private static void storeAtHome(final Agent agent) {
         final Storage agentStorage = agent.getRelatedComponent(Storage.class);
         final Storage agentHomeStorage = agent.getHome().getRelatedComponent(Storage.class);
-        agentStorage.transfer(agentHomeStorage);
+        if (!agentStorage.transfer(agentHomeStorage)) {
+            throw new IllegalStateException("Storage transfer failed for agent " + agent.getEntityId() + " with storage " +
+                    agent.getRelatedComponent(Storage.class) + " to home " + agent.getHome().getEntityId() + " with storage " +
+                    agent.getHome().getRelatedComponent(Storage.class));
+        }
     }
 
     public static Task create(final Action action, final Vector2 actionPosition) {
