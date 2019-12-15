@@ -29,4 +29,8 @@ public class Vector2 {
         out.x = left.x - right.x;
         out.y = left.y - right.y;
     }
+
+    public boolean isInBounds(final Vector2 position) {
+        return position.x >= 0 && position.x < this.x && position.y > 0 && position.y < this.y;
+    }
 }
