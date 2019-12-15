@@ -2,11 +2,13 @@ package com.tgf.twf.rendering;
 
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
+import lombok.Getter;
 
 /**
  * A converter between rendering position and world position.
  */
 public class CoordinatesTransformer {
+    @Getter
     private final Vector2f tileSize;
     private final Vector2f offset;
     private final Vector2f cameraPan;

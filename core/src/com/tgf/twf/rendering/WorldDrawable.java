@@ -23,6 +23,8 @@ public class WorldDrawable extends BaseDrawable {
     private final GeoMap geoMap;
     private final CoordinatesTransformer coordinatesTransformer;
 
+    private final RenderableTilesTraverser renderableTilesTraverser;
+
     private final Sprite agent;
     private final Sprite agentIdle;
     private final Sprite agentCarrying;
@@ -57,6 +59,10 @@ public class WorldDrawable extends BaseDrawable {
         for (final TerrainType terrainType : TerrainType.values()) {
             terrainSprites[terrainType.ordinal()] = new TransparentSprite(textureAtlas.createSprite(terrainType.getName() + "_tile"));
         }
+        this.renderableTilesTraverser = RenderableTilesTraverser.builder()
+                .coordinatesTransformer(coordinatesTransformer)
+                .worldSize(worldSize)
+                .build();
     }
 
     @Override
@@ -67,44 +73,42 @@ public class WorldDrawable extends BaseDrawable {
     }
 
     private void drawTerrain(final Batch batch) {
-        for (pos.y = worldSize.y - 1; pos.y >= 0; --pos.y) {
-            for (pos.x = 0; pos.x < worldSize.x; ++pos.x) {
-                if (!geoMap.isBuildingAt(pos)) {
-                    final TerrainType terrainType = geoMap.getTerrainAt(pos);
-                    coordinatesTransformer.convertWorldToScreen(pos, screenPos);
-                    coordinatesTransformer.convertScreenToRender(screenPos, renderPos);
-                    batch.draw(terrainSprites[terrainType.ordinal()].getSprite(), renderPos.x, renderPos.y);
-                }
+        this.renderableTilesTraverser.forEach((pos) -> {
+            if (!geoMap.isBuildingAt(pos)) {
+                final TerrainType terrainType = geoMap.getTerrainAt(pos);
+                coordinatesTransformer.convertWorldToScreen(pos, screenPos);
+                coordinatesTransformer.convertScreenToRender(screenPos, renderPos);
+                batch.draw(terrainSprites[terrainType.ordinal()].getSprite(), renderPos.x, renderPos.y);
             }
-        }
+        });
     }
 
     private void drawBuildingAndAgents(final Batch batch) {
         final Vector2 toolPreviousPos = toolPreview.getWorldPosition();
         final Agent[] agents = new Agent[MAX_AGENTS_RENDERED_PER_TILE];
-        for (pos.y = worldSize.y - 1; pos.y >= 0; --pos.y) {
-            for (pos.x = 0; pos.x < worldSize.x; ++pos.x) {
-                final Building building = geoMap.getBuildingAt(pos);
-                final int agentCount = geoMap.getAgentsAt(pos.x, pos.y, agents);
-                final boolean isToolPreviewPos = toolPreviousPos.equals(pos);
+        this.renderableTilesTraverser.forEach((pos) ->
+                {
+                    final Building building = geoMap.getBuildingAt(pos);
+                    final int agentCount = geoMap.getAgentsAt(pos.x, pos.y, agents);
+                    final boolean isToolPreviewPos = toolPreviousPos.equals(pos);
 
-                if (building == null && agentCount == 0 && !isToolPreviewPos) {
-                    continue;
+                    if (building == null && agentCount == 0 && !isToolPreviewPos) {
+                        return;
+                    }
+
+                    coordinatesTransformer.convertWorldToScreen(pos, screenPos);
+
+                    if (building != null) {
+                        drawBuilding(batch, building);
+                    }
+
+                    drawAgents(batch, agents);
+
+                    if (isToolPreviewPos) {
+                        toolPreview.preview(batch);
+                    }
                 }
-
-                coordinatesTransformer.convertWorldToScreen(pos, screenPos);
-
-                if (building != null) {
-                    drawBuilding(batch, building);
-                }
-
-                drawAgents(batch, agents);
-
-                if (isToolPreviewPos) {
-                    toolPreview.preview(batch);
-                }
-            }
-        }
+        );
     }
 
     private void drawBuilding(final Batch batch, final Building building) {
