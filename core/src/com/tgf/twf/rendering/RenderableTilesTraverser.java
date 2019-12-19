@@ -32,7 +32,7 @@ public class RenderableTilesTraverser {
         screen.y = height - tileSize.y / 2;
         coordinatesTransformer.convertScreenToWorld(screen, topRight);
 
-        final int numberOfRows = (int) Math.ceil(height / tileSize.y) + 1;
+        final int numberOfRows = (int) Math.ceil(height / tileSize.y);
         final int numberOfColumns = (int) Math.ceil(width / tileSize.x);
 
         for (int rowIndex = 0; rowIndex < numberOfRows; rowIndex++) {
