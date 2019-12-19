@@ -2,6 +2,7 @@ package com.tgf.twf.core.world.agriculture;
 
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.rules.Rules;
+import com.tgf.twf.core.world.storage.EmptyInventory;
 import com.tgf.twf.core.world.task.Task;
 import com.tgf.twf.core.world.task.TaskFactory;
 import com.tgf.twf.core.world.task.TaskSystem;
@@ -38,6 +39,7 @@ public class UncultivatedState implements Field.State {
                         .completionCallback(this::complete)
                         .duration(Rules.PLANT_DURATION)
                         .cost(Rules.PLANT_COST)
+                        .prodction(EmptyInventory.INSTANCE)
                         .build(),
                 fieldPosition);
     }

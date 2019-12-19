@@ -140,6 +140,11 @@ public class MoveAction implements Action {
     }
 
     @Override
+    public Inventory getProduction() {
+        return EmptyInventory.INSTANCE;
+    }
+
+    @Override
     public String getName() {
         return "move";
     }
