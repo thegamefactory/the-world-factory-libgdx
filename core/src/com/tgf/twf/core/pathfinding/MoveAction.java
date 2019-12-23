@@ -6,8 +6,6 @@ import com.tgf.twf.core.util.CompletionCallback;
 import com.tgf.twf.core.world.rules.Rules;
 import com.tgf.twf.core.world.storage.EmptyInventory;
 import com.tgf.twf.core.world.storage.Inventory;
-import com.tgf.twf.core.world.storage.ResourceType;
-import com.tgf.twf.core.world.storage.SingleResourceTypeInventory;
 import com.tgf.twf.core.world.task.Action;
 import com.tgf.twf.core.world.task.Agent;
 import lombok.RequiredArgsConstructor;
@@ -69,27 +67,19 @@ public class MoveAction implements Action {
         UPDATE_DIRECTION
     }
 
-    public enum MoveTarget {
-        ACTION,
-        HOME
-    }
-
     private Event nextEvent;
     private int elapsedNanosSinceLastStateChange = 0;
     private boolean isComplete = false;
     private Vector2 currentPosition;
     private Vector2 nextPosition;
     private final Vector2 currentDirection = new Vector2();
-    private final MoveTarget moveTarget;
 
     public MoveAction(final Agent agent,
                       final Path.PathWalker pathWalker,
-                      final CompletionCallback completionCallback,
-                      final MoveTarget moveTarget) {
+                      final CompletionCallback completionCallback) {
         this.agent = agent;
         this.pathWalker = pathWalker;
         this.completionCallback = completionCallback;
-        this.moveTarget = moveTarget;
 
         this.elapsedNanosSinceLastStateChange = 0;
         this.nextEvent = Event.CROSS_TILE_BORDER;
@@ -133,9 +123,6 @@ public class MoveAction implements Action {
 
     @Override
     public Inventory getCost() {
-        if (moveTarget == MoveTarget.ACTION) {
-            return SingleResourceTypeInventory.of(ResourceType.FOOD, Math.max(pathWalker.getLength() - 1, 0));
-        }
         return EmptyInventory.INSTANCE;
     }
 

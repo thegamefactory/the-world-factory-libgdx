@@ -27,12 +27,12 @@ public final class TaskFactory {
             }
 
             return ImmutableList.of(
-                    new MoveAction(agent, path.forwardWalker(), CompletionCallback.IDENTITY, MoveAction.MoveTarget.ACTION),
+                    new MoveAction(agent, path.forwardWalker(), CompletionCallback.IDENTITY),
                     action,
                     new MoveAction(agent, path.backwardsWalker(), () -> {
                         storeAtHome(agent);
                         path.close();
-                    }, MoveAction.MoveTarget.HOME)
+                    })
             );
         };
     }
