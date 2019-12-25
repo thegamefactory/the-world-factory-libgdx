@@ -8,9 +8,9 @@ import com.tgf.twf.core.geo.GeoMap;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.World;
+import com.tgf.twf.core.world.agents.Agent;
 import com.tgf.twf.core.world.building.Building;
 import com.tgf.twf.core.world.storage.Storage;
-import com.tgf.twf.core.world.task.Agent;
 import com.tgf.twf.core.world.terrain.TerrainType;
 import com.tgf.twf.input.ToolPreview;
 import com.tgf.twf.input.ToolTip;
@@ -120,6 +120,7 @@ public class WorldDrawable extends BaseDrawable {
     private void drawAgents(final Batch batch, final Agent[] agents) {
         int idleAgentCount = 0;
         for (int i = 0; i < agents.length && agents[i] != null; i++) {
+            // TODO: implementn 1:1 agent state - sprite mapping
             if (agents[i].isIdle()) {
                 idleAgentCount++;
                 continue;

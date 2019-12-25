@@ -1,15 +1,11 @@
 package com.tgf.twf.core.world.agriculture;
 
 import com.tgf.twf.core.geo.Vector2;
+import com.tgf.twf.core.world.agents.Agent;
+import com.tgf.twf.core.world.agents.CyclicAction;
+import com.tgf.twf.core.world.agents.TaskSystem;
 import com.tgf.twf.core.world.rules.Rules;
-import com.tgf.twf.core.world.storage.EmptyInventory;
-import com.tgf.twf.core.world.task.Task;
-import com.tgf.twf.core.world.task.TaskFactory;
-import com.tgf.twf.core.world.task.TaskSystem;
-import com.tgf.twf.core.world.task.TimedAction;
 import lombok.RequiredArgsConstructor;
-
-import java.time.Duration;
 
 /**
  * The {@link Field.State}  of that field when it's uncultivated.
@@ -23,28 +19,24 @@ public class UncultivatedState implements Field.State {
     private final Vector2 fieldPosition;
 
     @Override
-    public Class<? extends Field.State> tick(final Duration delta) {
+    public Class<? extends Field.State> tick() {
         return isComplete ? GrowingState.class : null;
     }
 
     @Override
     public void onStateEnter() {
-        taskSystem.addTask(buildPlantTask());
+        taskSystem.addActionLast(new PlantAction());
     }
 
-    private Task buildPlantTask() {
-        return TaskFactory.create(
-                TimedAction.builder()
-                        .name("plant")
-                        .completionCallback(this::complete)
-                        .duration(Rules.PLANT_DURATION)
-                        .cost(Rules.PLANT_COST)
-                        .prodction(EmptyInventory.INSTANCE)
-                        .build(),
-                fieldPosition);
-    }
+    class PlantAction extends CyclicAction {
+        PlantAction() {
+            super(fieldPosition, Rules.PLANT_TOTAL_DURATION);
+        }
 
-    void complete() {
-        isComplete = true;
+        @Override
+        public boolean onCycleComplete(final Agent agent) {
+            isComplete = true;
+            return isComplete;
+        }
     }
 }

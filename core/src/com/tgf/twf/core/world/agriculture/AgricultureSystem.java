@@ -4,13 +4,12 @@ import com.google.common.collect.ImmutableMap;
 import com.tgf.twf.core.ecs.Entities;
 import com.tgf.twf.core.ecs.System;
 import com.tgf.twf.core.geo.Position;
+import com.tgf.twf.core.world.agents.TaskSystem;
 import com.tgf.twf.core.world.building.Building;
 import com.tgf.twf.core.world.building.BuildingType;
 import com.tgf.twf.core.world.rules.Rules;
 import com.tgf.twf.core.world.storage.Storage;
-import com.tgf.twf.core.world.task.TaskSystem;
 
-import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
@@ -49,9 +48,9 @@ public class AgricultureSystem implements System {
     }
 
     @Override
-    public void update(final Duration delta) {
+    public void tick() {
         for (final Field field : fields) {
-            final Class<? extends Field.State> nextState = field.getState().tick(delta);
+            final Class<? extends Field.State> nextState = field.getState().tick();
             if (nextState != null) {
                 final Field.State state = stateFactories.getOrDefault(
                         nextState,

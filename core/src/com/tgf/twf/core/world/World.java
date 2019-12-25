@@ -5,6 +5,8 @@ import com.tgf.twf.core.ecs.System;
 import com.tgf.twf.core.geo.GeoMap;
 import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
+import com.tgf.twf.core.world.agents.Agent;
+import com.tgf.twf.core.world.agents.TaskSystem;
 import com.tgf.twf.core.world.agriculture.AgricultureSystem;
 import com.tgf.twf.core.world.building.Building;
 import com.tgf.twf.core.world.building.BuildingType;
@@ -12,13 +14,9 @@ import com.tgf.twf.core.world.rules.Rules;
 import com.tgf.twf.core.world.storage.AnyResourceTypeFixedCapacity;
 import com.tgf.twf.core.world.storage.ResourceType;
 import com.tgf.twf.core.world.storage.Storage;
-import com.tgf.twf.core.world.task.Agent;
-import com.tgf.twf.core.world.task.TaskSystem;
 import com.tgf.twf.core.world.terrain.CoastTerrainGenerator;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import java.time.Duration;
 
 /**
  * Top class representing the world.
@@ -41,7 +39,7 @@ public class World implements System {
         geoMap = new GeoMap(size);
         new CoastTerrainGenerator().generate(geoMap);
 
-        taskSystem = new TaskSystem();
+        taskSystem = new TaskSystem(geoMap);
         agricultureSystem = new AgricultureSystem(taskSystem);
 
         final Position initialPosition = new Position(size.x / 2, size.y / 2);
@@ -59,8 +57,8 @@ public class World implements System {
     }
 
     @Override
-    public void update(final Duration delta) {
-        agricultureSystem.update(delta);
-        taskSystem.update(delta);
+    public void tick() {
+        agricultureSystem.tick();
+        taskSystem.tick();
     }
 }

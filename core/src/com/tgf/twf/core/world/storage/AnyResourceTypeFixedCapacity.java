@@ -16,11 +16,8 @@ public class AnyResourceTypeFixedCapacity implements Capacity {
     private static final Set<ResourceType> STORABLE_RESOURCE_TYPES = ImmutableSet.copyOf(ResourceType.values());
 
     @Override
-    public int getRemainingCapacity(final Inventory currentInventory, final ResourceType resourceType, final CapacityCountMode capacityCountMode) {
-        int currentInventoryUsage = currentInventory.getTotalStoredQuantity();
-        if (capacityCountMode.equals(CapacityCountMode.INCLUDE_RESERVATIONS)) {
-            currentInventoryUsage += currentInventory.getTotalReservedQuantity();
-        }
+    public int getRemainingCapacity(final Inventory currentInventory, final ResourceType resourceType) {
+        final int currentInventoryUsage = currentInventory.getTotalStoredQuantity();
         return Math.max(capacity - currentInventoryUsage, 0);
     }
 

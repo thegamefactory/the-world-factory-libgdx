@@ -16,12 +16,9 @@ public class SingleResourceTypeCapacity implements Capacity {
     private final int capacity;
 
     @Override
-    public int getRemainingCapacity(final Inventory currentInventory, final ResourceType resourceType, final CapacityCountMode capacityCountMode) {
+    public int getRemainingCapacity(final Inventory currentInventory, final ResourceType resourceType) {
         if (this.resourceType.equals(resourceType)) {
-            int currentInventoryUsage = currentInventory.getStoredQuantity(resourceType);
-            if (capacityCountMode.equals(CapacityCountMode.INCLUDE_RESERVATIONS)) {
-                currentInventoryUsage += currentInventory.getReservedQuantity(resourceType);
-            }
+            final int currentInventoryUsage = currentInventory.getStoredQuantity(resourceType);
             return Math.max(capacity - currentInventoryUsage, 0);
         } else {
             return 0;

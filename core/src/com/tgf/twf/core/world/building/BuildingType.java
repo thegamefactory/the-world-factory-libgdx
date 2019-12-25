@@ -7,25 +7,27 @@ import com.tgf.twf.core.world.storage.SingleResourceTypeCapacity;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.Duration;
-
 /**
  * A {@link BuildingType} defines the behavior of {@link Building} instances that are constructed from it.
  */
 @Builder
 public class BuildingType {
     public static final BuildingType FARM = BuildingType.builder()
-            .buildTime(Rules.FARM_BUILD_DURATION)
+            .costResourceType(ResourceType.FOOD)
+            .costQuantity(1)
             .capacity(new SingleResourceTypeCapacity(ResourceType.FOOD, Rules.FARM_STORAGE_CAPACITY))
             .name("Farm")
             .build();
     public static final BuildingType FIELD = BuildingType.builder()
-            .buildTime(Rules.FIELD_BUILD_DURATION)
-            .capacity(new SingleResourceTypeCapacity(ResourceType.FOOD, Rules.FIELD_STORAGE_CAPACITY))
+            .costResourceType(ResourceType.FOOD)
+            .costQuantity(1)
+            .capacity(new SingleResourceTypeCapacity(ResourceType.FOOD, Rules.FIELD_FOOD_YIELD))
             .name("Field")
             .build();
     @Getter
-    private final Duration buildTime;
+    private final ResourceType costResourceType;
+    @Getter
+    private final int costQuantity;
     @Getter
     private final Capacity capacity;
     @Getter

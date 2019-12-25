@@ -1,6 +1,7 @@
 package com.tgf.twf.core.pathfinding;
 
 import com.tgf.twf.core.geo.Vector2;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.io.Closeable;
@@ -8,13 +9,15 @@ import java.util.Iterator;
 
 /**
  * A double linked list of {@link Vector2} wrapped in {@link PathNode}.
- * Caches the total length so it's not necessary to walk the list to get it.
- * Implements a forward {@link PathWalker} and a backwards {@link PathWalker} corresponding to {@link Iterator}s traversing the list head from tail
+ * Caches the total length so it's not necessary to iterate through the list to get it.
+ * Implements a forward {@link PathIterator} and a backwards {@link PathIterator} corresponding to {@link Iterator}s traversing the list head from
+ * tail
  * and tail from head, respectively.
  * Because {@link PathNode} are pooled, the {@link Path} should be closed after usage.
  */
 @RequiredArgsConstructor
 public class Path implements Closeable {
+    @Getter
     private final int length;
     private final PathNode head;
     private final PathNode tail;
@@ -22,15 +25,16 @@ public class Path implements Closeable {
     /**
      * An enhanced {@link Iterator} of {@link Vector2} corresponding to the intermediate positions on the path.
      */
-    public interface PathWalker extends Iterator<Vector2> {
-        int getLength();
+    public interface PathIterator extends Iterator<Vector2>, Closeable {
+        @Override
+        void close();
     }
 
     /**
-     * @return a {@link PathWalker} walking the path head to tail.
+     * @return a {@link PathIterator} iterating through the path head to tail.
      */
-    public PathWalker forwardWalker() {
-        return new PathWalker() {
+    public PathIterator forwardIterator() {
+        return new PathIterator() {
             PathNode iterator;
 
             @Override
@@ -49,17 +53,17 @@ public class Path implements Closeable {
             }
 
             @Override
-            public int getLength() {
-                return length;
+            public void close() {
+                Path.this.close();
             }
         };
     }
 
     /**
-     * @return a {@link PathWalker} walking the path tail to head.
+     * @return a {@link PathIterator} iterating through the path tail to head.
      */
-    public PathWalker backwardsWalker() {
-        return new PathWalker() {
+    public PathIterator backwardsIterator() {
+        return new PathIterator() {
             PathNode iterator = null;
 
             @Override
@@ -78,8 +82,8 @@ public class Path implements Closeable {
             }
 
             @Override
-            public int getLength() {
-                return length;
+            public void close() {
+                Path.this.close();
             }
         };
     }

@@ -10,15 +10,5 @@ package com.tgf.twf.core.world.storage;
 public interface MutableInventory extends Inventory {
     boolean store(final ResourceType resourceType, final int quantity);
 
-    boolean store(final Inventory inventory);
-
     boolean retrieve(final ResourceType resourceType, final int quantity);
-
-    boolean retrieve(final Inventory inventory);
-
-    boolean reserve(final ResourceType resourceType, final int quantity);
-
-    boolean reserve(final Inventory inventory);
-
-    void clear();
 }

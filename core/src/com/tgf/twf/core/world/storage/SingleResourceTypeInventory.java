@@ -10,19 +10,12 @@ import java.util.Set;
  */
 @ToString
 public class SingleResourceTypeInventory implements MutableInventory {
-    public static final Inventory ONE_FOOD = SingleResourceTypeInventory.of(ResourceType.FOOD, 1);
-
     private final ResourceType resourceType;
     private int quantity;
-    private int reservedQuantity = 0;
 
     public SingleResourceTypeInventory(final ResourceType resourceType, final int quantity) {
         this.resourceType = resourceType;
         this.quantity = quantity;
-    }
-
-    public static SingleResourceTypeInventory of(final ResourceType resourceType, final int quantity) {
-        return new SingleResourceTypeInventory(resourceType, quantity);
     }
 
     public static SingleResourceTypeInventory empty(final ResourceType resourceType) {
@@ -36,38 +29,7 @@ public class SingleResourceTypeInventory implements MutableInventory {
         }
         if (resourceType == this.resourceType) {
             this.quantity += quantity;
-            reservedQuantity = Math.max(0, reservedQuantity - quantity);
             return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public boolean store(final Inventory inventory) {
-        if (checkInventoryContainsOnlyResourceType(inventory)) {
-            return store(resourceType, inventory.getStoredQuantity(resourceType));
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public boolean reserve(final ResourceType resourceType, final int quantity) {
-        if (quantity == 0) {
-            return true;
-        }
-        if (resourceType != this.resourceType) {
-            return false;
-        }
-        this.reservedQuantity += quantity;
-        return true;
-    }
-
-    @Override
-    public boolean reserve(final Inventory inventory) {
-        if (checkInventoryContainsOnlyResourceType(inventory)) {
-            return reserve(resourceType, inventory.getStoredQuantity(resourceType));
         } else {
             return false;
         }
@@ -90,21 +52,6 @@ public class SingleResourceTypeInventory implements MutableInventory {
     }
 
     @Override
-    public boolean retrieve(final Inventory inventory) {
-        if (checkInventoryContainsOnlyResourceType(inventory)) {
-            return retrieve(resourceType, inventory.getStoredQuantity(resourceType));
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public void clear() {
-        this.quantity = 0;
-        this.reservedQuantity = 0;
-    }
-
-    @Override
     public boolean isEmpty() {
         return true;
     }
@@ -119,20 +66,6 @@ public class SingleResourceTypeInventory implements MutableInventory {
     }
 
     @Override
-    public int getReservedQuantity(final ResourceType resourceType) {
-        if (resourceType == this.resourceType) {
-            return reservedQuantity;
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
-    public int getTotalReservedQuantity() {
-        return reservedQuantity;
-    }
-
-    @Override
     public int getTotalStoredQuantity() {
         return quantity;
     }
@@ -140,14 +73,5 @@ public class SingleResourceTypeInventory implements MutableInventory {
     @Override
     public Set<ResourceType> getStoredResourceTypes() {
         return ImmutableSet.of(resourceType);
-    }
-
-    private boolean checkInventoryContainsOnlyResourceType(final Inventory inventory) {
-        for (final ResourceType resourceType : inventory.getStoredResourceTypes()) {
-            if (resourceType != this.resourceType && inventory.getStoredQuantity(resourceType) > 0) {
-                return false;
-            }
-        }
-        return true;
     }
 }

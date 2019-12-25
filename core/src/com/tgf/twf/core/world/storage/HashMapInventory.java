@@ -1,6 +1,5 @@
 package com.tgf.twf.core.world.storage;
 
-import lombok.Data;
 import lombok.ToString;
 
 import java.util.HashMap;
@@ -12,28 +11,9 @@ import java.util.Set;
  */
 @ToString
 public class HashMapInventory implements MutableInventory {
-    @Data
-    private static class Stock {
-        private int storedQuantity;
-        private int reservedQuantity;
-
-        Stock(final int storedQuantity, final int reservedQuantity) {
-            this.storedQuantity = storedQuantity;
-            this.reservedQuantity = reservedQuantity;
-        }
-
-        static Stock ofStoredQuantity(final int storedQuantity) {
-            return new Stock(storedQuantity, 0);
-        }
-
-        static Stock ofReservedQuantity(final int reservedQuantity) {
-            return new Stock(0, reservedQuantity);
-        }
-    }
-
-    private final Map<ResourceType, Stock> stocks = new HashMap<>();
+    private final Map<ResourceType, Integer> stocks = new HashMap<>();
     private int totalStoredQuantity = 0;
-    private int totalReservedQuantity = 0;
+    private final int totalReservedQuantity = 0;
 
     @Override
     public boolean isEmpty() {
@@ -42,19 +22,7 @@ public class HashMapInventory implements MutableInventory {
 
     @Override
     public int getStoredQuantity(final ResourceType resourceType) {
-        final Stock stock = stocks.get(resourceType);
-        return stock == null ? 0 : stock.storedQuantity;
-    }
-
-    @Override
-    public int getReservedQuantity(final ResourceType resourceType) {
-        final Stock stock = stocks.get(resourceType);
-        return stock == null ? 0 : stock.reservedQuantity;
-    }
-
-    @Override
-    public int getTotalReservedQuantity() {
-        return totalReservedQuantity;
+        return stocks.getOrDefault(resourceType, 0);
     }
 
     @Override
@@ -72,48 +40,8 @@ public class HashMapInventory implements MutableInventory {
         if (quantity == 0) {
             return true;
         }
-        Stock stock = stocks.get(resourceType);
-        if (null == stock) {
-            stock = Stock.ofStoredQuantity(quantity);
-            stocks.put(resourceType, stock);
-        } else {
-            stock.storedQuantity += quantity;
-            final int removedReservedQuantity = Math.min(stock.reservedQuantity, quantity);
-            stock.reservedQuantity -= removedReservedQuantity;
-            totalReservedQuantity -= removedReservedQuantity;
-        }
+        stocks.put(resourceType, stocks.getOrDefault(resourceType, 0) + quantity);
         totalStoredQuantity += quantity;
-        return true;
-    }
-
-    @Override
-    public boolean store(final Inventory inventory) {
-        for (final ResourceType resourceType : inventory.getStoredResourceTypes()) {
-            store(resourceType, inventory.getStoredQuantity(resourceType));
-        }
-        return true;
-    }
-
-    @Override
-    public boolean reserve(final ResourceType resourceType, final int quantity) {
-        if (quantity == 0) {
-            return true;
-        }
-        final Stock stock = stocks.get(resourceType);
-        if (stock == null) {
-            stocks.put(resourceType, Stock.ofReservedQuantity(quantity));
-        } else {
-            stock.reservedQuantity += quantity;
-            totalReservedQuantity += quantity;
-        }
-        return true;
-    }
-
-    @Override
-    public boolean reserve(final Inventory inventory) {
-        inventory.getStoredResourceTypes().forEach(
-                resourceType -> reserve(resourceType, inventory.getStoredQuantity(resourceType))
-        );
         return true;
     }
 
@@ -122,34 +50,13 @@ public class HashMapInventory implements MutableInventory {
         if (quantity == 0) {
             return true;
         }
-        final Stock stock = stocks.get(resourceType);
-        if (null == stock) {
-            return false;
-        }
-        final int newStock = stock.storedQuantity - quantity;
-        if (newStock < 0) {
-            return false;
-        }
-        if (newStock == 0 && stock.reservedQuantity == 0) {
-            stocks.remove(resourceType);
+        final int stored = getStoredQuantity(resourceType);
+        if (stored >= quantity) {
+            stocks.put(resourceType, stored - quantity);
+            totalStoredQuantity -= quantity;
+            return true;
         } else {
-            stock.storedQuantity = newStock;
+            return false;
         }
-        totalStoredQuantity -= quantity;
-        return true;
-    }
-
-    @Override
-    public boolean retrieve(final Inventory inventory) {
-        inventory.getStoredResourceTypes().forEach(
-                resourceType -> retrieve(resourceType, inventory.getStoredQuantity(resourceType))
-        );
-        return true;
-    }
-
-    @Override
-    public void clear() {
-        stocks.clear();
-        totalStoredQuantity = 0;
     }
 }

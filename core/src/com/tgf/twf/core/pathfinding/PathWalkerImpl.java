@@ -2,26 +2,19 @@ package com.tgf.twf.core.pathfinding;
 
 import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
-import com.tgf.twf.core.util.CompletionCallback;
+import com.tgf.twf.core.world.agents.Agent;
 import com.tgf.twf.core.world.rules.Rules;
-import com.tgf.twf.core.world.storage.EmptyInventory;
-import com.tgf.twf.core.world.storage.Inventory;
-import com.tgf.twf.core.world.task.Action;
-import com.tgf.twf.core.world.task.Agent;
 import lombok.RequiredArgsConstructor;
 
-import java.time.Duration;
-
 /**
- * An {@link Action} that models the progressive movement of an {@link Agent} through a {@link Path.PathWalker}.
+ * Main implementation of {@link PathWalker}.
+ * Models a {@link Path.PathIterator} walked by an agent.
  */
 @RequiredArgsConstructor
-public class MoveAction implements Action {
-    private final Agent agent;
+public class PathWalkerImpl implements PathWalker {
+    final Agent agent;
 
-    private Path.PathWalker pathWalker;
-    private CompletionCallback completionCallback;
-
+    private Path.PathIterator pathIterator;
     /*
      * The diagram below illustrates how a MoveAction progresses.
      * ellapsedNanosSinceLastStateChange is increased at each update call.
@@ -62,84 +55,65 @@ public class MoveAction implements Action {
      * At each update, the agent subTilePosition is updated with a vector within the rectangle (-0.5, -0.5),(0.5, 0.5), corresponding to the
      * relative position of the agent compared to the center of the tile.
      */
+
     private enum Event {
         CROSS_TILE_BORDER,
         UPDATE_DIRECTION
     }
 
     private Event nextEvent;
-    private int elapsedNanosSinceLastStateChange = 0;
-    private boolean isComplete = false;
+    private int tickCount = 0;
     private Vector2 currentPosition;
     private Vector2 nextPosition;
     private final Vector2 currentDirection = new Vector2();
 
-    public MoveAction(final Agent agent,
-                      final Path.PathWalker pathWalker,
-                      final CompletionCallback completionCallback) {
+    public PathWalkerImpl(final Agent agent,
+                          final Path.PathIterator pathIterator) {
         this.agent = agent;
-        this.pathWalker = pathWalker;
-        this.completionCallback = completionCallback;
+        this.pathIterator = pathIterator;
 
-        this.elapsedNanosSinceLastStateChange = 0;
+        this.tickCount = 0;
         this.nextEvent = Event.CROSS_TILE_BORDER;
-        this.nextPosition = pathWalker.next();
+        this.nextPosition = pathIterator.next();
         updateDirection();
     }
 
     @Override
-    public boolean isComplete() {
-        return isComplete;
-    }
+    public boolean walk() {
+        tickCount++;
 
-    @Override
-    public void update(final Duration delta) {
-        if (isComplete) {
-            return;
-        }
-
-        elapsedNanosSinceLastStateChange = elapsedNanosSinceLastStateChange + delta.getNano();
-
-        while (elapsedNanosSinceLastStateChange > halfTileInNanos()) {
-            elapsedNanosSinceLastStateChange = elapsedNanosSinceLastStateChange - halfTileInNanos();
+        if (tickCount == Rules.AGENT_TICKS_PER_TILE / 2) {
+            tickCount = 0;
             if (Event.CROSS_TILE_BORDER == nextEvent) {
                 agent.getRelatedComponent(Position.class).setPosition(nextPosition);
                 nextEvent = Event.UPDATE_DIRECTION;
             } else {
                 updateDirection();
                 if (nextPosition == null) {
-                    isComplete = true;
-                    elapsedNanosSinceLastStateChange = 0;
-                    completionCallback.complete();
+                    agent.getSubTilePosition().x = 0;
+                    agent.getSubTilePosition().y = 0;
+                    return true;
                 }
                 nextEvent = Event.CROSS_TILE_BORDER;
             }
         }
 
-        final float tileLerpFactor = tileLerpFactor(elapsedNanosSinceLastStateChange, nextEvent);
+        final float tileLerpFactor = tileLerpFactor(nextEvent);
         agent.getSubTilePosition().x = currentDirection.x * tileLerpFactor;
         agent.getSubTilePosition().y = currentDirection.y * tileLerpFactor;
+
+        return false;
     }
 
     @Override
-    public Inventory getCost() {
-        return EmptyInventory.INSTANCE;
-    }
-
-    @Override
-    public Inventory getProduction() {
-        return EmptyInventory.INSTANCE;
-    }
-
-    @Override
-    public String getName() {
-        return "move";
+    public void close() {
+        pathIterator.close();
     }
 
     private void updateDirection() {
         currentPosition = nextPosition;
-        if (pathWalker.hasNext()) {
-            nextPosition = pathWalker.next();
+        if (pathIterator.hasNext()) {
+            nextPosition = pathIterator.next();
             Vector2.minus(nextPosition, currentPosition, currentDirection);
         } else {
             nextPosition = null;
@@ -148,16 +122,8 @@ public class MoveAction implements Action {
         }
     }
 
-    private static int halfTileInNanos() {
-        return Rules.AGENT_NANOS_PER_TILE / 2;
-    }
-
-    private static int fullTileInNanos() {
-        return Rules.AGENT_NANOS_PER_TILE;
-    }
-
-    private static float tileLerpFactor(final int ellapsedNanosSinceLastTile, final Event nextEvent) {
-        final float progress = (float) ellapsedNanosSinceLastTile / fullTileInNanos();
+    private float tileLerpFactor(final Event nextEvent) {
+        final float progress = (float) tickCount / Rules.AGENT_TICKS_PER_TILE;
         if (Event.CROSS_TILE_BORDER == nextEvent) {
             return progress;
         } else {

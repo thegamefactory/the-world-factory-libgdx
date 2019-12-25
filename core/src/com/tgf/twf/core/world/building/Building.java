@@ -6,15 +6,12 @@ import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.world.storage.Storage;
 import lombok.Getter;
 
-import java.time.Duration;
-
 /**
  * A component state modeling a live instance of a {@link BuildingType}.
  */
 public class Building extends Component {
     @Getter
     private final BuildingType buildingType;
-    private Duration buildingDurationRemaining;
     private BuildingState buildingState = BuildingState.CONSTRUCTING;
 
     public enum BuildingState {
@@ -24,7 +21,6 @@ public class Building extends Component {
 
     public Building(final BuildingType buildingType) {
         this.buildingType = buildingType;
-        this.buildingDurationRemaining = buildingType.getBuildTime();
     }
 
     public static Building createEntity(final BuildingType buildingType, final Position position) {
@@ -35,23 +31,6 @@ public class Building extends Component {
                 .withComponent(new Storage(buildingType.getCapacity()))
                 .buildAndAttach();
         return building;
-    }
-
-    public void build(final Duration delta) {
-        if (!isConstructed()) {
-            buildingDurationRemaining = safeMinus(buildingDurationRemaining, delta);
-            if (buildingDurationRemaining.isZero()) {
-                setConstructed();
-            }
-        }
-    }
-
-    private static Duration safeMinus(final Duration buildingDurationRemaining, final Duration delta) {
-        final Duration result = buildingDurationRemaining.minus(delta);
-        if (result.isNegative()) {
-            return Duration.ZERO;
-        }
-        return result;
     }
 
     public boolean isConstructed() {

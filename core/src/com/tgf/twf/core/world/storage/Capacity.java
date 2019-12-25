@@ -8,12 +8,7 @@ import java.util.Set;
  * the {@link Inventory} already has in stock.
  */
 public interface Capacity {
-    enum CapacityCountMode {
-        INCLUDE_RESERVATIONS,
-        EXCLUDE_RESERATIONS
-    }
-
-    int getRemainingCapacity(final Inventory currentInventory, final ResourceType resourceType, final CapacityCountMode capacityCountMode);
+    int getRemainingCapacity(final Inventory currentInventory, final ResourceType resourceType);
 
     int getTotalCapacity(final ResourceType resourceType);
 

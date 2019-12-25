@@ -34,7 +34,7 @@ public class PlayerIntentionApi {
 
         final Position pos = Position.from(position);
         final Building building = Building.createEntity(buildingType, pos);
-        world.getTaskSystem().addTask(new ConstructAction(building), position);
+        world.getTaskSystem().addActionLast(new ConstructAction(building));
         return true;
     }
 }

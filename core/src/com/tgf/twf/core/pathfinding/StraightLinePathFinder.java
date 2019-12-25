@@ -6,6 +6,8 @@ import com.tgf.twf.core.geo.Vector2;
  * An implentation of {@link PathFinder} which finds a straight line path, regardless of any obstacles that may be present.
  */
 public class StraightLinePathFinder implements PathFinder {
+    public static StraightLinePathFinder INSTANCE = new StraightLinePathFinder();
+
     @Override
     public Path find(final Vector2 origin, final Vector2 target) {
         final int deltaX = target.x - origin.x;

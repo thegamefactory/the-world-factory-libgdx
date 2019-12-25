@@ -29,64 +29,29 @@ public class Storage extends Component {
     }
 
     /**
-     * Clears the {@link Inventory}.
+     * @return True if the {@link Inventory} contains any resource for which there's no storage available anymore.
      */
-    public void clear() {
-        inventory.clear();
+    public boolean isAnyResourceFull() {
+        return inventory.getStoredResourceTypes().stream()
+                .anyMatch(resourceType -> capacity.getRemainingCapacity(inventory, resourceType) <= 0);
     }
 
     /**
-     * @param resourceType      The resource type whose capacity is being queried.
-     * @param capacityCountMode Whether or not consider reservations to evaluate the remaining capacity.
-     * @return The remaining capacity of the storage for this capacity.
-     */
-    public int getRemainingCapacity(final ResourceType resourceType, final Capacity.CapacityCountMode capacityCountMode) {
-        return capacity.getRemainingCapacity(inventory, resourceType, capacityCountMode);
-    }
-
-    /**
-     * @param resources The quantity of resources to store, per resource type.
-     * @return true if the storage have enough capacity in store to satisfy the offer.
-     */
-    public boolean canStore(final Inventory resources) {
-        return resources.getStoredResourceTypes().stream()
-                .allMatch(resourceType -> capacity.getRemainingCapacity(inventory, resourceType, Capacity.CapacityCountMode.EXCLUDE_RESERATIONS)
-                        >= resources.getStoredQuantity(resourceType));
-    }
-
-    /**
-     * Store the resources in the inventory. {@link #canStore(Inventory)} should be called first to check if the storage can accept the offer or not.
+     * Store the resources in the inventory, up to the storage capacity.
      *
-     * @param resources The quantity of resources to store.
+     * @param resourceType The type of resources to store.
+     * @param quantity     The qu
+     *                     of resources to store.
+     * @return the quantity actually stored.
      */
-    public void store(final Inventory resources) {
-        if (!inventory.store(resources)) {
-            throw new IllegalStateException("Storage rejected storage of " + resources);
+    public int storeToCapacity(final ResourceType resourceType, final int quantity) {
+        final int remainingCapacity = capacity.getRemainingCapacity(inventory, resourceType);
+        final int actuallyStored = Math.min(quantity, remainingCapacity);
+        if (!inventory.store(resourceType, actuallyStored)) {
+            throw new IllegalStateException("Storage rejected storage of " + quantity + " " + resourceType);
         }
+        return actuallyStored;
     }
-
-    /**
-     * @param resources The quantity of resources to store, per resource type.
-     * @return true if the storage have enough capacity in store to satisfy the offer.
-     */
-    public boolean canReserve(final Inventory resources) {
-        return resources.getStoredResourceTypes().stream()
-                .allMatch(resourceType -> capacity.getRemainingCapacity(inventory, resourceType, Capacity.CapacityCountMode.INCLUDE_RESERVATIONS)
-                        >= resources.getStoredQuantity(resourceType));
-    }
-
-    /**
-     * Reserve capacity in the storage for a future {@link #store(Inventory)} call. {@link #canReserve(Inventory)} should be called first to check
-     * if the storage can accept the offer or not.
-     *
-     * @param resources The quantity of resources to reservation.
-     */
-    public void reserve(final Inventory resources) {
-        if (!inventory.reserve(resources)) {
-            throw new IllegalStateException("Storage rejected reservation of " + resources);
-        }
-    }
-
 
     /**
      * Force to store the given quantity of {@link ResourceType}, regardless of the {@link Capacity}.
@@ -101,44 +66,21 @@ public class Storage extends Component {
     }
 
     /**
-     * @param resources The quantity of resources to consume.
-     * @return true if the storage have enough resources in store to satisfy the demand.
-     */
-    public boolean canRetrieve(final Inventory resources) {
-        return resources.getStoredResourceTypes().stream()
-                .allMatch(resourceType -> inventory.getStoredQuantity(resourceType) >= resources.getStoredQuantity(resourceType));
-    }
-
-    /**
-     * @param resources The quantity of resources to consume. {@link #canRetrieve(Inventory)} should be called first to check if the storage can
-     *                  satisfy the demand or not. Insufficient capacity will throw an {@link IllegalStateException}.
-     */
-    public void retrieve(final Inventory resources) {
-        resources.getStoredResourceTypes()
-                .forEach(resourceType -> {
-                    if (!inventory.retrieve(resourceType, resources.getStoredQuantity(resourceType))) {
-                        throw new IllegalStateException("Storage rejected retrieval of " + resourceType);
-                    }
-                });
-    }
-
-    /**
-     * Transfer the whole inventory to the destination storage.
+     * Retrieve the requested quantity of resources, up to emptying the inventory completely.
      *
-     * @return true if the inventory was transferred, depending on destination storage capacity.
+     * @param resourceType The type of resources to retrieve.
+     * @param quantity     The quantity of resources to retrieve.
+     * @return the quantity actually retrieved.
      */
-    public boolean transfer(final Storage destinationStorage) {
-        if (inventory.getTotalStoredQuantity() == 0) {
-            return true;
+    public int retrieveToEmpty(final ResourceType resourceType, final int quantity) {
+        final int availableQuantity = inventory.getStoredQuantity(resourceType);
+        final int actuallyRetrieved = Math.min(quantity, availableQuantity);
+
+        if (!inventory.retrieve(resourceType, actuallyRetrieved)) {
+            throw new IllegalStateException("Storage rejected retrieval of " + actuallyRetrieved + " " + resourceType);
         }
-        final boolean canStore = inventory.getStoredResourceTypes().stream()
-                .allMatch(resourceType -> destinationStorage.getRemainingCapacity(
-                        resourceType, Capacity.CapacityCountMode.EXCLUDE_RESERATIONS) >= inventory.getStoredQuantity(resourceType));
-        if (canStore) {
-            destinationStorage.store(inventory);
-            inventory.clear();
-        }
-        return canStore;
+
+        return actuallyRetrieved;
     }
 
     @Override
