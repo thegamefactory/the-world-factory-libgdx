@@ -14,8 +14,11 @@ import com.tgf.twf.core.world.storage.AnyResourceTypeFixedCapacity;
 import com.tgf.twf.core.world.storage.ResourceType;
 import com.tgf.twf.core.world.storage.Storage;
 import com.tgf.twf.core.world.terrain.CoastTerrainGenerator;
+import com.tgf.twf.core.world.terrain.ForrestTerrainGenerator;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Random;
 
 /**
  * Top class representing the world.
@@ -37,6 +40,7 @@ public class World implements System {
 
         geoMap = new GeoMap(size);
         new CoastTerrainGenerator().generate(geoMap);
+        new ForrestTerrainGenerator(new Random(), Rules.FORREST_RATIO).generate(geoMap);
 
         taskSystem = new TaskSystem(geoMap);
         agricultureSystem = new AgricultureSystem(taskSystem);

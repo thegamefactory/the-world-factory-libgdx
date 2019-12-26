@@ -13,6 +13,7 @@ public class Rules {
     public static final int FIELD_GROWING_DURATION = 1000;
     public static final int FIELD_FOOD_YIELD = 5;
     public static final int FOOD_TO_ENERGY_CONVERSION = 500;
+    public static final float FORREST_RATIO = 0.05f;
     public static final int HARVEST_ONE_FOOD_DURATION = 100;
     public static final int INITIAL_AGENT_COUNT = 1;
     public static final int INITIAL_FOOD_STORAGE = 5;

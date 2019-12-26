@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public enum TerrainType {
+    FORREST("forrest"),
     GRASS("grass"),
     WATER("water");
 
