@@ -8,6 +8,7 @@ public class Rules {
     public static final int AGENT_MAX_ENERGY_LEVEL = 500;
     public static final int AGENT_STORAGE_CAPACITY = 10;
     public static final int AGENT_TICKS_PER_TILE = 50;
+    public static final float BERRY_RATIO = 0.02f;
     public static final int CONSTRUCT_DURATION_PER_RESOURCE = 50;
     public static final int FARM_STORAGE_CAPACITY = 100;
     public static final int FIELD_GROWING_DURATION = 1000;
