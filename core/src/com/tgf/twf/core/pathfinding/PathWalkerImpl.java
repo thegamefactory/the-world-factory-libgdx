@@ -1,6 +1,5 @@
 package com.tgf.twf.core.pathfinding;
 
-import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.agents.Agent;
 import com.tgf.twf.core.world.rules.Rules;
@@ -85,7 +84,7 @@ public class PathWalkerImpl implements PathWalker {
         if (tickCount == Rules.AGENT_TICKS_PER_TILE / 2) {
             tickCount = 0;
             if (Event.CROSS_TILE_BORDER == nextEvent) {
-                agent.getRelatedComponent(Position.class).setPosition(nextPosition);
+                agent.setPosition(nextPosition);
                 nextEvent = Event.UPDATE_DIRECTION;
             } else {
                 updateDirection();

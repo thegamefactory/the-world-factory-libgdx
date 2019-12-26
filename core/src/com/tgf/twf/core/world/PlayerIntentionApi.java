@@ -1,7 +1,6 @@
 package com.tgf.twf.core.world;
 
 import com.tgf.twf.core.geo.GeoMap;
-import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.building.Building;
 import com.tgf.twf.core.world.building.BuildingType;
@@ -32,8 +31,7 @@ public class PlayerIntentionApi {
             return true;
         }
 
-        final Position pos = Position.from(position);
-        final Building building = Building.createEntity(buildingType, pos);
+        final Building building = Building.createEntity(buildingType, position);
         world.getTaskSystem().addActionLast(new ConstructAction(building));
         return true;
     }

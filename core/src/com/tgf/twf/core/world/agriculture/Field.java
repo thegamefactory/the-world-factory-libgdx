@@ -1,6 +1,8 @@
 package com.tgf.twf.core.world.agriculture;
 
 import com.tgf.twf.core.ecs.Component;
+import com.tgf.twf.core.geo.Vector2;
+import com.tgf.twf.core.world.building.Building;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +18,10 @@ import lombok.ToString;
 @AllArgsConstructor
 public class Field extends Component {
     private State state;
+
+    public Vector2 getPosition() {
+        return getRelatedComponent(Building.class).getPosition();
+    }
 
     public interface State {
         Class<? extends State> tick();

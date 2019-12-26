@@ -1,7 +1,6 @@
 package com.tgf.twf.core.world.agents;
 
 import com.tgf.twf.core.ecs.Component;
-import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.pathfinding.PathWalker;
@@ -24,7 +23,6 @@ import lombok.Setter;
  * An agent has a home which is a {@link Building} it's attached to and it's trying to go to to store accumulated resources and retrieved food.
  * This is meant to evolve in the future with the concept of day night cycle.
  */
-@RequiredArgsConstructor
 public class Agent extends Component {
     private final Building home;
 
@@ -39,6 +37,9 @@ public class Agent extends Component {
     @Getter
     @Setter
     private Action action;
+
+    @Getter
+    private Vector2 position;
 
     /**
      * For rendering purposes, a vector to indicate the position of the agent compared to the center of the tile. Its x and y components must remain
@@ -56,6 +57,11 @@ public class Agent extends Component {
     @Getter
     private int energy;
 
+    public Agent(final Building home, final Vector2 position) {
+        this.home = home;
+        this.position = new Vector2(position);
+    }
+
     boolean homeHasFood() {
         return home.getRelatedComponent(Storage.class).getStored(ResourceType.FOOD) > 0;
     }
@@ -69,11 +75,7 @@ public class Agent extends Component {
     }
 
     Vector2 getHomePosition() {
-        return getHome().getRelatedComponent(Position.class).toVector2();
-    }
-
-    Vector2 getPosition() {
-        return getRelatedComponent(Position.class).toVector2();
+        return getHome().getPosition();
     }
 
     Storage getStorage() {
@@ -113,11 +115,22 @@ public class Agent extends Component {
         this.pathWalker = pathWalker;
     }
 
+    public void setPosition(final Vector2 newPosition) {
+        notify(new MoveEvent(newPosition));
+        position = newPosition;
+    }
+
     int store(final ResourceType resourceType, final int quantity) {
         return getStorage().storeToCapacity(resourceType, quantity);
     }
 
     void storeEnergy(final int quantity) {
         energy = Math.min(energy + quantity, Rules.AGENT_MAX_ENERGY_LEVEL);
+    }
+
+    @RequiredArgsConstructor
+    public static class MoveEvent implements Event {
+        @Getter
+        private final Vector2 newPosition;
     }
 }

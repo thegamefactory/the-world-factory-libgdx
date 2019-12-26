@@ -1,9 +1,7 @@
 package com.tgf.twf.core.geo;
 
-import com.google.common.collect.ImmutableList;
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.Entities;
-import com.tgf.twf.core.ecs.Entity;
 import com.tgf.twf.core.world.agents.Agent;
 import com.tgf.twf.core.world.building.Building;
 import com.tgf.twf.core.world.terrain.TerrainMap;
@@ -13,7 +11,6 @@ import lombok.Getter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * A class for geographical position lookups.
@@ -22,17 +19,20 @@ import java.util.Optional;
 public class GeoMap implements TerrainMap {
     @Getter
     private final Vector2 size;
-    private final List<Entity>[] entities;
+    private final List<Agent>[] agents;
+    private final Building[] buildings;
     private final TerrainType[] terrain;
 
     public GeoMap(final Vector2 size) {
         this.size = size;
-        entities = new List[size.x * size.y];
+        agents = new List[size.x * size.y];
+        buildings = new Building[size.x * size.y];
         terrain = new TerrainType[size.x * size.y];
         Arrays.fill(terrain, TerrainType.GRASS);
 
-        Entities.registerComponentEventListener(this::handle, Position.class, Component.CreationEvent.class);
-        Entities.registerComponentEventListener(this::handle, Position.class, Position.MoveEvent.class);
+        Entities.registerComponentEventListener(this::handle, Building.class, Component.CreationEvent.class);
+        Entities.registerComponentEventListener(this::handle, Agent.class, Component.CreationEvent.class);
+        Entities.registerComponentEventListener(this::handle, Agent.class, Agent.MoveEvent.class);
     }
 
     public Building getBuildingAt(final Vector2 position) {
@@ -40,32 +40,26 @@ public class GeoMap implements TerrainMap {
     }
 
     public Building getBuildingAt(final int x, final int y) {
-        final List<Entity> entities = getEntityAt(x, y);
-
-        for (final Entity entity : entities) {
-            final Building building = entity.getComponent(Building.class);
-            if (null != building) {
-                return building;
-            }
-        }
-        return null;
+        return buildings[getIndex(x, y)];
     }
 
-    public int getAgentsAt(final int x, final int y, final Agent[] agents) {
-        final List<Entity> entities = getEntityAt(x, y);
+    public int getAgentsAt(final int x, final int y, final Agent[] agentsOut) {
+        final List<Agent> agentList = agents[x * size.y + y];
+
+        if (null == agentList) {
+            agentsOut[0] = null;
+            return 0;
+        }
 
         int i = 0;
-        for (final Entity entity : entities) {
-            final Agent agent = entity.getComponent(Agent.class);
-            if (null != agent) {
-                agents[i++] = agent;
-                if (i == agents.length) {
-                    break;
-                }
+        for (final Agent agent : agentList) {
+            agentsOut[i++] = agent;
+            if (i == agentsOut.length) {
+                break;
             }
         }
-        if (i != agents.length) {
-            agents[i] = null;
+        if (i != agentsOut.length) {
+            agentsOut[i] = null;
         }
         return i;
     }
@@ -96,25 +90,26 @@ public class GeoMap implements TerrainMap {
         return getBuildingAt(x, y) != null;
     }
 
-    public List<Entity> getEntityAt(final int x, final int y) {
-        return Optional.ofNullable(entities[x * size.y + y]).orElse(ImmutableList.of());
+    public void handle(final Building sender, final Component.CreationEvent event) {
+        final int index = getIndex(sender.getPosition().x, sender.getPosition().y);
+        buildings[index] = sender;
     }
 
-    public void handle(final Position sender, final Component.CreationEvent event) {
-        placeEntity(sender.getEntity(), sender.x, sender.y);
+    public void handle(final Agent sender, final Component.CreationEvent event) {
+        placeAgent(sender, sender.getPosition());
     }
 
-    public void handle(final Position sender, final Position.MoveEvent event) {
-        entities[getIndex(sender.x, sender.y)].remove(sender.getEntity());
-        placeEntity(sender.getEntity(), event.getNewPosition().x, event.getNewPosition().y);
+    public void handle(final Agent sender, final Agent.MoveEvent event) {
+        agents[getIndex(sender.getPosition().x, sender.getPosition().y)].remove(sender);
+        placeAgent(sender, event.getNewPosition());
     }
 
-    private void placeEntity(final Entity entity, final int x, final int y) {
-        final int index = getIndex(x, y);
-        if (entities[index] == null) {
-            entities[index] = new LinkedList<>();
+    private void placeAgent(final Agent sender, final Vector2 position) {
+        final int index = getIndex(position.x, position.y);
+        if (agents[index] == null) {
+            agents[index] = new LinkedList<>();
         }
-        entities[index].add(entity);
+        agents[index].add(sender);
     }
 
     private int getIndex(final Vector2 position) {

@@ -1,6 +1,5 @@
 package com.tgf.twf.core.pathfinding;
 
-import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.agents.Agent;
 
@@ -11,11 +10,11 @@ import java.io.Closeable;
  */
 public interface PathWalker extends Closeable {
     static PathWalker createPathWalker(final Agent agent, final Vector2 destination) {
-        final Vector2 origin = agent.getRelatedComponent(Position.class).toVector2();
+        final Vector2 origin = agent.getPosition();
         if (origin.equals(destination)) {
             return NullPathWalker.INSTANCE;
         }
-        final Path path = StraightLinePathFinder.INSTANCE.find(agent.getRelatedComponent(Position.class).toVector2(), destination);
+        final Path path = StraightLinePathFinder.INSTANCE.find(agent.getPosition(), destination);
         if (path == null) {
             return null;
         }

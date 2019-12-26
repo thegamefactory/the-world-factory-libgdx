@@ -1,6 +1,5 @@
 package com.tgf.twf.core.world.building;
 
-import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.agents.Action;
 import com.tgf.twf.core.world.agents.Agent;
@@ -18,7 +17,7 @@ public class ConstructAction implements Action {
 
     @Override
     public Vector2 getPosition() {
-        return building.getRelatedComponent(Position.class).toVector2();
+        return building.getPosition();
     }
 
     @Override

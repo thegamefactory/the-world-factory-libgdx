@@ -3,7 +3,6 @@ package com.tgf.twf.core.world;
 import com.tgf.twf.core.ecs.Entity;
 import com.tgf.twf.core.ecs.System;
 import com.tgf.twf.core.geo.GeoMap;
-import com.tgf.twf.core.geo.Position;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.agents.Agent;
 import com.tgf.twf.core.world.agents.TaskSystem;
@@ -42,15 +41,14 @@ public class World implements System {
         taskSystem = new TaskSystem(geoMap);
         agricultureSystem = new AgricultureSystem(taskSystem);
 
-        final Position initialPosition = new Position(size.x / 2, size.y / 2);
+        final Vector2 initialPosition = new Vector2(size.x / 2, size.y / 2);
         final Building farm = Building.createEntity(BuildingType.FARM, initialPosition);
         farm.setConstructed();
         farm.getRelatedComponent(Storage.class).forceStore(ResourceType.FOOD, Rules.INITIAL_FOOD_STORAGE);
 
         for (int i = 0; i < Rules.INITIAL_AGENT_COUNT; i++) {
             Entity.builder()
-                    .withComponent(new Agent(farm))
-                    .withComponent(new Position(initialPosition))
+                    .withComponent(new Agent(farm, initialPosition))
                     .withComponent(new Storage(new AnyResourceTypeFixedCapacity(Rules.AGENT_STORAGE_CAPACITY)))
                     .buildAndAttach();
         }

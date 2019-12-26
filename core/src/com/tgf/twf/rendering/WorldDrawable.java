@@ -120,7 +120,7 @@ public class WorldDrawable extends BaseDrawable {
     private void drawAgents(final Batch batch, final Agent[] agents) {
         int idleAgentCount = 0;
         for (int i = 0; i < agents.length && agents[i] != null; i++) {
-            // TODO: implementn 1:1 agent state - sprite mapping
+            // TODO: implement 1:1 agent state - sprite mapping
             if (agents[i].isIdle()) {
                 idleAgentCount++;
                 continue;
