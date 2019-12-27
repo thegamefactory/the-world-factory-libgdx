@@ -44,6 +44,10 @@ public class GeoMap implements TerrainMap {
         return buildings[getIndex(x, y)];
     }
 
+    public List<Agent> getAgentsAt(final Vector2 position) {
+        return getAgentsAt(position.x, position.y);
+    }
+
     public List<Agent> getAgentsAt(final int x, final int y) {
         final List<Agent> agentsAt = agents[x * size.y + y];
         return agentsAt == null ? ImmutableList.of() : agentsAt;

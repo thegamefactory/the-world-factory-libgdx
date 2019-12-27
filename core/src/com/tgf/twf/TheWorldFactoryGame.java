@@ -22,6 +22,7 @@ import com.tgf.twf.core.world.PlayerIntentionApi;
 import com.tgf.twf.core.world.World;
 import com.tgf.twf.core.world.building.BuildingType;
 import com.tgf.twf.core.world.rules.Rules;
+import com.tgf.twf.input.AgentSelector;
 import com.tgf.twf.input.BuildingToolButtonListener;
 import com.tgf.twf.input.GameInputProcessor;
 import com.tgf.twf.input.Tool;
@@ -81,6 +82,7 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         final BitmapFont toolTipFont = new BitmapFont();
         disposables.add(toolTipFont);
         final ToolTip toolTip = new ToolTip(coordinatesTransformer, world.getGeoMap(), toolTipFont);
+        final AgentSelector agentSelector = new AgentSelector(coordinatesTransformer, world.getGeoMap(), toolTipFont);
 
         final GameInputProcessor gameInputProcessor = new GameInputProcessor(gameStage, toolPreview, toolTip);
         renderCallbacks.add(() -> {
@@ -111,6 +113,7 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
                 .textureAtlas(textureAtlas)
                 .toolPreview(toolPreview)
                 .toolTip(toolTip)
+                .agentSelector(agentSelector)
                 .world(world)
                 .build();
         final WorldActor worldActor = new WorldActor(world, worldDrawable);

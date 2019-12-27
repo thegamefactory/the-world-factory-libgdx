@@ -45,6 +45,13 @@ public class CoordinatesTransformer {
         screen.y = (-x + y) * (tileSize.y / 2) + cameraPan.y;
     }
 
+    public void convertWorldToScreen(final Vector2f world, final Vector2f screen) {
+        final float x = world.x;
+        final float y = world.y;
+        screen.x = (x + y) * (tileSize.x / 2) + cameraPan.x;
+        screen.y = (-x + y) * (tileSize.y / 2) + cameraPan.y;
+    }
+
     public void convertScreenToWorld(final Vector2f screen, final Vector2f world) {
         final float x = screen.x;
         final float y = screen.y;

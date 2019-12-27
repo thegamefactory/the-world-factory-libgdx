@@ -128,6 +128,10 @@ public class Agent extends Component {
         energy = Math.min(energy + quantity, Rules.AGENT_MAX_ENERGY_LEVEL);
     }
 
+    public Vector2f getNonDiscretePosition() {
+        return new Vector2f(position.x + subTilePosition.x, position.y + subTilePosition.y);
+    }
+
     @RequiredArgsConstructor
     public static class MoveEvent implements Event {
         @Getter
