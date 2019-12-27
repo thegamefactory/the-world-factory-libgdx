@@ -1,5 +1,6 @@
 package com.tgf.twf.core.geo;
 
+import com.google.common.collect.ImmutableList;
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.Entities;
 import com.tgf.twf.core.world.agents.Agent;
@@ -43,25 +44,9 @@ public class GeoMap implements TerrainMap {
         return buildings[getIndex(x, y)];
     }
 
-    public int getAgentsAt(final int x, final int y, final Agent[] agentsOut) {
-        final List<Agent> agentList = agents[x * size.y + y];
-
-        if (null == agentList) {
-            agentsOut[0] = null;
-            return 0;
-        }
-
-        int i = 0;
-        for (final Agent agent : agentList) {
-            agentsOut[i++] = agent;
-            if (i == agentsOut.length) {
-                break;
-            }
-        }
-        if (i != agentsOut.length) {
-            agentsOut[i] = null;
-        }
-        return i;
+    public List<Agent> getAgentsAt(final int x, final int y) {
+        final List<Agent> agentsAt = agents[x * size.y + y];
+        return agentsAt == null ? ImmutableList.of() : agentsAt;
     }
 
     @Override

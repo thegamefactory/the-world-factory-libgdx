@@ -16,6 +16,8 @@ import com.tgf.twf.input.ToolPreview;
 import com.tgf.twf.input.ToolTip;
 import lombok.Builder;
 
+import java.util.List;
+
 /**
  * A drawable that draws the world in the given {@link Batch}.
  */
@@ -25,9 +27,9 @@ public class WorldDrawable extends BaseDrawable {
 
     private final RenderableTilesTraverser renderableTilesTraverser;
 
-    private final Sprite agent;
-    private final Sprite agentIdle;
-    private final Sprite agentCarrying;
+    private final Sprite agentSprite;
+    private final Sprite agentIdleSprite;
+    private final Sprite agentCarryingSprite;
     private final TransparentSprite[] terrainSprites;
 
     private final ToolPreview toolPreview;
@@ -52,9 +54,9 @@ public class WorldDrawable extends BaseDrawable {
         this.coordinatesTransformer = coordinatesTransformer;
         this.toolPreview = toolPreview;
         this.toolTip = toolTip;
-        this.agent = textureAtlas.createSprite("agent");
-        this.agentIdle = textureAtlas.createSprite("agent_idle");
-        this.agentCarrying = textureAtlas.createSprite("agent_carrying");
+        this.agentSprite = textureAtlas.createSprite("agent");
+        this.agentIdleSprite = textureAtlas.createSprite("agent_idle");
+        this.agentCarryingSprite = textureAtlas.createSprite("agent_carrying");
         this.terrainSprites = new TransparentSprite[TerrainType.values().length];
         for (final TerrainType terrainType : TerrainType.values()) {
             terrainSprites[terrainType.ordinal()] = new TransparentSprite(textureAtlas.createSprite(terrainType.getName() + "_tile"));
@@ -85,14 +87,13 @@ public class WorldDrawable extends BaseDrawable {
 
     private void drawBuildingAndAgents(final Batch batch) {
         final Vector2 toolPreviousPos = toolPreview.getWorldPosition();
-        final Agent[] agents = new Agent[MAX_AGENTS_RENDERED_PER_TILE];
         this.renderableTilesTraverser.forEach((pos) ->
                 {
                     final Building building = geoMap.getBuildingAt(pos);
-                    final int agentCount = geoMap.getAgentsAt(pos.x, pos.y, agents);
+                    final List<Agent> agents = geoMap.getAgentsAt(pos.x, pos.y);
                     final boolean isToolPreviewPos = toolPreviousPos.equals(pos);
 
-                    if (building == null && agentCount == 0 && !isToolPreviewPos) {
+                    if (building == null && agents.size() == 0 && !isToolPreviewPos) {
                         return;
                     }
 
@@ -117,25 +118,25 @@ public class WorldDrawable extends BaseDrawable {
         batch.draw(buildingImage, renderPos.x, renderPos.y);
     }
 
-    private void drawAgents(final Batch batch, final Agent[] agents) {
+    private void drawAgents(final Batch batch, final List<Agent> agents) {
         int idleAgentCount = 0;
-        for (int i = 0; i < agents.length && agents[i] != null; i++) {
+        for (final Agent agent : agents) {
             // TODO: implement 1:1 agent state - sprite mapping
-            if (agents[i].isIdle()) {
+            if (agent.isIdle()) {
                 idleAgentCount++;
                 continue;
             }
-            final Vector2f subTilePosition = agents[i].getSubTilePosition();
-            final boolean isCarrying = !agents[i].getRelatedComponent(Storage.class).isEmpty();
+            final Vector2f subTilePosition = agent.getSubTilePosition();
+            final boolean isCarrying = !agent.getRelatedComponent(Storage.class).isEmpty();
 
-            batch.draw(isCarrying ? agentCarrying : agent,
-                    screenPos.x + ((int) (agent.getWidth() * -0.5)) + coordinatesTransformer.convertWorldToScreenXWithoutOffset(subTilePosition),
-                    screenPos.y + (int) (agent.getHeight() * -0.5) + coordinatesTransformer.convertWorldToScreenYWithoutOffset(subTilePosition));
+            batch.draw(isCarrying ? agentCarryingSprite : agentSprite,
+                    screenPos.x + ((int) (agentSprite.getWidth() * -0.5)) + coordinatesTransformer.convertWorldToScreenXWithoutOffset(subTilePosition),
+                    screenPos.y + (int) (agentSprite.getHeight() * -0.5) + coordinatesTransformer.convertWorldToScreenYWithoutOffset(subTilePosition));
         }
         for (int i = 0; i < idleAgentCount; i++) {
-            batch.draw(agentIdle,
-                    screenPos.x + ((int) (agent.getWidth() * (i - 0.5))),
-                    screenPos.y + (int) (agent.getHeight() * -0.5));
+            batch.draw(agentIdleSprite,
+                    screenPos.x + ((int) (agentSprite.getWidth() * (i - 0.5))),
+                    screenPos.y + (int) (agentSprite.getHeight() * -0.5));
         }
     }
 }
