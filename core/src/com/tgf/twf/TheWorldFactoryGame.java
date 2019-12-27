@@ -78,11 +78,18 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
             coordinatesTransformer.centerCamera((world.getSize().x - 1) * 0.5f, (world.getSize().y - 1) * 0.5f);
         });
 
-        final ToolPreview toolPreview = new ToolPreview(Tool.NULL_TOOL, new Vector2f(), coordinatesTransformer);
-        final BitmapFont toolTipFont = new BitmapFont();
-        disposables.add(toolTipFont);
-        final ToolTip toolTip = new ToolTip(coordinatesTransformer, world.getGeoMap(), toolTipFont);
-        final AgentSelector agentSelector = new AgentSelector(coordinatesTransformer, world.getGeoMap(), toolTipFont);
+        final Vector2f mouseScreenPosition = new Vector2f();
+        final ToolPreview toolPreview = new ToolPreview(Tool.NULL_TOOL, mouseScreenPosition, coordinatesTransformer);
+        final BitmapFont defaultFont = new BitmapFont();
+        disposables.add(defaultFont);
+        final ToolTip toolTip = new ToolTip(coordinatesTransformer, world.getGeoMap(), defaultFont, mouseScreenPosition);
+        final AgentSelector agentSelector = AgentSelector.builder()
+                .coordinatesTransformer(coordinatesTransformer)
+                .geoMap(world.getGeoMap())
+                .font(defaultFont)
+                .mouseScreenPosition(mouseScreenPosition)
+                .build();
+        renderCallbacks.add(agentSelector::update);
 
         final GameInputProcessor gameInputProcessor = new GameInputProcessor(gameStage, toolPreview, toolTip);
         renderCallbacks.add(() -> {
@@ -113,7 +120,6 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
                 .textureAtlas(textureAtlas)
                 .toolPreview(toolPreview)
                 .toolTip(toolTip)
-                .agentSelector(agentSelector)
                 .world(world)
                 .build();
         final WorldActor worldActor = new WorldActor(world, worldDrawable);
@@ -122,7 +128,8 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
 
         final PlayerIntentionApi playerIntentionApi = new PlayerIntentionApi(world);
 
-        final WorldInputListener worldInputListener = new WorldInputListener(playerIntentionApi, coordinatesTransformer, toolPreview, toolTip);
+        final WorldInputListener worldInputListener = new WorldInputListener(playerIntentionApi, coordinatesTransformer, toolPreview,
+                mouseScreenPosition);
         worldActor.addListener(worldInputListener);
 
         final BuildingTextures buildingTextures = new BuildingTextures(textureAtlas);
@@ -134,19 +141,17 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         farmButton.addListener(new BuildingToolButtonListener(worldInputListener, BuildingType.FARM, playerIntentionApi, buildingTextures));
 
         final Label.LabelStyle defaultStyle = new Label.LabelStyle();
-        final BitmapFont defaultFont = new BitmapFont();
-        disposables.add(defaultFont);
         defaultStyle.font = defaultFont;
         defaultStyle.fontColor = Color.BLACK;
 
         final Label debugLabel = new Label("", defaultStyle);
         final Vector2f mouseWorld = new Vector2f();
         this.renderCallbacks.add(() -> {
-            coordinatesTransformer.convertScreenToWorld(worldInputListener.getMouseScreen(), mouseWorld);
+            coordinatesTransformer.convertScreenToWorld(mouseScreenPosition, mouseWorld);
             debugLabel.setText("fps: " + Gdx.graphics.getFramesPerSecond() +
                     "\nnativeHeap: " + Gdx.app.getNativeHeap() + "; javaHeap: " + Gdx.app.getJavaHeap() +
                     "\nmouseWorld: " + mouseWorld.friendlyFormat() +
-                    ", mouseScreen: " + worldInputListener.getMouseScreen().friendlyFormat());
+                    ", mouseScreen: " + mouseScreenPosition.friendlyFormat());
         });
 
         final Table uiLayout = new Table();

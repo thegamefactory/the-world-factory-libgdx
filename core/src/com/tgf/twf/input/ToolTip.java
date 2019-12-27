@@ -25,8 +25,7 @@ public class ToolTip {
     private final CoordinatesTransformer coordinatesTransformer;
     private final GeoMap geoMap;
     private final BitmapFont font;
-    @Setter
-    private Vector2f screenPosition = new Vector2f();
+    private final Vector2f screenPosition;
     @Setter
     private boolean isIntrospectionKeyModifierPressed = false;
 

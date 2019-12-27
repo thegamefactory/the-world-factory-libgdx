@@ -7,7 +7,6 @@ import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.PlayerIntentionApi;
 import com.tgf.twf.rendering.CoordinatesTransformer;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -18,10 +17,7 @@ public class WorldInputListener extends InputListener {
     private final PlayerIntentionApi playerIntentionApi;
     private final CoordinatesTransformer coordinatesTransformer;
     private final ToolPreview toolPreview;
-    private final ToolTip toolTip;
-
-    @Getter
-    private final Vector2f mouseScreen = new Vector2f();
+    private final Vector2f mouseScreenPosition;
 
     @Override
     public boolean touchDown(final InputEvent event, final float x, final float y, final int pointer, final int button) {
@@ -37,10 +33,8 @@ public class WorldInputListener extends InputListener {
 
     @Override
     public boolean mouseMoved(final InputEvent event, final float x, final float y) {
-        mouseScreen.x = x;
-        mouseScreen.y = y;
-        toolPreview.setScreenPosition(mouseScreen);
-        toolTip.setScreenPosition(mouseScreen);
+        mouseScreenPosition.x = x;
+        mouseScreenPosition.y = y;
         return false;
     }
 

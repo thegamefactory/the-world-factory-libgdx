@@ -15,13 +15,13 @@ import lombok.Data;
 @AllArgsConstructor
 public class ToolPreview {
     private Tool tool;
-    private Vector2f screenPosition;
+    private final Vector2f mouseScreenPosition;
     private final CoordinatesTransformer coordinatesTransformer;
 
     public void preview(final Batch batch) {
         final Vector2f renderPosition = new Vector2f();
         final Vector2 worldPosition = new Vector2();
-        coordinatesTransformer.convertScreenToWorld(screenPosition, worldPosition);
+        coordinatesTransformer.convertScreenToWorld(mouseScreenPosition, worldPosition);
         coordinatesTransformer.convertWorldToRender(worldPosition, renderPosition);
         final boolean isSuccess = tool.execute(worldPosition, ExecutionMode.DRY_RUN);
         if (isSuccess) {
@@ -35,7 +35,7 @@ public class ToolPreview {
 
     public Vector2 getWorldPosition() {
         final Vector2 worldPosition = new Vector2();
-        coordinatesTransformer.convertScreenToWorld(screenPosition, worldPosition);
+        coordinatesTransformer.convertScreenToWorld(mouseScreenPosition, worldPosition);
         return worldPosition;
     }
 }

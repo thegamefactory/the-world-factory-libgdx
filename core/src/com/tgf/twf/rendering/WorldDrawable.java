@@ -12,7 +12,6 @@ import com.tgf.twf.core.world.agents.Agent;
 import com.tgf.twf.core.world.building.Building;
 import com.tgf.twf.core.world.storage.Storage;
 import com.tgf.twf.core.world.terrain.TerrainType;
-import com.tgf.twf.input.AgentSelector;
 import com.tgf.twf.input.ToolPreview;
 import com.tgf.twf.input.ToolTip;
 import lombok.Builder;
@@ -35,7 +34,6 @@ public class WorldDrawable extends BaseDrawable {
 
     private final ToolPreview toolPreview;
     private final ToolTip toolTip;
-    private final AgentSelector agentSelector;
 
     final Vector2 worldSize;
     final Vector2 pos = new Vector2();
@@ -48,14 +46,12 @@ public class WorldDrawable extends BaseDrawable {
             final CoordinatesTransformer coordinatesTransformer,
             final ToolPreview toolPreview,
             final ToolTip toolTip,
-            final AgentSelector agentSelector,
             final TextureAtlas textureAtlas) {
         this.geoMap = world.getGeoMap();
         this.worldSize = world.getSize();
         this.coordinatesTransformer = coordinatesTransformer;
         this.toolPreview = toolPreview;
         this.toolTip = toolTip;
-        this.agentSelector = agentSelector;
         this.agentSprite = textureAtlas.createSprite("agent");
         this.agentIdleSprite = textureAtlas.createSprite("agent_idle");
         this.agentCarryingSprite = textureAtlas.createSprite("agent_carrying");
@@ -74,7 +70,6 @@ public class WorldDrawable extends BaseDrawable {
         drawTerrain(batch);
         drawBuildingAndAgents(batch);
         toolTip.render(batch);
-        agentSelector.render(batch);
     }
 
     private void drawTerrain(final Batch batch) {

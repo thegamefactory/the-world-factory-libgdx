@@ -21,6 +21,7 @@ public class WorldActor extends Image {
     @Override
     public void act(final float delta) {
         super.act(delta);
+
         ellapsed += delta;
         while (ellapsed > Rules.TICKS_PERIOD) {
             ellapsed -= Rules.TICKS_PERIOD;
