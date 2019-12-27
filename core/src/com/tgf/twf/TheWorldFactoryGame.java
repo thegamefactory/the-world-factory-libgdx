@@ -84,9 +84,10 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
 
         final GameInputProcessor gameInputProcessor = new GameInputProcessor(gameStage, toolPreview, toolTip);
         renderCallbacks.add(() -> {
-            gameStage.act(Gdx.graphics.getDeltaTime() * (float) Math.pow(2, gameInputProcessor.getSpeedFactor()));
+            gameStage.act(Gdx.graphics.getDeltaTime() * gameInputProcessor.getGameSpeed().getSpeedFactor());
             gameStage.draw();
         });
+
         renderCallbacks.add(() ->
                 coordinatesTransformer.pan(
                         CAMERA_SPEED_PIXELS_PER_SECONDS * gameInputProcessor.getHorizontalSpeed() * Gdx.graphics.getDeltaTime(),

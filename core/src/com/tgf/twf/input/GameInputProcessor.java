@@ -29,7 +29,7 @@ public class GameInputProcessor implements InputProcessor {
     private boolean isDownPressed = false;
 
     @Getter
-    private int speedFactor = 0;
+    private final GameSpeed gameSpeed = new GameSpeed();
 
     public GameInputProcessor(final InputProcessor delegate, final ToolPreview toolPreview, final ToolTip toolTip) {
         this.delegate = delegate;
@@ -104,13 +104,19 @@ public class GameInputProcessor implements InputProcessor {
             toolTip.setIntrospectionKeyModifierPressed(isPressed);
             return true;
         }
-        if (keycode == Input.Keys.valueOf("]") || keycode == Input.Keys.PLUS) {
-            speedFactor++;
-            return true;
-        }
-        if (keycode == Input.Keys.valueOf("[") || keycode == Input.Keys.MINUS) {
-            speedFactor--;
-            return true;
+        if (isPressed) {
+            if (keycode == Input.Keys.P) {
+                gameSpeed.togglePause();
+                return true;
+            }
+            if (keycode == Input.Keys.valueOf("]") || keycode == Input.Keys.PLUS) {
+                gameSpeed.increaseSpeed();
+                return true;
+            }
+            if (keycode == Input.Keys.valueOf("[") || keycode == Input.Keys.MINUS) {
+                gameSpeed.decreaseSpeed();
+                return true;
+            }
         }
         return false;
     }
