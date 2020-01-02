@@ -1,7 +1,6 @@
 package com.tgf.twf.core.world.agents;
 
 import com.tgf.twf.core.world.building.Building;
-import com.tgf.twf.core.world.rules.Rules;
 import com.tgf.twf.core.world.storage.ResourceType;
 import com.tgf.twf.core.world.storage.Storage;
 
@@ -17,9 +16,8 @@ public class EatingAgentState implements AgentState {
 
     @Override
     public AgentState tick(final Agent agent, final AgentStateTickContext agentStateTickContext) {
-        if (agent.getEatenFood() >= Rules.AGENT_FOOD_CONSUMPTION_PER_DAY) {
-            agent.resetEatenFood();
-            return SleepingAgentState.INSTANCE;
+        if (!agent.isHungry()) {
+            return IdleAgentState.INSTANCE;
         }
 
         final Building building = agentStateTickContext.getGeoMap().getBuildingAt(agent.getPosition());
@@ -35,8 +33,7 @@ public class EatingAgentState implements AgentState {
 
         final int retrieved = storage.retrieveToEmpty(ResourceType.FOOD, 1);
         if (retrieved == 0) {
-            // TODO: handle deadlock
-            return null;
+            return IdleAgentState.INSTANCE;
         }
 
         agent.eat(retrieved);

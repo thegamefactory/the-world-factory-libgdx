@@ -5,6 +5,7 @@ import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.pathfinding.PathWalker;
 import com.tgf.twf.core.world.building.Building;
+import com.tgf.twf.core.world.rules.Rules;
 import com.tgf.twf.core.world.storage.ResourceType;
 import com.tgf.twf.core.world.storage.Storage;
 import lombok.Getter;
@@ -54,15 +55,11 @@ public class Agent extends Component {
     private PathWalker pathWalker;
 
     @Getter
-    private int eatenFood;
+    private int food = Rules.AGENT_MAX_FOOD;
 
     public Agent(final Building home, final Vector2 position) {
         this.home = home;
         this.position = new Vector2(position);
-    }
-
-    int getFood() {
-        return getStorage().getStored(ResourceType.FOOD);
     }
 
     Building getHome() {
@@ -93,12 +90,16 @@ public class Agent extends Component {
         }
     }
 
-    public void eat(final int foodQuantity) {
-        this.eatenFood += foodQuantity;
+    public boolean isHungry() {
+        return this.food < Rules.AGENT_MAX_FOOD;
     }
 
-    public void resetEatenFood() {
-        this.eatenFood = 0;
+    public void increaseHunger(final int foodRequired) {
+        this.food -= foodRequired;
+    }
+
+    public void eat(final int foodQuantity) {
+        this.food += foodQuantity;
     }
 
     public void setPathWalker(final PathWalker pathWalker) {

@@ -23,7 +23,7 @@ public class MoveToHomeAgentState implements AgentState {
 
         if (agent.getPathWalker().walk()) {
             agent.setPathWalker(null);
-            return EatingAgentState.INSTANCE;
+            return SleepingAgentState.INSTANCE;
         }
 
         return null;
