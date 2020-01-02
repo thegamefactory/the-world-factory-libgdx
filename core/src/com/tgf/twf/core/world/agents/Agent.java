@@ -1,6 +1,7 @@
 package com.tgf.twf.core.world.agents;
 
 import com.tgf.twf.core.ecs.Component;
+import com.tgf.twf.core.geo.GeoMap;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.pathfinding.PathWalker;
@@ -62,6 +63,10 @@ public class Agent extends Component {
         this.position = new Vector2(position);
     }
 
+    public void eat(final int foodQuantity) {
+        this.food += foodQuantity;
+    }
+
     Building getHome() {
         return home;
     }
@@ -70,8 +75,32 @@ public class Agent extends Component {
         return getHome().getPosition();
     }
 
+    Storage getHomeStorage() {
+        return getHome().getRelatedComponent(Storage.class);
+    }
+
     Storage getStorage() {
         return getRelatedComponent(Storage.class);
+    }
+
+    Storage getBuildingStorageLocatedHere(final GeoMap geoMap) {
+        final Building building = geoMap.getBuildingAt(getPosition());
+        if (building == null) {
+            return null;
+        }
+        return building.getRelatedComponent(Storage.class);
+    }
+
+    boolean isAnyStoredResourceFull() {
+        return getStorage().isAnyResourceFull();
+    }
+
+    public boolean isHome() {
+        return this.position.equals(getHomePosition());
+    }
+
+    public boolean isHungry() {
+        return this.food < Rules.AGENT_MAX_FOOD;
     }
 
     public boolean isIdle() {
@@ -82,8 +111,8 @@ public class Agent extends Component {
         return getStorage().isEmpty();
     }
 
-    boolean isAnyStoredResourceFull() {
-        return getStorage().isAnyResourceFull();
+    public void increaseHunger(final int foodRequired) {
+        this.food -= foodRequired;
     }
 
     public int retrieve(final ResourceType resourceType, final int quantity) {
@@ -92,18 +121,6 @@ public class Agent extends Component {
         } else {
             return getStorage().retrieveToEmpty(resourceType, quantity);
         }
-    }
-
-    public boolean isHungry() {
-        return this.food < Rules.AGENT_MAX_FOOD;
-    }
-
-    public void increaseHunger(final int foodRequired) {
-        this.food -= foodRequired;
-    }
-
-    public void eat(final int foodQuantity) {
-        this.food += foodQuantity;
     }
 
     public void setPathWalker(final PathWalker pathWalker) {

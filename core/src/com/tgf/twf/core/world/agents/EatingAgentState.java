@@ -1,11 +1,10 @@
 package com.tgf.twf.core.world.agents;
 
-import com.tgf.twf.core.world.building.Building;
 import com.tgf.twf.core.world.storage.ResourceType;
 import com.tgf.twf.core.world.storage.Storage;
 
 /**
- * A {@link AgentState} in which the {@link Agent} consumes its food and gets energy for that.
+ * A {@link AgentState} in which the {@link Agent} consumes food from the storage at the current location.
  */
 public class EatingAgentState implements AgentState {
     private EatingAgentState() {
@@ -20,14 +19,8 @@ public class EatingAgentState implements AgentState {
             return IdleAgentState.INSTANCE;
         }
 
-        final Building building = agentStateTickContext.getGeoMap().getBuildingAt(agent.getPosition());
-        if (building == null) {
-            // TODO: remove agent
-            return null;
-        }
-        final Storage storage = building.getRelatedComponent(Storage.class);
+        final Storage storage = agent.getBuildingStorageLocatedHere(agentStateTickContext.getGeoMap());
         if (storage == null) {
-            // TODO: remove agent
             return null;
         }
 

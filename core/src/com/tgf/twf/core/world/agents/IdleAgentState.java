@@ -2,6 +2,7 @@ package com.tgf.twf.core.world.agents;
 
 import com.tgf.twf.core.pathfinding.PathWalker;
 import com.tgf.twf.core.world.daytimesystem.Daytime;
+import com.tgf.twf.core.world.storage.ResourceType;
 
 /**
  * A {@link AgentState} in which the {@link Agent} rests and replenishes its energy slowly.
@@ -16,8 +17,22 @@ public class IdleAgentState implements AgentState {
 
     @Override
     public AgentState tick(final Agent agent, final AgentStateTickContext agentStateTickContext) {
-        if (Daytime.INSTANCE.isNight()) {
+        final boolean isHome = agent.isHome();
+
+        if (Daytime.INSTANCE.isNight() && !isHome) {
             return MoveToHomeAgentState.INSTANCE;
+        }
+
+        if (isHome && !agent.isStorageEmpty() && agent.getHomeStorage().acceptAny(agent.getStorage())) {
+            return StoringFoodAgentState.INSTANCE;
+        }
+
+        if (Daytime.INSTANCE.isNight() && isHome) {
+            return SleepingAgentState.INSTANCE;
+        }
+
+        if (isHome && agent.isHungry() && agent.getHomeStorage().getStored(ResourceType.FOOD) > 0) {
+            return EatingAgentState.INSTANCE;
         }
 
         if (agent.isAnyStoredResourceFull()) {

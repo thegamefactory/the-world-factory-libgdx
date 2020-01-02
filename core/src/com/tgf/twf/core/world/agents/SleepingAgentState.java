@@ -12,7 +12,7 @@ public class SleepingAgentState implements AgentState {
     @Override
     public AgentState tick(final Agent agent, final AgentStateTickContext agentStateTickContext) {
         if (Daytime.INSTANCE.isDay()) {
-            return EatingAgentState.INSTANCE;
+            return IdleAgentState.INSTANCE;
         }
 
         return null;

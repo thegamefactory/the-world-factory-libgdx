@@ -83,6 +83,15 @@ public class Storage extends Component {
         return actuallyRetrieved;
     }
 
+    /**
+     * @param other The tested {@link Storage}
+     * @return True if any of the resource types contained in the other storage can be stored in this storage.
+     */
+    public boolean acceptAny(final Storage other) {
+        return other.inventory.getStoredResourceTypes().stream()
+                .anyMatch(resourceType -> getCapacity().getRemainingCapacity(inventory, resourceType) > 0);
+    }
+
     @Override
     public String toString() {
         return super.toString() + "(capacity=" + capacity + ", inventory=" + inventory + ")";
