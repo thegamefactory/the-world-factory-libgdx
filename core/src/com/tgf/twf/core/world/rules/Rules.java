@@ -17,5 +17,7 @@ public class Rules {
     public static final int INITIAL_FOOD_STORAGE = 5;
     public static final int PLANT_TOTAL_DURATION = 500;
     public static final float TICKS_PERIOD = 0.02f;
+    public static final int TICKS_PER_DAY = 3000;
+    public static final int TICKS_PER_NIGHT = 1000;
     public static final Vector2 WORLD_SIZE = new Vector2(15, 15);
 }

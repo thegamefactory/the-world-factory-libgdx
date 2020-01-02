@@ -1,6 +1,7 @@
 package com.tgf.twf.core.world.agents;
 
 import com.tgf.twf.core.pathfinding.PathWalker;
+import com.tgf.twf.core.world.daytimesystem.Daytime;
 
 /**
  * A {@link AgentState} in which the {@link Agent} rests and replenishes its energy slowly.
@@ -15,6 +16,10 @@ public class IdleAgentState implements AgentState {
 
     @Override
     public AgentState tick(final Agent agent, final AgentStateTickContext agentStateTickContext) {
+        if (Daytime.INSTANCE.isNight()) {
+            return MoveToHomeAgentState.INSTANCE;
+        }
+
         if (agent.isAnyStoredResourceFull()) {
             // TODO - break assumption home == closest available storage
             // TODO - check that the picked storage can accept the resources before trying to go there (maybe?) or at least break the infinite
