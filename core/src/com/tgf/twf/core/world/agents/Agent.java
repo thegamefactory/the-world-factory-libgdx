@@ -78,6 +78,10 @@ public class Agent extends Component {
         return action == null && pathWalker == null;
     }
 
+    boolean isStorageEmpty() {
+        return getStorage().isEmpty();
+    }
+
     boolean isAnyStoredResourceFull() {
         return getStorage().isAnyResourceFull();
     }
