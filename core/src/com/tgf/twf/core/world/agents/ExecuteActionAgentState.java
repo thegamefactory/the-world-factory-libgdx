@@ -12,13 +12,9 @@ public class ExecuteActionAgentState implements AgentState {
 
     @Override
     public AgentState tick(final Agent agent, final AgentStateTickContext agentStateTickContext) {
-        if (1 == agent.retrieveEnergy(1) && agent.getAction().tick(agent)) {
+        if (agent.getAction().tick(agent)) {
             agent.setAction(null);
             return IdleAgentState.INSTANCE;
-        }
-
-        if (agent.getEnergy() == 0) {
-            return EatingAgentState.INSTANCE;
         }
 
         return null;

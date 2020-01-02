@@ -1,7 +1,6 @@
 package com.tgf.twf.core.world.agents;
 
 import com.tgf.twf.core.world.building.Building;
-import com.tgf.twf.core.world.rules.Rules;
 import com.tgf.twf.core.world.storage.ResourceType;
 import com.tgf.twf.core.world.storage.Storage;
 
@@ -17,10 +16,6 @@ public class StoringFoodAgentState implements AgentState {
 
     @Override
     public AgentState tick(final Agent agent, final AgentStateTickContext agentStateTickContext) {
-        if (agent.getFood() <= Rules.AGENT_IDEAL_FOOD_LEVEL) {
-            return IdleAgentState.INSTANCE;
-        }
-
         final Building building = agentStateTickContext.getGeoMap().getBuildingAt(agent.getPosition());
         if (building == null) {
             return IdleAgentState.INSTANCE;
@@ -31,6 +26,10 @@ public class StoringFoodAgentState implements AgentState {
         }
 
         final int quantity = agent.retrieve(ResourceType.FOOD, 1);
+        if (quantity == 0) {
+            return IdleAgentState.INSTANCE;
+        }
+
         final int stored = storage.storeToCapacity(ResourceType.FOOD, quantity);
         if (stored != quantity) {
             agent.store(ResourceType.FOOD, quantity - stored);

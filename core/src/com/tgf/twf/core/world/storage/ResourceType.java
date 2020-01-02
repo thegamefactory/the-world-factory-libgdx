@@ -8,7 +8,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 @RequiredArgsConstructor
 public enum ResourceType {
-    FOOD;
+    FOOD,
+    WORK_UNIT;
 
     private final String name = StringUtils.capitalize(this.name().toLowerCase());
 
