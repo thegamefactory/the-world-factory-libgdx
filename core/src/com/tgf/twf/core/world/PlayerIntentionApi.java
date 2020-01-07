@@ -32,7 +32,7 @@ public class PlayerIntentionApi {
         }
 
         final Building building = Building.createEntity(buildingType, position);
-        world.getTaskSystem().addActionLast(new ConstructAction(building));
+        world.getAgentSystem().addActionLast(new ConstructAction(building));
         return true;
     }
 }

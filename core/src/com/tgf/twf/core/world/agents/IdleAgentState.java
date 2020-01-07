@@ -35,6 +35,11 @@ public class IdleAgentState implements AgentState {
             return EatingAgentState.INSTANCE;
         }
 
+        if (isHome && agent.isStarving()) {
+            // TODO: maybe handle case where the agent still has resources
+            return DecomissioningAgentState.INSTANCE;
+        }
+
         if (agent.isAnyStoredResourceFull()) {
             if (tryMoveToStorage(agent)) {
                 return MoveToFoodStorageAgentState.INSTANCE;
@@ -43,7 +48,7 @@ public class IdleAgentState implements AgentState {
 
         Action nextAction = agent.getAction();
         if (null == nextAction) {
-            nextAction = agentStateTickContext.getTaskSystem().removeFirstAction();
+            nextAction = agentStateTickContext.getAgentSystem().removeFirstAction();
         }
 
         if (nextAction != null) {
@@ -53,7 +58,7 @@ public class IdleAgentState implements AgentState {
                 agent.setPathWalker(pathWalker);
                 return MoveToActionAgentState.INSTANCE;
             } else {
-                agentStateTickContext.getTaskSystem().addActionLast(nextAction);
+                agentStateTickContext.getAgentSystem().addActionLast(nextAction);
             }
         }
 

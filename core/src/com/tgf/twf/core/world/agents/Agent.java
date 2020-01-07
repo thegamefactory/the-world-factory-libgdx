@@ -102,6 +102,10 @@ public class Agent extends Component {
         this.food += foodQuantity;
     }
 
+    public boolean isStarving() {
+        return this.food <= 0;
+    }
+
     boolean isStorageEmpty() {
         return getStorage().isEmpty();
     }

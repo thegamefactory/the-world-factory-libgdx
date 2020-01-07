@@ -5,7 +5,7 @@ import com.tgf.twf.core.ecs.System;
 import com.tgf.twf.core.geo.GeoMap;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.agents.Agent;
-import com.tgf.twf.core.world.agents.TaskSystem;
+import com.tgf.twf.core.world.agents.AgentSystem;
 import com.tgf.twf.core.world.agriculture.AgricultureSystem;
 import com.tgf.twf.core.world.building.Building;
 import com.tgf.twf.core.world.building.BuildingType;
@@ -34,7 +34,7 @@ public class World implements System {
     private final GeoMap geoMap;
 
     @Getter
-    private final TaskSystem taskSystem;
+    private final AgentSystem agentSystem;
     private final AgricultureSystem agricultureSystem;
 
     public World(final Vector2 size) {
@@ -45,8 +45,8 @@ public class World implements System {
         new BerryTerrainGenerator(new Random(), Rules.BERRY_RATIO).generate(geoMap);
         new ForrestTerrainGenerator(new Random(), Rules.FORREST_RATIO).generate(geoMap);
 
-        taskSystem = new TaskSystem(geoMap);
-        agricultureSystem = new AgricultureSystem(taskSystem);
+        agentSystem = new AgentSystem(geoMap);
+        agricultureSystem = new AgricultureSystem(agentSystem);
 
         final Vector2 initialPosition = new Vector2(size.x / 2, size.y / 2);
         final Building farm = Building.createEntity(BuildingType.FARM, initialPosition);
@@ -64,7 +64,7 @@ public class World implements System {
     @Override
     public void tick() {
         agricultureSystem.tick();
-        taskSystem.tick();
+        agentSystem.tick();
         Daytime.INSTANCE.tick();
     }
 }

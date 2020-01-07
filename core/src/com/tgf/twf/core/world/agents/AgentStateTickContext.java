@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AgentStateTickContext {
     @Getter
-    private final TaskSystem taskSystem;
+    private final AgentSystem agentSystem;
 
     @Getter
     private final GeoMap geoMap;

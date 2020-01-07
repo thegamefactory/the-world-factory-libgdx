@@ -82,6 +82,16 @@ public class Entities {
         components.forEach(this::sendComponentAttachedEvents);
     }
 
+    void detachEntity(final Entity entity) {
+        if (!entities.containsKey(entity.getEntityId())) {
+            throw new IllegalArgumentException("No such entity: " + entity.getEntityId());
+        }
+
+        final List<Component> components = ImmutableList.copyOf(entity.getComponents());
+        components.forEach(this::sendComponentDetachedEvents);
+        entities.remove(entity.getEntityId(), entity);
+    }
+
     <ComponentT extends Component> void attachComponent(final ComponentT component) {
         if (isComponentEntityAttached(component)) {
             sendComponentAttachedEvents(component);
@@ -95,6 +105,11 @@ public class Entities {
     private <ComponentT extends Component> void sendComponentAttachedEvents(final ComponentT component) {
         componentEventListeners.get(new ComponentEventKey(component.getClass(), Component.CreationEvent.class))
                 .forEach(l -> l.handle(component, Component.CreationEvent.INSTANCE));
+    }
+
+    private <ComponentT extends Component> void sendComponentDetachedEvents(final ComponentT component) {
+        componentEventListeners.get(new ComponentEventKey(component.getClass(), Component.DeletionEvent.class))
+                .forEach(l -> l.handle(component, Component.DeletionEvent.INSTANCE));
     }
 
     public boolean notify(final Component sender, final Component.Event event) {

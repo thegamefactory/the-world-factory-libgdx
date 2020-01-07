@@ -3,8 +3,8 @@ package com.tgf.twf.core.world.agriculture;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.agents.Action;
 import com.tgf.twf.core.world.agents.Agent;
+import com.tgf.twf.core.world.agents.AgentSystem;
 import com.tgf.twf.core.world.agents.CyclicAction;
-import com.tgf.twf.core.world.agents.TaskSystem;
 import com.tgf.twf.core.world.rules.Rules;
 import com.tgf.twf.core.world.storage.ResourceType;
 import com.tgf.twf.core.world.storage.Storage;
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class GrownState implements Field.State {
     private boolean isComplete = false;
-    private final TaskSystem taskSystem;
+    private final AgentSystem agentSystem;
     private final Vector2 fieldPosition;
     private final Storage fieldStorage;
 
@@ -30,7 +30,7 @@ public class GrownState implements Field.State {
     @Override
     public void onStateEnter() {
         fieldStorage.storeToCapacity(ResourceType.FOOD, Rules.FIELD_FOOD_YIELD);
-        taskSystem.addActionLast(buildHarvestAction());
+        agentSystem.addActionLast(buildHarvestAction());
     }
 
     private Action buildHarvestAction() {

@@ -60,6 +60,16 @@ public abstract class Component {
     }
 
     /**
+     * An {@link Event} generated when a component is deleted.
+     */
+    public static final class DeletionEvent implements Event {
+        private DeletionEvent() {
+        }
+
+        static DeletionEvent INSTANCE = new DeletionEvent();
+    }
+
+    /**
      * An interface that any class who want to be notified for {@link Event}s need to implement.
      * The listener must register itself to events via {@link Entities#registerComponentEventListener(EventListener, Class, Class)}
      *

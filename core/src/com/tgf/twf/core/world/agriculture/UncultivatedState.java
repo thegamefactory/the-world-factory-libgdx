@@ -2,8 +2,8 @@ package com.tgf.twf.core.world.agriculture;
 
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.world.agents.Agent;
+import com.tgf.twf.core.world.agents.AgentSystem;
 import com.tgf.twf.core.world.agents.CyclicAction;
-import com.tgf.twf.core.world.agents.TaskSystem;
 import com.tgf.twf.core.world.rules.Rules;
 import lombok.RequiredArgsConstructor;
 
@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UncultivatedState implements Field.State {
     private boolean isComplete = false;
-    private final TaskSystem taskSystem;
+    private final AgentSystem agentSystem;
     private final Vector2 fieldPosition;
 
     @Override
@@ -25,7 +25,7 @@ public class UncultivatedState implements Field.State {
 
     @Override
     public void onStateEnter() {
-        taskSystem.addActionLast(new PlantAction());
+        agentSystem.addActionLast(new PlantAction());
     }
 
     class PlantAction extends CyclicAction {

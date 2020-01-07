@@ -3,7 +3,7 @@ package com.tgf.twf.core.world.agriculture;
 import com.google.common.collect.ImmutableMap;
 import com.tgf.twf.core.ecs.Entities;
 import com.tgf.twf.core.ecs.System;
-import com.tgf.twf.core.world.agents.TaskSystem;
+import com.tgf.twf.core.world.agents.AgentSystem;
 import com.tgf.twf.core.world.building.Building;
 import com.tgf.twf.core.world.building.BuildingType;
 import com.tgf.twf.core.world.rules.Rules;
@@ -18,17 +18,17 @@ import java.util.function.Function;
  */
 public class AgricultureSystem implements System {
     private final List<Field> fields = new LinkedList<>();
-    private final TaskSystem taskSystem;
+    private final AgentSystem agentSystem;
 
     private final ImmutableMap<Class<? extends Field.State>, Function<Field, Field.State>> stateFactories;
 
-    public AgricultureSystem(final TaskSystem taskSystem) {
-        this.taskSystem = taskSystem;
+    public AgricultureSystem(final AgentSystem agentSystem) {
+        this.agentSystem = agentSystem;
         this.stateFactories = ImmutableMap.of(
-                UncultivatedState.class, field -> new UncultivatedState(taskSystem, field.getPosition()),
+                UncultivatedState.class, field -> new UncultivatedState(agentSystem, field.getPosition()),
                 GrowingState.class, field -> new GrowingState(Rules.FIELD_GROWING_DURATION),
                 GrownState.class, field -> new GrownState(
-                        taskSystem,
+                        agentSystem,
                         field.getPosition(),
                         field.getRelatedComponent(Storage.class))
         );
@@ -37,7 +37,7 @@ public class AgricultureSystem implements System {
 
     public void handle(final Building sender, final Building.ConstructedEvent event) {
         if (sender.getBuildingType() == BuildingType.FIELD) {
-            final UncultivatedState uncultivatedState = new UncultivatedState(taskSystem, sender.getPosition());
+            final UncultivatedState uncultivatedState = new UncultivatedState(agentSystem, sender.getPosition());
             final Field field = new Field(uncultivatedState);
             fields.add(field);
             sender.getEntity().attachComponent(field);

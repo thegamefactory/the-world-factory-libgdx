@@ -34,6 +34,7 @@ public class GeoMap implements TerrainMap {
 
         Entities.registerComponentEventListener(this::handle, Building.class, Component.CreationEvent.class);
         Entities.registerComponentEventListener(this::handle, Agent.class, Component.CreationEvent.class);
+        Entities.registerComponentEventListener(this::handle, Agent.class, Component.DeletionEvent.class);
         Entities.registerComponentEventListener(this::handle, Agent.class, Agent.MoveEvent.class);
     }
 
@@ -94,9 +95,17 @@ public class GeoMap implements TerrainMap {
         placeAgent(sender, sender.getPosition());
     }
 
+    public void handle(final Agent sender, final Component.DeletionEvent event) {
+        removeAgent(sender);
+    }
+
     public void handle(final Agent sender, final Agent.MoveEvent event) {
-        agents[getIndex(sender.getPosition().x, sender.getPosition().y)].remove(sender);
+        removeAgent(sender);
         placeAgent(sender, event.getNewPosition());
+    }
+
+    private void removeAgent(final Agent sender) {
+        agents[getIndex(sender.getPosition().x, sender.getPosition().y)].remove(sender);
     }
 
     private void placeAgent(final Agent sender, final Vector2 position) {

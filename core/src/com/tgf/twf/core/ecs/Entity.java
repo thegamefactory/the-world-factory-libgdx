@@ -71,6 +71,10 @@ public class Entity {
         Entities.getInstance().attachComponent(component);
     }
 
+    public void detach() {
+        Entities.getInstance().detachEntity(this);
+    }
+
     public static Builder builder() {
         return new Builder();
     }
