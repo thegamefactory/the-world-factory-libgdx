@@ -15,7 +15,7 @@ public class StoringFoodAgentState implements AgentState {
 
     @Override
     public AgentState tick(final Agent agent, final AgentStateTickContext agentStateTickContext) {
-        final Storage storage = agent.getBuildingStorageLocatedHere(agentStateTickContext.getGeoMap());
+        final Storage storage = agentStateTickContext.getGeoMap().getStorageAt(agent.getPosition());
         if (storage == null) {
             return IdleAgentState.INSTANCE;
         }

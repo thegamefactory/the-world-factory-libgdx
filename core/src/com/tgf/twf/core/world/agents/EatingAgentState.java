@@ -19,7 +19,7 @@ public class EatingAgentState implements AgentState {
             return IdleAgentState.INSTANCE;
         }
 
-        final Storage storage = agent.getBuildingStorageLocatedHere(agentStateTickContext.getGeoMap());
+        final Storage storage = agentStateTickContext.getGeoMap().getStorageAt(agent.getPosition());
         if (storage == null) {
             return null;
         }
@@ -29,7 +29,7 @@ public class EatingAgentState implements AgentState {
             return IdleAgentState.INSTANCE;
         }
 
-        agent.eat(retrieved);
+        agent.increaseFood(retrieved);
         return null;
     }
 }

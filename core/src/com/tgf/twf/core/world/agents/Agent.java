@@ -1,7 +1,6 @@
 package com.tgf.twf.core.world.agents;
 
 import com.tgf.twf.core.ecs.Component;
-import com.tgf.twf.core.geo.GeoMap;
 import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.pathfinding.PathWalker;
@@ -63,8 +62,8 @@ public class Agent extends Component {
         this.position = new Vector2(position);
     }
 
-    public void eat(final int foodQuantity) {
-        this.food += foodQuantity;
+    public void decreaseFood(final int foodRequired) {
+        this.food -= foodRequired;
     }
 
     Building getHome() {
@@ -83,14 +82,6 @@ public class Agent extends Component {
         return getRelatedComponent(Storage.class);
     }
 
-    Storage getBuildingStorageLocatedHere(final GeoMap geoMap) {
-        final Building building = geoMap.getBuildingAt(getPosition());
-        if (building == null) {
-            return null;
-        }
-        return building.getRelatedComponent(Storage.class);
-    }
-
     boolean isAnyStoredResourceFull() {
         return getStorage().isAnyResourceFull();
     }
@@ -107,12 +98,12 @@ public class Agent extends Component {
         return action == null && pathWalker == null;
     }
 
-    boolean isStorageEmpty() {
-        return getStorage().isEmpty();
+    public void increaseFood(final int foodQuantity) {
+        this.food += foodQuantity;
     }
 
-    public void increaseHunger(final int foodRequired) {
-        this.food -= foodRequired;
+    boolean isStorageEmpty() {
+        return getStorage().isEmpty();
     }
 
     public int retrieve(final ResourceType resourceType, final int quantity) {

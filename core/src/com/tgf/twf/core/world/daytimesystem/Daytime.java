@@ -19,7 +19,7 @@ public class Daytime implements System {
         ticksToday++;
         if (ticksToday == Rules.TICKS_PER_DAY) {
             Entities.allComponents(Agent.class)
-                    .forEach(agent -> agent.increaseHunger(Rules.AGENT_FOOD_EATEN_PER_DAY));
+                    .forEach(agent -> agent.decreaseFood(Rules.AGENT_FOOD_EATEN_PER_DAY));
         }
         ticksToday = ticksToday % (Rules.TICKS_PER_DAY + Rules.TICKS_PER_NIGHT);
     }
