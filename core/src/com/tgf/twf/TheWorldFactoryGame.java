@@ -21,6 +21,7 @@ import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.PlayerIntentionApi;
 import com.tgf.twf.core.world.World;
 import com.tgf.twf.core.world.building.BuildingType;
+import com.tgf.twf.core.world.daytimesystem.Daytime;
 import com.tgf.twf.core.world.rules.Rules;
 import com.tgf.twf.input.BuildingToolButtonListener;
 import com.tgf.twf.input.GameInputProcessor;
@@ -162,7 +163,11 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
 
     @Override
     public void render() {
-        Gdx.gl.glClearColor(0.5f, 0.5f, 0.5f, 1);
+        if (Daytime.INSTANCE.isDay()) {
+            Gdx.gl.glClearColor(0.5f, 0.5f, 0.5f, 1);
+        } else {
+            Gdx.gl.glClearColor(0f, 0f, 0f, 1);
+        }
         Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
 
         for (final RenderCallback renderCallback : renderCallbacks) {

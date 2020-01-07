@@ -5,6 +5,7 @@ import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.pathfinding.PathWalker;
 import com.tgf.twf.core.world.building.Building;
+import com.tgf.twf.core.world.rules.Rules;
 import com.tgf.twf.core.world.storage.ResourceType;
 import com.tgf.twf.core.world.storage.Storage;
 import lombok.Getter;
@@ -54,15 +55,15 @@ public class Agent extends Component {
     private PathWalker pathWalker;
 
     @Getter
-    private int eatenFood;
+    private int food = Rules.AGENT_MAX_FOOD;
 
     public Agent(final Building home, final Vector2 position) {
         this.home = home;
         this.position = new Vector2(position);
     }
 
-    int getFood() {
-        return getStorage().getStored(ResourceType.FOOD);
+    public void decreaseFood(final int foodRequired) {
+        this.food -= foodRequired;
     }
 
     Building getHome() {
@@ -73,16 +74,36 @@ public class Agent extends Component {
         return getHome().getPosition();
     }
 
+    Storage getHomeStorage() {
+        return getHome().getRelatedComponent(Storage.class);
+    }
+
     Storage getStorage() {
         return getRelatedComponent(Storage.class);
+    }
+
+    boolean isAnyStoredResourceFull() {
+        return getStorage().isAnyResourceFull();
+    }
+
+    public boolean isHome() {
+        return this.position.equals(getHomePosition());
+    }
+
+    public boolean isHungry() {
+        return this.food < Rules.AGENT_MAX_FOOD;
     }
 
     public boolean isIdle() {
         return action == null && pathWalker == null;
     }
 
-    boolean isAnyStoredResourceFull() {
-        return getStorage().isAnyResourceFull();
+    public void increaseFood(final int foodQuantity) {
+        this.food += foodQuantity;
+    }
+
+    boolean isStorageEmpty() {
+        return getStorage().isEmpty();
     }
 
     public int retrieve(final ResourceType resourceType, final int quantity) {
@@ -91,14 +112,6 @@ public class Agent extends Component {
         } else {
             return getStorage().retrieveToEmpty(resourceType, quantity);
         }
-    }
-
-    public void eat(final int foodQuantity) {
-        this.eatenFood += foodQuantity;
-    }
-
-    public void resetEatenFood() {
-        this.eatenFood = 0;
     }
 
     public void setPathWalker(final PathWalker pathWalker) {

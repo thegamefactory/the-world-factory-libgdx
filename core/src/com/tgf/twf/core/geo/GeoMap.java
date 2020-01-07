@@ -5,6 +5,7 @@ import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.Entities;
 import com.tgf.twf.core.world.agents.Agent;
 import com.tgf.twf.core.world.building.Building;
+import com.tgf.twf.core.world.storage.Storage;
 import com.tgf.twf.core.world.terrain.TerrainMap;
 import com.tgf.twf.core.world.terrain.TerrainType;
 import lombok.Getter;
@@ -43,6 +44,15 @@ public class GeoMap implements TerrainMap {
     public Building getBuildingAt(final int x, final int y) {
         return buildings[getIndex(x, y)];
     }
+
+    public Storage getStorageAt(final Vector2 position) {
+        final Building building = getBuildingAt(position);
+        if (building == null) {
+            return null;
+        }
+        return building.getRelatedComponent(Storage.class);
+    }
+
 
     public List<Agent> getAgentsAt(final int x, final int y) {
         final List<Agent> agentsAt = agents[x * size.y + y];

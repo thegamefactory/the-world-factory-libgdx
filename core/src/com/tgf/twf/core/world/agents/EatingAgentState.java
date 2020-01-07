@@ -1,9 +1,10 @@
 package com.tgf.twf.core.world.agents;
 
-import com.tgf.twf.core.world.rules.Rules;
+import com.tgf.twf.core.world.storage.ResourceType;
+import com.tgf.twf.core.world.storage.Storage;
 
 /**
- * A {@link AgentState} in which the {@link Agent} consumes its food and gets energy for that.
+ * A {@link AgentState} in which the {@link Agent} consumes food from the storage at the current location.
  */
 public class EatingAgentState implements AgentState {
     private EatingAgentState() {
@@ -14,16 +15,21 @@ public class EatingAgentState implements AgentState {
 
     @Override
     public AgentState tick(final Agent agent, final AgentStateTickContext agentStateTickContext) {
-        if (agent.getFood() == 0 || agent.getEnergy() + Rules.FOOD_TO_ENERGY_CONVERSION > Rules.AGENT_MAX_ENERGY_LEVEL) {
-            if (agent.getEnergy() > 0 && agent.getAction() != null) {
-                return ExecuteActionAgentState.INSTANCE;
-            } else {
-                return IdleAgentState.INSTANCE;
-            }
+        if (!agent.isHungry()) {
+            return IdleAgentState.INSTANCE;
         }
 
-        final int removedFood = agent.retrieveFood(1);
-        agent.storeEnergy(removedFood * Rules.FOOD_TO_ENERGY_CONVERSION);
+        final Storage storage = agentStateTickContext.getGeoMap().getStorageAt(agent.getPosition());
+        if (storage == null) {
+            return null;
+        }
+
+        final int retrieved = storage.retrieveToEmpty(ResourceType.FOOD, 1);
+        if (retrieved == 0) {
+            return IdleAgentState.INSTANCE;
+        }
+
+        agent.increaseFood(retrieved);
         return null;
     }
 }

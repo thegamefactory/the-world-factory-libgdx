@@ -9,6 +9,7 @@ import com.tgf.twf.core.world.agents.TaskSystem;
 import com.tgf.twf.core.world.agriculture.AgricultureSystem;
 import com.tgf.twf.core.world.building.Building;
 import com.tgf.twf.core.world.building.BuildingType;
+import com.tgf.twf.core.world.daytimesystem.Daytime;
 import com.tgf.twf.core.world.rules.Rules;
 import com.tgf.twf.core.world.storage.AnyResourceTypeFixedCapacity;
 import com.tgf.twf.core.world.storage.ResourceType;
@@ -64,5 +65,6 @@ public class World implements System {
     public void tick() {
         agricultureSystem.tick();
         taskSystem.tick();
+        Daytime.INSTANCE.tick();
     }
 }
