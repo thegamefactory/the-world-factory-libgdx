@@ -3,8 +3,11 @@ package com.tgf.twf.core.world.building;
 import com.tgf.twf.core.ecs.Component;
 import com.tgf.twf.core.ecs.Entity;
 import com.tgf.twf.core.geo.Vector2;
+import com.tgf.twf.core.world.home.Home;
 import com.tgf.twf.core.world.storage.Storage;
 import lombok.Getter;
+
+import java.util.Optional;
 
 /**
  * A component state modeling a live instance of a {@link BuildingType}.
@@ -29,10 +32,15 @@ public class Building extends Component {
 
     public static Building createEntity(final BuildingType buildingType, final Vector2 position) {
         final Building building = new Building(buildingType, position);
-        Entity.builder()
+        final Entity.Builder entityBuilder = Entity.builder()
                 .withComponent(building)
-                .withComponent(new Storage(buildingType.getCapacity()))
-                .buildAndAttach();
+                .withComponent(new Storage());
+
+        if (buildingType.getAgentCapacity() > 0) {
+            entityBuilder.withComponent(new Home());
+        }
+
+        entityBuilder.buildAndAttach();
         return building;
     }
 
@@ -42,6 +50,9 @@ public class Building extends Component {
 
     public void setConstructed() {
         if (!BuildingState.CONSTRUCTED.equals(buildingState)) {
+            Optional.ofNullable(getRelatedComponent(Storage.class)).ifPresent(storage -> storage.setCapacity(buildingType.getCapacity()));
+            Optional.ofNullable(getRelatedComponent(Home.class)).ifPresent(home -> home.setAgentCapacity(buildingType.getAgentCapacity()));
+
             buildingState = BuildingState.CONSTRUCTED;
             notify(ConstructedEvent.INSTANCE);
         }

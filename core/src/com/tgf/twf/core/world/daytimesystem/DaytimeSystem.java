@@ -5,14 +5,8 @@ import com.tgf.twf.core.ecs.System;
 import com.tgf.twf.core.world.agents.Agent;
 import com.tgf.twf.core.world.rules.Rules;
 
-public class Daytime implements System {
+public class DaytimeSystem implements System {
     private int ticksToday;
-
-    private Daytime() {
-
-    }
-
-    public static Daytime INSTANCE = new Daytime();
 
     @Override
     public void tick() {

@@ -1,7 +1,5 @@
 package com.tgf.twf.core.world.agents;
 
-import com.tgf.twf.core.world.daytimesystem.Daytime;
-
 public class SleepingAgentState implements AgentState {
     private SleepingAgentState() {
 
@@ -11,7 +9,7 @@ public class SleepingAgentState implements AgentState {
 
     @Override
     public AgentState tick(final Agent agent, final AgentStateTickContext agentStateTickContext) {
-        if (Daytime.INSTANCE.isDay()) {
+        if (agentStateTickContext.isDay()) {
             return IdleAgentState.INSTANCE;
         }
 

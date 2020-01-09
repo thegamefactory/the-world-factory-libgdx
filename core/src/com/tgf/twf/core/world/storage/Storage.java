@@ -8,13 +8,28 @@ import lombok.Getter;
  * The capacity of the storage is modeled in {@link Capacity}, while the actual stock is modeled in the {@link Inventory}.
  */
 public class Storage extends Component {
-    private final MutableInventory inventory;
+    private MutableInventory inventory;
+
     @Getter
-    private final Capacity capacity;
+    private Capacity capacity;
+
+    public Storage() {
+        this(NoCapacity.INSTANCE);
+    }
 
     public Storage(final Capacity capacity) {
         this.capacity = capacity;
         this.inventory = capacity.buildMutableInventory();
+    }
+
+    public void setCapacity(final Capacity newCapacity) {
+        if (newCapacity.getClass() != capacity.getClass()) {
+            if (inventory.getTotalStoredQuantity() != 0) {
+                throw new IllegalStateException("Cannot change capacity class, inventory is not empty");
+            }
+            this.inventory = newCapacity.buildMutableInventory();
+        }
+        this.capacity = newCapacity;
     }
 
     public int getStored(final ResourceType resourceType) {

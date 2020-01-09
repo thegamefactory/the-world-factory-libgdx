@@ -1,7 +1,6 @@
 package com.tgf.twf.core.world.agents;
 
 import com.tgf.twf.core.pathfinding.PathWalker;
-import com.tgf.twf.core.world.daytimesystem.Daytime;
 import com.tgf.twf.core.world.storage.ResourceType;
 
 /**
@@ -19,7 +18,7 @@ public class IdleAgentState implements AgentState {
     public AgentState tick(final Agent agent, final AgentStateTickContext agentStateTickContext) {
         final boolean isHome = agent.isHome();
 
-        if (Daytime.INSTANCE.isNight() && !isHome) {
+        if (agentStateTickContext.isNight() && !isHome) {
             return MoveToHomeAgentState.INSTANCE;
         }
 
@@ -27,7 +26,7 @@ public class IdleAgentState implements AgentState {
             return StoringFoodAgentState.INSTANCE;
         }
 
-        if (Daytime.INSTANCE.isNight() && isHome) {
+        if (agentStateTickContext.isNight() && isHome) {
             return SleepingAgentState.INSTANCE;
         }
 
@@ -37,7 +36,7 @@ public class IdleAgentState implements AgentState {
 
         if (isHome && agent.isStarving()) {
             // TODO: maybe handle case where the agent still has resources
-            return DecomissioningAgentState.INSTANCE;
+            return StarvingAgentState.INSTANCE;
         }
 
         if (agent.isAnyStoredResourceFull()) {

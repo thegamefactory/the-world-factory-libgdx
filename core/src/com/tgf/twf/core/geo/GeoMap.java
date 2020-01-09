@@ -86,20 +86,20 @@ public class GeoMap implements TerrainMap {
         return getBuildingAt(x, y) != null;
     }
 
-    public void handle(final Building sender, final Component.CreationEvent event) {
+    private void handle(final Building sender, final Component.CreationEvent event) {
         final int index = getIndex(sender.getPosition().x, sender.getPosition().y);
         buildings[index] = sender;
     }
 
-    public void handle(final Agent sender, final Component.CreationEvent event) {
+    private void handle(final Agent sender, final Component.CreationEvent event) {
         placeAgent(sender, sender.getPosition());
     }
 
-    public void handle(final Agent sender, final Component.DeletionEvent event) {
+    private void handle(final Agent sender, final Component.DeletionEvent event) {
         removeAgent(sender);
     }
 
-    public void handle(final Agent sender, final Agent.MoveEvent event) {
+    private void handle(final Agent sender, final Agent.MoveEvent event) {
         removeAgent(sender);
         placeAgent(sender, event.getNewPosition());
     }

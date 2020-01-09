@@ -12,13 +12,16 @@ import lombok.Getter;
  */
 @Builder
 public class BuildingType {
-    public static final BuildingType FARM = BuildingType.builder()
+    public static final BuildingType FARMHOUSE = BuildingType.builder()
+            .agentCapacity(Rules.MAX_AGENTS_PER_FARMHOUSE)
             .costResourceType(ResourceType.WORK_UNIT)
             .costQuantity(20)
             .capacity(new SingleResourceTypeCapacity(ResourceType.FOOD, Rules.FARM_STORAGE_CAPACITY))
-            .name("Farm")
+            .name("Farmhouse")
             .build();
+
     public static final BuildingType FIELD = BuildingType.builder()
+            .agentCapacity(0)
             .costResourceType(ResourceType.WORK_UNIT)
             .costQuantity(10)
             .capacity(new SingleResourceTypeCapacity(ResourceType.FOOD, Rules.FIELD_FOOD_YIELD))
@@ -32,4 +35,6 @@ public class BuildingType {
     private final Capacity capacity;
     @Getter
     private final String name;
+    @Getter
+    private final int agentCapacity;
 }

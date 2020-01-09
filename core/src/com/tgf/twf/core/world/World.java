@@ -1,31 +1,28 @@
 package com.tgf.twf.core.world;
 
-import com.tgf.twf.core.ecs.Entity;
 import com.tgf.twf.core.ecs.System;
 import com.tgf.twf.core.geo.GeoMap;
 import com.tgf.twf.core.geo.Vector2;
-import com.tgf.twf.core.world.agents.Agent;
 import com.tgf.twf.core.world.agents.AgentSystem;
 import com.tgf.twf.core.world.agriculture.AgricultureSystem;
 import com.tgf.twf.core.world.building.Building;
 import com.tgf.twf.core.world.building.BuildingType;
-import com.tgf.twf.core.world.daytimesystem.Daytime;
+import com.tgf.twf.core.world.daytimesystem.DaytimeSystem;
+import com.tgf.twf.core.world.home.Home;
+import com.tgf.twf.core.world.home.HomeSystem;
 import com.tgf.twf.core.world.rules.Rules;
-import com.tgf.twf.core.world.storage.AnyResourceTypeFixedCapacity;
 import com.tgf.twf.core.world.storage.ResourceType;
 import com.tgf.twf.core.world.storage.Storage;
 import com.tgf.twf.core.world.terrain.BerryTerrainGenerator;
 import com.tgf.twf.core.world.terrain.CoastTerrainGenerator;
 import com.tgf.twf.core.world.terrain.ForrestTerrainGenerator;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Random;
 
 /**
  * Top class representing the world.
  */
-@RequiredArgsConstructor
 public class World implements System {
     @Getter
     private final Vector2 size;
@@ -35,9 +32,15 @@ public class World implements System {
 
     @Getter
     private final AgentSystem agentSystem;
+
     private final AgricultureSystem agricultureSystem;
 
-    public World(final Vector2 size) {
+    @Getter
+    private final DaytimeSystem daytimeSystem;
+
+    private final HomeSystem homeSystem;
+
+    public World(final Vector2 size, final DaytimeSystem daytimeSystem) {
         this.size = size;
 
         geoMap = new GeoMap(size);
@@ -45,26 +48,28 @@ public class World implements System {
         new BerryTerrainGenerator(new Random(), Rules.BERRY_RATIO).generate(geoMap);
         new ForrestTerrainGenerator(new Random(), Rules.FORREST_RATIO).generate(geoMap);
 
-        agentSystem = new AgentSystem(geoMap);
+        this.daytimeSystem = daytimeSystem;
+        agentSystem = new AgentSystem(daytimeSystem, geoMap);
         agricultureSystem = new AgricultureSystem(agentSystem);
+        homeSystem = new HomeSystem();
 
         final Vector2 initialPosition = new Vector2(size.x / 2, size.y / 2);
-        final Building farm = Building.createEntity(BuildingType.FARM, initialPosition);
-        farm.setConstructed();
-        farm.getRelatedComponent(Storage.class).forceStore(ResourceType.FOOD, Rules.INITIAL_FOOD_STORAGE);
+        final Building farmhouse = Building.createEntity(BuildingType.FARMHOUSE, initialPosition);
 
+        farmhouse.setConstructed();
+        farmhouse.getRelatedComponent(Storage.class).forceStore(ResourceType.FOOD, Rules.INITIAL_FOOD_STORAGE);
+
+        final Home home = farmhouse.getRelatedComponent(Home.class);
         for (int i = 0; i < Rules.INITIAL_AGENT_COUNT; i++) {
-            Entity.builder()
-                    .withComponent(new Agent(farm, initialPosition))
-                    .withComponent(new Storage(new AnyResourceTypeFixedCapacity(Rules.AGENT_STORAGE_CAPACITY)))
-                    .buildAndAttach();
+            homeSystem.createAgent(home);
         }
     }
 
     @Override
     public void tick() {
+        daytimeSystem.tick();
         agricultureSystem.tick();
         agentSystem.tick();
-        Daytime.INSTANCE.tick();
+        homeSystem.tick();
     }
 }

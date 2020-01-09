@@ -21,7 +21,7 @@ import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.world.PlayerIntentionApi;
 import com.tgf.twf.core.world.World;
 import com.tgf.twf.core.world.building.BuildingType;
-import com.tgf.twf.core.world.daytimesystem.Daytime;
+import com.tgf.twf.core.world.daytimesystem.DaytimeSystem;
 import com.tgf.twf.core.world.rules.Rules;
 import com.tgf.twf.input.BuildingToolButtonListener;
 import com.tgf.twf.input.GameInputProcessor;
@@ -70,7 +70,18 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         });
         disposables.add(gameStage);
 
-        final World world = new World(Rules.WORLD_SIZE);
+        final DaytimeSystem daytimeSystem = new DaytimeSystem();
+        this.renderCallbacks.add(
+                () -> {
+                    if (daytimeSystem.isDay()) {
+                        Gdx.gl.glClearColor(0.5f, 0.5f, 0.5f, 1);
+                    } else {
+                        Gdx.gl.glClearColor(0f, 0f, 0f, 1);
+                    }
+                    Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
+                }
+        );
+        final World world = new World(Rules.WORLD_SIZE, daytimeSystem);
 
         final CoordinatesTransformer coordinatesTransformer = CoordinatesTransformer.ofTileSize(TILE_SIZE);
         resizeCallbacks.add((width, height) -> {
@@ -129,7 +140,7 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
         fieldButton.addListener(new BuildingToolButtonListener(worldInputListener, BuildingType.FIELD, playerIntentionApi, buildingTextures));
         final Sprite farmButtonTexture = textureAtlas.createSprite("farm_button");
         final ImageButton farmButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(farmButtonTexture)));
-        farmButton.addListener(new BuildingToolButtonListener(worldInputListener, BuildingType.FARM, playerIntentionApi, buildingTextures));
+        farmButton.addListener(new BuildingToolButtonListener(worldInputListener, BuildingType.FARMHOUSE, playerIntentionApi, buildingTextures));
 
         final Label.LabelStyle defaultStyle = new Label.LabelStyle();
         final BitmapFont defaultFont = new BitmapFont();
@@ -163,13 +174,6 @@ public class TheWorldFactoryGame extends ApplicationAdapter {
 
     @Override
     public void render() {
-        if (Daytime.INSTANCE.isDay()) {
-            Gdx.gl.glClearColor(0.5f, 0.5f, 0.5f, 1);
-        } else {
-            Gdx.gl.glClearColor(0f, 0f, 0f, 1);
-        }
-        Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
-
         for (final RenderCallback renderCallback : renderCallbacks) {
             renderCallback.render();
         }

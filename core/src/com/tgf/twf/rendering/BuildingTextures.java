@@ -49,7 +49,7 @@ public class BuildingTextures {
     }
 
     public TransparentSprite getBuildingTextureForPreview(final BuildingType buildingType) {
-        if (buildingType.equals(BuildingType.FARM)) {
+        if (buildingType.equals(BuildingType.FARMHOUSE)) {
             return farm;
         }
         if (buildingType.equals(BuildingType.FIELD)) {
@@ -83,7 +83,7 @@ public class BuildingTextures {
 
     private TransparentSprite getConstructedBuildingTexture(final Building building) {
         final BuildingType buildingType = building.getBuildingType();
-        if (buildingType.equals(BuildingType.FARM)) {
+        if (buildingType.equals(BuildingType.FARMHOUSE)) {
             return farm;
         }
         if (buildingType.equals(BuildingType.FIELD)) {

@@ -5,6 +5,7 @@ import com.tgf.twf.core.geo.Vector2;
 import com.tgf.twf.core.geo.Vector2f;
 import com.tgf.twf.core.pathfinding.PathWalker;
 import com.tgf.twf.core.world.building.Building;
+import com.tgf.twf.core.world.home.Home;
 import com.tgf.twf.core.world.rules.Rules;
 import com.tgf.twf.core.world.storage.ResourceType;
 import com.tgf.twf.core.world.storage.Storage;
@@ -24,7 +25,7 @@ import lombok.Setter;
  * This is meant to evolve in the future with the concept of day night cycle.
  */
 public class Agent extends Component {
-    private final Building home;
+    private final Home home;
 
     @Getter
     @Setter
@@ -39,7 +40,7 @@ public class Agent extends Component {
     private Action action;
 
     @Getter
-    private Vector2 position;
+    private final Vector2 position;
 
     /**
      * For rendering purposes, a vector to indicate the position of the agent compared to the center of the tile. Its x and y components must remain
@@ -57,7 +58,7 @@ public class Agent extends Component {
     @Getter
     private int food = Rules.AGENT_MAX_FOOD;
 
-    public Agent(final Building home, final Vector2 position) {
+    public Agent(final Home home, final Vector2 position) {
         this.home = home;
         this.position = new Vector2(position);
     }
@@ -66,15 +67,15 @@ public class Agent extends Component {
         this.food -= foodRequired;
     }
 
-    Building getHome() {
+    public Home getHome() {
         return home;
     }
 
     Vector2 getHomePosition() {
-        return getHome().getPosition();
+        return getHome().getRelatedComponent(Building.class).getPosition();
     }
 
-    Storage getHomeStorage() {
+    public Storage getHomeStorage() {
         return getHome().getRelatedComponent(Storage.class);
     }
 
@@ -127,7 +128,8 @@ public class Agent extends Component {
 
     public void setPosition(final Vector2 newPosition) {
         notify(new MoveEvent(newPosition));
-        position = newPosition;
+        position.x = newPosition.x;
+        position.y = newPosition.y;
     }
 
     int store(final ResourceType resourceType, final int quantity) {
